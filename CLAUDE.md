@@ -23,7 +23,7 @@ npm run lint     # Run ESLint
 | Backend | Next.js API routes |
 | Database & Storage | Supabase (PostgreSQL + Storage) |
 | CDN | Cloudflare R2 |
-| Auth | Clerk (magic links) |
+| Auth | Supabase Auth (magic links) |
 | AI | OpenAI GPT-4o (tribute generation), Claude Sonnet (photo captions), Gemini Flash (vision analysis) |
 | Payments | Stripe Checkout + Customer Portal |
 | Print-on-Demand | Gelato API (primary), Printful (backup) |
@@ -41,7 +41,7 @@ npm run lint     # Run ESLint
 ### Database Schema (Key Tables)
 
 ```sql
-users: id, email, clerk_id, created_at
+users: id (references auth.users), email, created_at
 memorials: id, user_id, pet_name, slug, birth_date, death_date, eulogy, decision_support_used, template, is_paid, is_published, auto_approve_memories, created_at, updated_at
 photos: id, memorial_id, url, caption, ai_detected_tags, sort_order, uploaded_by, created_at
 memories: id, memorial_id, contributor_name, contributor_email, content, photo_urls, is_approved, moderation_status, created_at, approved_at
