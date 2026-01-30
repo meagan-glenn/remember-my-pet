@@ -116,7 +116,7 @@ export async function POST(request: Request) {
       slug,
       birth_date: birthDate || null,
       death_date: deathDate || null,
-      eulogy: tribute.slice(0, MAX_TRIBUTE),
+      tribute: tribute.slice(0, MAX_TRIBUTE),
       is_paid: false,
       is_published: false,
     })
