@@ -15,25 +15,6 @@ function CreateMemorialInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // Resume from auth redirect (e.g. ?step=3)
-  useEffect(() => {
-    const step = searchParams.get("step");
-    if (step && wizard.hydrated) {
-      const stepNum = parseInt(step, 10);
-      if (stepNum >= 1 && stepNum <= 4) {
-        wizard.updateState({ currentStep: stepNum });
-      }
-    }
-  }, [searchParams, wizard.hydrated]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  if (!wizard.hydrated) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-amber-500 border-t-transparent" />
-      </div>
-    );
-  }
-
   const handleSave = useCallback(async () => {
     const res = await fetch("/api/memorial", {
       method: "POST",
@@ -63,6 +44,25 @@ function CreateMemorialInner() {
     wizard.reset();
     router.push(`/dashboard?created=${slug}`);
   }, [wizard.petDetails, wizard.generatedTribute, wizard.photos, wizard.reset, router]);
+
+  // Resume from auth redirect (e.g. ?step=3)
+  useEffect(() => {
+    const step = searchParams.get("step");
+    if (step && wizard.hydrated) {
+      const stepNum = parseInt(step, 10);
+      if (stepNum >= 1 && stepNum <= 4) {
+        wizard.updateState({ currentStep: stepNum });
+      }
+    }
+  }, [searchParams, wizard.hydrated]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  if (!wizard.hydrated) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-amber-500 border-t-transparent" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white py-8 px-4">
