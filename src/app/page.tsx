@@ -7,16 +7,23 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Heart, Camera, Users, Film, ArrowRight, PawPrint } from "lucide-react";
 
+const OPENING_QUESTIONS = [
+  (name: string) => `What's your favorite memory with ${name}?`,
+  (name: string) => `What made ${name} special to you?`,
+  (name: string) => `What's something about ${name} that always made you smile?`,
+  (name: string) => `What would you want people to know about ${name}?`,
+  (name: string) => `What's a moment with ${name} you'll never forget?`,
+];
+
+function pickOpeningQuestion() {
+  return OPENING_QUESTIONS[Math.floor(Math.random() * OPENING_QUESTIONS.length)];
+}
+
 const CONVERSATION_STEPS = [
   {
     question: (name: string) =>
       `I'm so sorry about ${name}. What kind of animal was ${name}?`,
     options: ["Dog", "Cat", "Other"],
-  },
-  {
-    question: (name: string) =>
-      `What's one thing you never want to forget about ${name}?`,
-    options: null,
   },
 ];
 
@@ -46,6 +53,7 @@ export default function Home() {
   const [userInput, setUserInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [species, setSpecies] = useState("");
+  const [openingQuestion] = useState(() => pickOpeningQuestion());
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -57,6 +65,7 @@ export default function Home() {
     if (!petName.trim()) return;
     setStarted(true);
     setIsTyping(true);
+    // Longer delay to feel like a real person pausing before responding
     setTimeout(() => {
       setIsTyping(false);
       setMessages([
@@ -65,7 +74,7 @@ export default function Home() {
           content: CONVERSATION_STEPS[0].question(petName.trim()),
         },
       ]);
-    }, 1200);
+    }, 2000);
   };
 
   const handleSpeciesSelect = (selected: string) => {
@@ -82,10 +91,10 @@ export default function Home() {
         ...prev,
         {
           role: "assistant",
-          content: CONVERSATION_STEPS[1].question(petName.trim()),
+          content: openingQuestion(petName.trim()),
         },
       ]);
-    }, 1000);
+    }, 1500);
   };
 
   const handleMemorySubmit = (e: React.FormEvent) => {

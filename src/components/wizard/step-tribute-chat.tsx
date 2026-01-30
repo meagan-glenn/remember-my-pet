@@ -25,10 +25,11 @@ interface StepTributeChatProps {
   };
   chatMessages: { role: "assistant" | "user"; content: string }[];
   generatedTribute: string;
+  homepageMemory?: string;
   onAddMessage: (message: { role: "assistant" | "user"; content: string }) => void;
   onSetTribute: (tribute: string) => void;
-  onNext: () => void;
-  onBack: () => void;
+  onNext?: () => void;
+  onBack?: () => void;
 }
 
 export function StepTributeChat({
@@ -38,6 +39,7 @@ export function StepTributeChat({
   generatedTribute,
   onAddMessage,
   onSetTribute,
+  homepageMemory,
   onNext,
   onBack,
 }: StepTributeChatProps) {
@@ -122,7 +124,14 @@ export function StepTributeChat({
               : petDetails.species,
           birthDate: petDetails.birthDate,
           deathDate: petDetails.deathDate,
-          chatHistory: chatMessages.filter((m) => m.content !== "(skipped)"),
+          chatHistory: [
+            // Include homepage memory as context if available
+            ...(homepageMemory ? [
+              { role: "assistant" as const, content: "Tell me a memory about " + (petDetails.petName || "your pet") + "." },
+              { role: "user" as const, content: homepageMemory },
+            ] : []),
+            ...chatMessages.filter((m) => m.content !== "(skipped)"),
+          ],
         }),
       });
 
@@ -283,14 +292,16 @@ export function StepTributeChat({
             )}
 
             {/* Back button */}
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={onBack}
-              className="w-full text-gray-500"
-            >
-              Back
-            </Button>
+            {onBack && (
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={onBack}
+                className="w-full text-gray-500"
+              >
+                Back
+              </Button>
+            )}
           </>
         )}
       </div>
