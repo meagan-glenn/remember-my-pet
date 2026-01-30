@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import {
   saveHeroFile,
   loadHeroFile,
@@ -27,20 +27,19 @@ export interface WizardPhoto {
   sortOrder: number;
 }
 
-export interface WizardState {
-  currentStep: number;
+export interface MemorialState {
   petDetails: PetDetails;
   photos: WizardPhoto[];
   chatMessages: { role: "assistant" | "user"; content: string }[];
   generatedTribute: string;
   memorialId: string;
+  homepageMemory: string;
 }
 
 const STORAGE_KEY = "petmemorial-wizard-state";
 const SAVE_DEBOUNCE_MS = 500;
 
-const initialState: WizardState = {
-  currentStep: 1,
+const initialState: MemorialState = {
   petDetails: {
     petName: "",
     species: "dog",
@@ -53,20 +52,24 @@ const initialState: WizardState = {
   chatMessages: [],
   generatedTribute: "",
   memorialId: "",
+  homepageMemory: "",
 };
 
-function loadState(): WizardState {
+function loadState(): MemorialState {
   if (typeof window === "undefined") return initialState;
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (!stored) return initialState;
-    return { ...initialState, ...JSON.parse(stored) };
+    // Destructure out currentStep from old wizard state for backward compat
+    const { currentStep: _currentStep, ...rest } = JSON.parse(stored);
+    void _currentStep;
+    return { ...initialState, ...rest };
   } catch {
     return initialState;
   }
 }
 
-function saveState(state: WizardState) {
+function saveState(state: MemorialState) {
   if (typeof window === "undefined") return;
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -75,12 +78,14 @@ function saveState(state: WizardState) {
   }
 }
 
-export function useMemorialWizard() {
-  const [state, setState] = useState<WizardState>(initialState);
+export function useMemorialState() {
+  const [state, setState] = useState<MemorialState>(initialState);
   const [hydrated, setHydrated] = useState(false);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const stateRef = useRef(state);
-  stateRef.current = state;
+  useEffect(() => {
+    stateRef.current = state;
+  });
 
   // File refs for deferred upload (not serializable)
   const heroPhotoFileRef = useRef<File | null>(null);
@@ -102,6 +107,10 @@ export function useMemorialWizard() {
               petName: seed.petName,
               species: seed.species || loaded.petDetails.species,
             };
+          }
+          // Store homepage memory for tribute integration
+          if (seed.memory && !loaded.homepageMemory) {
+            loaded.homepageMemory = seed.memory;
           }
         }
       } catch {
@@ -165,30 +174,6 @@ export function useMemorialWizard() {
       flush();
     };
   }, []);
-
-  const updateState = useCallback(
-    (partial: Partial<WizardState>) =>
-      setState((prev) => ({ ...prev, ...partial })),
-    []
-  );
-
-  const nextStep = useCallback(
-    () =>
-      setState((prev) => ({
-        ...prev,
-        currentStep: Math.min(prev.currentStep + 1, 4),
-      })),
-    []
-  );
-
-  const previousStep = useCallback(
-    () =>
-      setState((prev) => ({
-        ...prev,
-        currentStep: Math.max(prev.currentStep - 1, 1),
-      })),
-    []
-  );
 
   const updatePetDetails = useCallback(
     (details: Partial<PetDetails>) =>
@@ -274,6 +259,12 @@ export function useMemorialWizard() {
     []
   );
 
+  const setHomepageMemory = useCallback(
+    (memory: string) =>
+      setState((prev) => ({ ...prev, homepageMemory: memory })),
+    []
+  );
+
   const reset = useCallback(() => {
     setState(initialState);
     if (typeof window !== "undefined") {
@@ -282,26 +273,36 @@ export function useMemorialWizard() {
     }
   }, []);
 
-  return {
-    currentStep: state.currentStep,
-    petDetails: state.petDetails,
-    photos: state.photos,
-    chatMessages: state.chatMessages,
-    generatedTribute: state.generatedTribute,
-    memorialId: state.memorialId,
-    hydrated,
-    heroPhotoFileRef,
-    photoFilesRef,
-    nextStep,
-    previousStep,
-    updateState,
-    updatePetDetails,
-    addPhoto,
-    removePhoto,
-    reorderPhotos,
-    addChatMessage,
-    setTribute,
-    setHeroPhotoFile,
-    reset,
-  };
+  const actions = useMemo(
+    () => ({
+      updatePetDetails,
+      addPhoto,
+      removePhoto,
+      reorderPhotos,
+      addChatMessage,
+      setTribute,
+      setHeroPhotoFile,
+      setHomepageMemory,
+      reset,
+    }),
+    [updatePetDetails, addPhoto, removePhoto, reorderPhotos, addChatMessage, setTribute, setHeroPhotoFile, setHomepageMemory, reset]
+  );
+
+  return useMemo(
+    () => ({
+      petDetails: state.petDetails,
+      photos: state.photos,
+      chatMessages: state.chatMessages,
+      generatedTribute: state.generatedTribute,
+      memorialId: state.memorialId,
+      homepageMemory: state.homepageMemory,
+      hydrated,
+      heroPhotoFileRef,
+      photoFilesRef,
+      ...actions,
+    }),
+    [state, hydrated, actions]
+  );
 }
+
+export type MemorialStateValue = ReturnType<typeof useMemorialState>;

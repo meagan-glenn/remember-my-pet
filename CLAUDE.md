@@ -78,6 +78,15 @@ contributors: id, memorial_id, email, name, became_creator, created_at
 - **Trust signals**: Privacy promise, no timers, permanent hosting
 - **Header**: Paw print logo icon, serif branding, simplified nav
 - **localStorage bridge**: Saves pet name/species/memory as `petmemorial-wizard-seed` for wizard pickup
+- **Wizard seed consumption**: Wizard hook reads `petmemorial-wizard-seed` on hydration, pre-fills pet name and species
+
+### Client-Side Photo Previews & Deferred Upload
+- **No auth required to create**: Users build the entire memorial (including photos) without signing in
+- **Blob URL previews**: Photos use `URL.createObjectURL()` for instant client-side preview (raw `<img>` tags, not Next.js `Image`)
+- **IndexedDB persistence**: File objects stored in IndexedDB (`src/lib/photo-store.ts`) to survive auth redirects
+- **Deferred upload flow**: On Save → upload files to `/api/upload` → get Supabase URLs → POST to `/api/memorial`
+- **Auth redirect**: If unauthenticated at save time, redirects to `/sign-in?redirect=/create?step=4`; wizard state (localStorage) + files (IndexedDB) persist across the redirect
+- **URL validation**: `/api/memorial` rejects photo URLs that don't start with `NEXT_PUBLIC_SUPABASE_URL` (always validated, even if env var is unset)
 
 ### Memorial Public Page (Issues #6 & #7)
 - **Public page** (`/[slug]`): Hero image + pet name/dates overlay, tribute card, responsive photo gallery
@@ -98,6 +107,7 @@ contributors: id, memorial_id, email, name, became_creator, created_at
 - Email notifications (Resend)
 - Analytics (PostHog)
 - Cloudflare R2 CDN integration
+- Sign-in redirect callback for `/create?step=4` return flow (sign-in page needs to honor `redirect` query param)
 
 ## Reference Documents
 

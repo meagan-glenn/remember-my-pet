@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
-import type { PetDetails } from "@/hooks/use-memorial-wizard";
+import type { PetDetails } from "@/hooks/use-memorial-state";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";

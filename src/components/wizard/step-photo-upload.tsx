@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
-import type { WizardPhoto } from "@/hooks/use-memorial-wizard";
+import type { WizardPhoto } from "@/hooks/use-memorial-state";
 import { Button } from "@/components/ui/button";
 import { X, Upload, ImagePlus } from "lucide-react";
 
@@ -10,8 +10,8 @@ interface StepPhotoUploadProps {
   heroPhoto: string;
   onAddPhoto: (photo: WizardPhoto) => void;
   onRemovePhoto: (id: string) => void;
-  onNext: () => void;
-  onBack: () => void;
+  onNext?: () => void;
+  onBack?: () => void;
   petName: string;
 }
 
@@ -172,24 +172,30 @@ export function StepPhotoUpload({
         </div>
       )}
 
-      <div className="flex gap-3">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onBack}
-          className="h-12 flex-1"
-        >
-          Back
-        </Button>
-        <Button
-          type="button"
-          onClick={onNext}
-          disabled={needsMore}
-          className="h-12 flex-1 bg-amber-600 hover:bg-amber-700"
-        >
-          Continue
-        </Button>
-      </div>
+      {(onBack || onNext) && (
+        <div className="flex gap-3">
+          {onBack && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onBack}
+              className="h-12 flex-1"
+            >
+              Back
+            </Button>
+          )}
+          {onNext && (
+            <Button
+              type="button"
+              onClick={onNext}
+              disabled={needsMore}
+              className="h-12 flex-1 bg-amber-600 hover:bg-amber-700"
+            >
+              Continue
+            </Button>
+          )}
+        </div>
+      )}
     </div>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import type { PetDetails, WizardPhoto } from "@/hooks/use-memorial-wizard";
+import type { PetDetails, WizardPhoto } from "@/hooks/use-memorial-state";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Pencil, Check, GripVertical } from "lucide-react";
@@ -69,7 +69,7 @@ interface StepPreviewProps {
   onUpdateTribute: (tribute: string) => void;
   onReorderPhotos: (photos: WizardPhoto[]) => void;
   onSave: () => Promise<void>;
-  onBack: () => void;
+  onBack?: () => void;
 }
 
 export function StepPreview({
@@ -259,14 +259,16 @@ export function StepPreview({
       {error && <p className="text-sm text-red-500 text-center">{error}</p>}
 
       <div className="flex gap-3">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onBack}
-          className="h-12 flex-1"
-        >
-          Back
-        </Button>
+        {onBack && (
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onBack}
+            className="h-12 flex-1"
+          >
+            Back
+          </Button>
+        )}
         <Button
           type="button"
           onClick={handleSaveMemorial}
