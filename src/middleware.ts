@@ -22,8 +22,10 @@ export async function middleware(request: NextRequest) {
     }
   );
 
-  // Refresh the auth token
-  await supabase.auth.getUser();
+  // Refresh the auth token (single call, reuse result)
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   // Protected routes — redirect to sign-in if not authenticated
   const protectedPaths = ["/dashboard"];
@@ -31,16 +33,10 @@ export async function middleware(request: NextRequest) {
     request.nextUrl.pathname.startsWith(path)
   );
 
-  if (isProtected) {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      const redirectUrl = new URL("/sign-in", request.url);
-      redirectUrl.searchParams.set("redirect", request.nextUrl.pathname);
-      return NextResponse.redirect(redirectUrl);
-    }
+  if (isProtected && !user) {
+    const redirectUrl = new URL("/sign-in", request.url);
+    redirectUrl.searchParams.set("redirect", request.nextUrl.pathname);
+    return NextResponse.redirect(redirectUrl);
   }
 
   return response;

@@ -1,5 +1,11 @@
 import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase-server";
+import { rateLimit } from "@/lib/rate-limit";
+
+const MAX_PET_NAME = 100;
+const MAX_TRIBUTE = 5000;
+const MAX_PHOTOS = 20;
+const MAX_SLUG_ATTEMPTS = 10;
 
 function generateSlug(petName: string, deathDate: string | null): string {
   const name = petName
@@ -22,14 +28,55 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  if (!rateLimit(`memorial:${user.id}`, 10)) {
+    return NextResponse.json(
+      { error: "Too many requests. Please wait a moment." },
+      { status: 429 }
+    );
+  }
+
   const { petName, species, birthDate, deathDate, tribute, photoUrls } =
     await request.json();
 
-  if (!petName || !tribute) {
+  // Input validation
+  if (!petName || typeof petName !== "string" || !tribute || typeof tribute !== "string") {
     return NextResponse.json(
       { error: "Missing required fields" },
       { status: 400 }
     );
+  }
+
+  if (petName.length > MAX_PET_NAME) {
+    return NextResponse.json(
+      { error: `Pet name must be under ${MAX_PET_NAME} characters` },
+      { status: 400 }
+    );
+  }
+
+  if (tribute.length > MAX_TRIBUTE) {
+    return NextResponse.json(
+      { error: `Tribute must be under ${MAX_TRIBUTE} characters` },
+      { status: 400 }
+    );
+  }
+
+  // Validate photoUrls
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  if (photoUrls && Array.isArray(photoUrls)) {
+    if (photoUrls.length > MAX_PHOTOS) {
+      return NextResponse.json(
+        { error: `Maximum ${MAX_PHOTOS} photos allowed` },
+        { status: 400 }
+      );
+    }
+    for (const url of photoUrls) {
+      if (typeof url !== "string" || (supabaseUrl && !url.startsWith(supabaseUrl))) {
+        return NextResponse.json(
+          { error: "Invalid photo URL" },
+          { status: 400 }
+        );
+      }
+    }
   }
 
   // Ensure user row exists
@@ -37,21 +84,27 @@ export async function POST(request: Request) {
     .from("users")
     .upsert({ id: user.id, email: user.email }, { onConflict: "id" });
 
-  // Generate unique slug
+  // Generate unique slug (capped attempts)
   const baseSlug = generateSlug(petName, deathDate);
   let slug = baseSlug;
-  let counter = 2;
+  let found = false;
 
-  while (true) {
+  for (let i = 2; i <= MAX_SLUG_ATTEMPTS + 1; i++) {
     const { data } = await supabase
       .from("memorials")
       .select("id")
       .eq("slug", slug)
       .maybeSingle();
 
-    if (!data) break;
-    slug = `${baseSlug}-${counter}`;
-    counter++;
+    if (!data) {
+      found = true;
+      break;
+    }
+    slug = `${baseSlug}-${i}`;
+  }
+
+  if (!found) {
+    slug = `${baseSlug}-${crypto.randomUUID().slice(0, 6)}`;
   }
 
   // Insert memorial
@@ -59,11 +112,11 @@ export async function POST(request: Request) {
     .from("memorials")
     .insert({
       user_id: user.id,
-      pet_name: petName,
+      pet_name: petName.slice(0, MAX_PET_NAME),
       slug,
       birth_date: birthDate || null,
       death_date: deathDate || null,
-      eulogy: tribute,
+      eulogy: tribute.slice(0, MAX_TRIBUTE),
       is_paid: false,
       is_published: false,
     })
@@ -71,12 +124,16 @@ export async function POST(request: Request) {
     .single();
 
   if (memError) {
-    return NextResponse.json({ error: memError.message }, { status: 500 });
+    console.error("Memorial creation error:", memError.message);
+    return NextResponse.json(
+      { error: "Failed to create memorial" },
+      { status: 500 }
+    );
   }
 
   // Insert photos
   if (photoUrls?.length) {
-    const photosData = photoUrls.map((url: string, index: number) => ({
+    const photosData = photoUrls.slice(0, MAX_PHOTOS).map((url: string, index: number) => ({
       memorial_id: memorial.id,
       url,
       sort_order: index,
