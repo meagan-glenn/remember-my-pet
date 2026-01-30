@@ -8,6 +8,7 @@ export interface PetDetails {
   customSpecies: string;
   birthDate: string;
   deathDate: string;
+  heroPhoto: string;
 }
 
 export interface WizardPhoto {
@@ -36,6 +37,7 @@ const initialState: WizardState = {
     customSpecies: "",
     birthDate: "",
     deathDate: "",
+    heroPhoto: "",
   },
   photos: [],
   chatMessages: [],

@@ -8,12 +8,15 @@ import Image from "next/image";
 
 interface StepPhotoUploadProps {
   photos: WizardPhoto[];
+  heroPhoto: string;
   onAddPhoto: (photo: WizardPhoto) => void;
   onRemovePhoto: (id: string) => void;
   onNext: () => void;
   onBack: () => void;
   petName: string;
 }
+
+const MIN_TOTAL_PHOTOS = 5;
 
 const MAX_PHOTOS = 20;
 const MAX_SIZE_MB = 10;
@@ -27,12 +30,15 @@ const ACCEPTED_TYPES = [
 
 export function StepPhotoUpload({
   photos,
+  heroPhoto,
   onAddPhoto,
   onRemovePhoto,
   onNext,
   onBack,
   petName,
 }: StepPhotoUploadProps) {
+  const totalPhotos = photos.length + (heroPhoto ? 1 : 0);
+  const needsMore = totalPhotos < MIN_TOTAL_PHOTOS;
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadingCount, setUploadingCount] = useState(0);
   const [error, setError] = useState("");
@@ -108,6 +114,11 @@ export function StepPhotoUpload({
         <p className="text-gray-500">
           Share your favorite photos. You can add up to {MAX_PHOTOS}.
         </p>
+        {needsMore && (
+          <p className="text-sm text-amber-600">
+            {MIN_TOTAL_PHOTOS - totalPhotos} more photo{MIN_TOTAL_PHOTOS - totalPhotos !== 1 ? "s" : ""} needed
+          </p>
+        )}
       </div>
 
       {/* Drop zone */}
@@ -201,7 +212,7 @@ export function StepPhotoUpload({
         <Button
           type="button"
           onClick={onNext}
-          disabled={photos.length === 0}
+          disabled={needsMore}
           className="h-12 flex-1 bg-amber-600 hover:bg-amber-700"
         >
           Continue

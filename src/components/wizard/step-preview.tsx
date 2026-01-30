@@ -4,14 +4,72 @@ import { useState } from "react";
 import type { PetDetails, WizardPhoto } from "@/hooks/use-memorial-wizard";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Pencil, Check } from "lucide-react";
+import { Pencil, Check, GripVertical } from "lucide-react";
 import Image from "next/image";
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  useSortable,
+  rectSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+
+function SortablePhoto({ photo }: { photo: WizardPhoto }) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: photo.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="relative aspect-square rounded-lg overflow-hidden group"
+    >
+      <Image
+        src={photo.url}
+        alt=""
+        fill
+        sizes="(max-width: 640px) 33vw, 150px"
+        className="object-cover"
+      />
+      <button
+        type="button"
+        {...attributes}
+        {...listeners}
+        className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-colors cursor-grab active:cursor-grabbing"
+      >
+        <GripVertical className="h-5 w-5 text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-lg" />
+      </button>
+    </div>
+  );
+}
 
 interface StepPreviewProps {
   petDetails: PetDetails;
   photos: WizardPhoto[];
+  heroPhoto: string;
   tribute: string;
   onUpdateTribute: (tribute: string) => void;
+  onReorderPhotos: (photos: WizardPhoto[]) => void;
   onSave: () => Promise<void>;
   onBack: () => void;
 }
@@ -19,8 +77,10 @@ interface StepPreviewProps {
 export function StepPreview({
   petDetails,
   photos,
+  heroPhoto,
   tribute,
   onUpdateTribute,
+  onReorderPhotos,
   onSave,
   onBack,
 }: StepPreviewProps) {
@@ -29,7 +89,24 @@ export function StepPreview({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
-  const heroPhoto = photos[0];
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 5 } })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = photos.findIndex((p) => p.id === active.id);
+    const newIndex = photos.findIndex((p) => p.id === over.id);
+    if (oldIndex === -1 || newIndex === -1) return;
+
+    const reordered = [...photos];
+    const [moved] = reordered.splice(oldIndex, 1);
+    reordered.splice(newIndex, 0, moved);
+    onReorderPhotos(reordered.map((p, i) => ({ ...p, sortOrder: i })));
+  };
   const species =
     petDetails.species === "other"
       ? petDetails.customSpecies
@@ -78,7 +155,7 @@ export function StepPreview({
         {heroPhoto && (
           <div className="relative aspect-[16/9] w-full overflow-hidden">
             <Image
-              src={heroPhoto.url}
+              src={heroPhoto}
               alt={petDetails.petName}
               fill
               sizes="(max-width: 640px) 100vw, 512px"
@@ -150,27 +227,30 @@ export function StepPreview({
           </div>
 
           {/* Photo gallery */}
-          {photos.length > 1 && (
+          {photos.length > 0 && (
             <div>
               <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-2">
                 Photos
+                <span className="ml-2 text-xs font-normal text-gray-400 normal-case">
+                  drag to reorder
+                </span>
               </h3>
-              <div className="grid grid-cols-3 gap-2">
-                {photos.slice(1).map((photo) => (
-                  <div
-                    key={photo.id}
-                    className="relative aspect-square rounded-lg overflow-hidden"
-                  >
-                    <Image
-                      src={photo.url}
-                      alt=""
-                      fill
-                      sizes="(max-width: 640px) 33vw, 150px"
-                      className="object-cover"
-                    />
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+              >
+                <SortableContext
+                  items={photos.map((p) => p.id)}
+                  strategy={rectSortingStrategy}
+                >
+                  <div className="grid grid-cols-3 gap-2">
+                    {photos.map((photo) => (
+                      <SortablePhoto key={photo.id} photo={photo} />
+                    ))}
                   </div>
-                ))}
-              </div>
+                </SortableContext>
+              </DndContext>
             </div>
           )}
         </div>

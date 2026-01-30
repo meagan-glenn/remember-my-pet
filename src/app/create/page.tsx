@@ -47,7 +47,10 @@ function CreateMemorialInner() {
         birthDate: wizard.petDetails.birthDate || null,
         deathDate: wizard.petDetails.deathDate || null,
         tribute: wizard.generatedTribute,
-        photoUrls: wizard.photos.map((p) => p.url),
+        photoUrls: [
+          ...(wizard.petDetails.heroPhoto ? [wizard.petDetails.heroPhoto] : []),
+          ...wizard.photos.map((p) => p.url),
+        ],
       }),
     });
 
@@ -85,6 +88,7 @@ function CreateMemorialInner() {
             {wizard.currentStep === 2 && (
               <StepPhotoUpload
                 photos={wizard.photos}
+                heroPhoto={wizard.petDetails.heroPhoto}
                 onAddPhoto={wizard.addPhoto}
                 onRemovePhoto={wizard.removePhoto}
                 onNext={wizard.nextStep}
@@ -110,8 +114,10 @@ function CreateMemorialInner() {
               <StepPreview
                 petDetails={wizard.petDetails}
                 photos={wizard.photos}
+                heroPhoto={wizard.petDetails.heroPhoto}
                 tribute={wizard.generatedTribute}
                 onUpdateTribute={wizard.setTribute}
+                onReorderPhotos={wizard.reorderPhotos}
                 onSave={handleSave}
                 onBack={wizard.previousStep}
               />

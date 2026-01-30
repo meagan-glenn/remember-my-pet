@@ -46,6 +46,7 @@ export function StepTributeChat({
   const [input, setInput] = useState("");
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Check auth on mount
@@ -79,36 +80,30 @@ export function StepTributeChat({
   const currentPromptIndex = Math.floor(chatMessages.length / 2);
   const allPromptsAnswered = currentPromptIndex >= PROMPTS.length;
 
+  const sendNextPrompt = (nextIndex: number) => {
+    if (nextIndex < PROMPTS.length) {
+      setIsTyping(true);
+      setTimeout(() => {
+        setIsTyping(false);
+        onAddMessage({
+          role: "assistant",
+          content: PROMPTS[nextIndex](petName || "your pet"),
+        });
+      }, 1500);
+    }
+  };
+
   const handleSend = () => {
     if (!input.trim()) return;
 
     onAddMessage({ role: "user", content: input.trim() });
     setInput("");
-
-    // Send next prompt after a short delay
-    const nextIndex = currentPromptIndex + 1;
-    if (nextIndex < PROMPTS.length) {
-      setTimeout(() => {
-        onAddMessage({
-          role: "assistant",
-          content: PROMPTS[nextIndex](petName || "your pet"),
-        });
-      }, 600);
-    }
+    sendNextPrompt(currentPromptIndex + 1);
   };
 
   const handleSkip = () => {
     onAddMessage({ role: "user", content: "(skipped)" });
-
-    const nextIndex = currentPromptIndex + 1;
-    if (nextIndex < PROMPTS.length) {
-      setTimeout(() => {
-        onAddMessage({
-          role: "assistant",
-          content: PROMPTS[nextIndex](petName || "your pet"),
-        });
-      }, 600);
-    }
+    sendNextPrompt(currentPromptIndex + 1);
   };
 
   const handleGenerateTribute = async () => {
@@ -220,6 +215,15 @@ export function StepTributeChat({
                   </div>
                 </div>
               ))}
+              {isTyping && (
+                <div className="flex justify-start">
+                  <div className="rounded-2xl px-4 py-3 bg-gray-100 flex items-center gap-1">
+                    <span className="h-2 w-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: "0ms" }} />
+                    <span className="h-2 w-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: "150ms" }} />
+                    <span className="h-2 w-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: "300ms" }} />
+                  </div>
+                </div>
+              )}
               <div ref={messagesEndRef} />
             </div>
 
@@ -262,7 +266,7 @@ export function StepTributeChat({
                   />
                   <Button
                     onClick={handleSend}
-                    disabled={!input.trim()}
+                    disabled={!input.trim() || isTyping}
                     className="h-12 px-6 bg-amber-600 hover:bg-amber-700"
                   >
                     Send
