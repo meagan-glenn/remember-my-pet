@@ -1,0 +1,231 @@
+"use client";
+
+import { useState, useRef, useCallback } from "react";
+import type { PetDetails } from "@/hooks/use-memorial-wizard";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { ImagePlus, X } from "lucide-react";
+import Image from "next/image";
+
+interface StepPetDetailsProps {
+  data: PetDetails;
+  onUpdate: (details: Partial<PetDetails>) => void;
+  onNext: () => void;
+}
+
+export function StepPetDetails({ data, onUpdate, onNext }: StepPetDetailsProps) {
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleHeroUpload = useCallback(
+    async (file: File) => {
+      if (file.size > 10 * 1024 * 1024) {
+        setErrors((prev) => ({ ...prev, heroPhoto: "File too large (max 10MB)" }));
+        return;
+      }
+      if (!file.type.startsWith("image/")) {
+        setErrors((prev) => ({ ...prev, heroPhoto: "Please select an image file" }));
+        return;
+      }
+
+      setUploading(true);
+      setErrors((prev) => {
+        const { heroPhoto: _, ...rest } = prev;
+        return rest;
+      });
+
+      try {
+        const formData = new FormData();
+        formData.append("file", file);
+        const res = await fetch("/api/upload", { method: "POST", body: formData });
+        if (!res.ok) {
+          const data = await res.json();
+          throw new Error(data.error || "Upload failed");
+        }
+        const { url } = await res.json();
+        onUpdate({ heroPhoto: url });
+      } catch (err) {
+        setErrors((prev) => ({
+          ...prev,
+          heroPhoto: err instanceof Error ? err.message : "Upload failed",
+        }));
+      } finally {
+        setUploading(false);
+      }
+    },
+    [onUpdate]
+  );
+
+  const validate = (): boolean => {
+    const newErrors: Record<string, string> = {};
+    if (!data.petName.trim()) {
+      newErrors.petName = "Please enter your pet's name";
+    }
+    if (
+      data.birthDate &&
+      data.deathDate &&
+      new Date(data.deathDate) < new Date(data.birthDate)
+    ) {
+      newErrors.deathDate = "This date should be after the birth date";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (validate()) onNext();
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="text-center space-y-2">
+        <h1 className="text-2xl font-semibold text-gray-900">
+          Let&apos;s remember them
+        </h1>
+        <p className="text-gray-500">
+          Tell us a little about your pet to get started.
+        </p>
+      </div>
+
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="petName">Pet&apos;s name</Label>
+          <Input
+            id="petName"
+            placeholder="Their name"
+            value={data.petName}
+            onChange={(e) => onUpdate({ petName: e.target.value })}
+            autoFocus
+            className="h-12 text-base"
+          />
+          {errors.petName && (
+            <p className="text-sm text-red-500">{errors.petName}</p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="species">Species</Label>
+          <div className="flex gap-2">
+            {["dog", "cat", "other"].map((s) => (
+              <button
+                key={s}
+                type="button"
+                onClick={() => onUpdate({ species: s })}
+                className={`flex-1 rounded-lg border px-4 py-3 text-sm font-medium capitalize transition-colors ${
+                  data.species === s
+                    ? "border-amber-500 bg-amber-50 text-amber-700"
+                    : "border-gray-200 text-gray-600 hover:border-gray-300"
+                }`}
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+          {data.species === "other" && (
+            <Input
+              placeholder="What kind of pet?"
+              value={data.customSpecies}
+              onChange={(e) => onUpdate({ customSpecies: e.target.value })}
+              className="h-12 text-base mt-2"
+            />
+          )}
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="birthDate">Born (optional)</Label>
+            <Input
+              id="birthDate"
+              type="date"
+              value={data.birthDate}
+              onChange={(e) => onUpdate({ birthDate: e.target.value })}
+              className="h-12"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="deathDate">Passed (optional)</Label>
+            <Input
+              id="deathDate"
+              type="date"
+              value={data.deathDate}
+              onChange={(e) => onUpdate({ deathDate: e.target.value })}
+              className="h-12"
+            />
+            {errors.deathDate && (
+              <p className="text-sm text-red-500">{errors.deathDate}</p>
+            )}
+          </div>
+        </div>
+
+        {/* Hero photo */}
+        <div className="space-y-2">
+          <Label>Primary photo</Label>
+          {data.heroPhoto ? (
+            <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl">
+              <Image
+                src={data.heroPhoto}
+                alt={data.petName || "Pet photo"}
+                fill
+                sizes="(max-width: 640px) 100vw, 512px"
+                className="object-cover"
+              />
+              <button
+                type="button"
+                onClick={() => onUpdate({ heroPhoto: "" })}
+                className="absolute top-2 right-2 rounded-full bg-black/50 p-1.5 text-white hover:bg-black/70 transition-colors"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading}
+              className="flex w-full flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 p-8 hover:border-gray-300 transition-colors"
+            >
+              {uploading ? (
+                <div className="h-8 w-8 animate-spin rounded-full border-2 border-amber-500 border-t-transparent" />
+              ) : (
+                <>
+                  <ImagePlus className="h-10 w-10 text-gray-400 mb-2" />
+                  <p className="text-sm font-medium text-gray-700">
+                    Add a favorite photo
+                  </p>
+                  <p className="text-xs text-gray-400 mt-1">
+                    This will be the main image on the memorial
+                  </p>
+                </>
+              )}
+            </button>
+          )}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) handleHeroUpload(file);
+              e.target.value = "";
+            }}
+            className="hidden"
+          />
+          {errors.heroPhoto && (
+            <p className="text-sm text-red-500">{errors.heroPhoto}</p>
+          )}
+        </div>
+      </div>
+
+      <Button
+        type="submit"
+        className="w-full h-12 text-base bg-amber-600 hover:bg-amber-700"
+        disabled={!data.petName.trim()}
+      >
+        Continue
+      </Button>
+    </form>
+  );
+}
