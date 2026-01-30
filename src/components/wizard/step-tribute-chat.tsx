@@ -8,10 +8,10 @@ import { Input } from "@/components/ui/input";
 
 const PROMPTS = [
   (name: string) => `What was ${name}'s favorite thing to do?`,
-  (name: string) => `What quirk or habit made ${name} unique?`,
-  (name: string) => `What's a memory with ${name} that always makes you smile?`,
-  (name: string) => `How did ${name} show love?`,
-  (name: string) => `What do you miss most about ${name}?`,
+  (name: string) => `What quirk or habit always made you laugh?`,
+  (name: string) => `What's your favorite memory together?`,
+  (name: string) => `What made ${name} one of a kind?`,
+  (name: string) => `What's a small, everyday moment with ${name} you never want to forget?`,
 ];
 
 interface StepTributeChatProps {
