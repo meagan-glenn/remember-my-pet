@@ -1,6 +1,15 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import {
+  saveHeroFile,
+  loadHeroFile,
+  removeHeroFile,
+  savePhotoFile,
+  loadPhotoFiles,
+  removePhotoFile,
+  clearPhotoStore,
+} from "@/lib/photo-store";
 
 export interface PetDetails {
   petName: string;
@@ -14,6 +23,7 @@ export interface PetDetails {
 export interface WizardPhoto {
   id: string;
   url: string;
+  file?: File; // local File for deferred upload
   sortOrder: number;
 }
 
@@ -72,10 +82,62 @@ export function useMemorialWizard() {
   const stateRef = useRef(state);
   stateRef.current = state;
 
-  // Hydrate from localStorage on mount
+  // File refs for deferred upload (not serializable)
+  const heroPhotoFileRef = useRef<File | null>(null);
+  const photoFilesRef = useRef<Map<string, File>>(new Map());
+
+  // Hydrate from localStorage + IndexedDB on mount
   useEffect(() => {
-    setState(loadState());
-    setHydrated(true);
+    async function hydrate() {
+      const loaded = loadState();
+      // Merge homepage seed if present
+      try {
+        const seedRaw = localStorage.getItem("petmemorial-wizard-seed");
+        if (seedRaw) {
+          const seed = JSON.parse(seedRaw);
+          localStorage.removeItem("petmemorial-wizard-seed");
+          if (!loaded.petDetails.petName && seed.petName) {
+            loaded.petDetails = {
+              ...loaded.petDetails,
+              petName: seed.petName,
+              species: seed.species || loaded.petDetails.species,
+            };
+          }
+        }
+      } catch {
+        // ignore malformed seed
+      }
+
+      // Restore file refs from IndexedDB (survives auth redirects)
+      try {
+        const heroFile = await loadHeroFile();
+        if (heroFile) {
+          heroPhotoFileRef.current = heroFile;
+          // Regenerate blob URL if wizard state has a heroPhoto marker
+          if (loaded.petDetails.heroPhoto) {
+            loaded.petDetails.heroPhoto = URL.createObjectURL(heroFile);
+          }
+        }
+        const photoFiles = await loadPhotoFiles();
+        if (photoFiles.size > 0) {
+          photoFilesRef.current = photoFiles;
+          // Regenerate blob URLs for photos that have stored files
+          loaded.photos = loaded.photos.map((p) => {
+            const file = photoFiles.get(p.id);
+            if (file) {
+              return { ...p, url: URL.createObjectURL(file) };
+            }
+            return p;
+          });
+        }
+      } catch {
+        // IndexedDB unavailable — files lost, user can re-add
+      }
+
+      setState(loaded);
+      setHydrated(true);
+    }
+    hydrate();
   }, []);
 
   // Debounced persist to localStorage
@@ -138,20 +200,57 @@ export function useMemorialWizard() {
   );
 
   const addPhoto = useCallback(
-    (photo: WizardPhoto) =>
+    (photo: WizardPhoto) => {
+      if (photo.file) {
+        photoFilesRef.current.set(photo.id, photo.file);
+        savePhotoFile(photo.id, photo.file).catch(() => {});
+      }
       setState((prev) => ({
         ...prev,
-        photos: [...prev.photos, photo],
-      })),
+        photos: [...prev.photos, { id: photo.id, url: photo.url, sortOrder: photo.sortOrder }],
+      }));
+    },
     []
   );
 
   const removePhoto = useCallback(
-    (id: string) =>
+    (id: string) => {
+      const file = photoFilesRef.current.get(id);
+      if (file) {
+        const photo = stateRef.current.photos.find((p) => p.id === id);
+        if (photo?.url.startsWith("blob:")) URL.revokeObjectURL(photo.url);
+        photoFilesRef.current.delete(id);
+        removePhotoFile(id).catch(() => {});
+      }
       setState((prev) => ({
         ...prev,
         photos: prev.photos.filter((p) => p.id !== id),
-      })),
+      }));
+    },
+    []
+  );
+
+  const setHeroPhotoFile = useCallback(
+    (file: File | null) => {
+      const old = stateRef.current.petDetails.heroPhoto;
+      if (old.startsWith("blob:")) URL.revokeObjectURL(old);
+
+      heroPhotoFileRef.current = file;
+      if (file) {
+        saveHeroFile(file).catch(() => {});
+        const url = URL.createObjectURL(file);
+        setState((prev) => ({
+          ...prev,
+          petDetails: { ...prev.petDetails, heroPhoto: url },
+        }));
+      } else {
+        removeHeroFile().catch(() => {});
+        setState((prev) => ({
+          ...prev,
+          petDetails: { ...prev.petDetails, heroPhoto: "" },
+        }));
+      }
+    },
     []
   );
 
@@ -179,6 +278,7 @@ export function useMemorialWizard() {
     setState(initialState);
     if (typeof window !== "undefined") {
       localStorage.removeItem(STORAGE_KEY);
+      clearPhotoStore().catch(() => {});
     }
   }, []);
 
@@ -190,6 +290,8 @@ export function useMemorialWizard() {
     generatedTribute: state.generatedTribute,
     memorialId: state.memorialId,
     hydrated,
+    heroPhotoFileRef,
+    photoFilesRef,
     nextStep,
     previousStep,
     updateState,
@@ -199,6 +301,7 @@ export function useMemorialWizard() {
     reorderPhotos,
     addChatMessage,
     setTribute,
+    setHeroPhotoFile,
     reset,
   };
 }

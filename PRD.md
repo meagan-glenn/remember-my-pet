@@ -205,8 +205,8 @@ Auto-generates captions like "Your morning sun-bather" that witness the pet's un
 |-------|------------|
 | Frontend | Next.js 14+ (App Router), TailwindCSS, Shadcn/ui, Framer Motion |
 | Backend | Next.js API routes, Supabase (PostgreSQL + Storage) |
-| Auth | Clerk (magic links) |
-| AI | OpenAI GPT-4o (eulogy), Claude Sonnet (captions), Gemini Flash (vision) |
+| Auth | Supabase Auth (magic links) |
+| AI | Claude Haiku (tribute generation), Claude Sonnet (captions), Gemini Flash (vision) |
 | Payments | Stripe Checkout + Customer Portal |
 | Print-on-Demand | Gelato API (primary), Printful (backup) |
 | Hosting | Vercel (frontend), Supabase (backend), Cloudflare R2 (CDN) |
@@ -216,7 +216,7 @@ Auto-generates captions like "Your morning sun-bather" that witness the pet's un
 ### Database Schema (Key Tables)
 
 ```sql
-users: id, email, clerk_id, created_at
+users: id (references auth.users), email, created_at
 
 memorials: id, user_id, pet_name, slug, birth_date, death_date,
            eulogy, decision_support_used, template, is_paid,

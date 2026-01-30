@@ -6,21 +6,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ImagePlus, X } from "lucide-react";
-import Image from "next/image";
 
 interface StepPetDetailsProps {
   data: PetDetails;
   onUpdate: (details: Partial<PetDetails>) => void;
+  onSetHeroFile: (file: File | null) => void;
   onNext: () => void;
 }
 
-export function StepPetDetails({ data, onUpdate, onNext }: StepPetDetailsProps) {
+export function StepPetDetails({ data, onUpdate, onSetHeroFile, onNext }: StepPetDetailsProps) {
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleHeroUpload = useCallback(
-    async (file: File) => {
+    (file: File) => {
       if (file.size > 10 * 1024 * 1024) {
         setErrors((prev) => ({ ...prev, heroPhoto: "File too large (max 10MB)" }));
         return;
@@ -30,32 +29,14 @@ export function StepPetDetails({ data, onUpdate, onNext }: StepPetDetailsProps) 
         return;
       }
 
-      setUploading(true);
       setErrors((prev) => {
         const { heroPhoto: _, ...rest } = prev;
         return rest;
       });
 
-      try {
-        const formData = new FormData();
-        formData.append("file", file);
-        const res = await fetch("/api/upload", { method: "POST", body: formData });
-        if (!res.ok) {
-          const data = await res.json();
-          throw new Error(data.error || "Upload failed");
-        }
-        const { url } = await res.json();
-        onUpdate({ heroPhoto: url });
-      } catch (err) {
-        setErrors((prev) => ({
-          ...prev,
-          heroPhoto: err instanceof Error ? err.message : "Upload failed",
-        }));
-      } finally {
-        setUploading(false);
-      }
+      onSetHeroFile(file);
     },
-    [onUpdate]
+    [onSetHeroFile]
   );
 
   const validate = (): boolean => {
@@ -165,16 +146,15 @@ export function StepPetDetails({ data, onUpdate, onNext }: StepPetDetailsProps) 
           <Label>Primary photo</Label>
           {data.heroPhoto ? (
             <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl">
-              <Image
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
                 src={data.heroPhoto}
                 alt={data.petName || "Pet photo"}
-                fill
-                sizes="(max-width: 640px) 100vw, 512px"
-                className="object-cover"
+                className="absolute inset-0 h-full w-full object-cover"
               />
               <button
                 type="button"
-                onClick={() => onUpdate({ heroPhoto: "" })}
+                onClick={() => onSetHeroFile(null)}
                 className="absolute top-2 right-2 rounded-full bg-black/50 p-1.5 text-white hover:bg-black/70 transition-colors"
               >
                 <X className="h-4 w-4" />
@@ -184,22 +164,15 @@ export function StepPetDetails({ data, onUpdate, onNext }: StepPetDetailsProps) 
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              disabled={uploading}
               className="flex w-full flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 p-8 hover:border-gray-300 transition-colors"
             >
-              {uploading ? (
-                <div className="h-8 w-8 animate-spin rounded-full border-2 border-amber-500 border-t-transparent" />
-              ) : (
-                <>
-                  <ImagePlus className="h-10 w-10 text-gray-400 mb-2" />
-                  <p className="text-sm font-medium text-gray-700">
-                    Add a favorite photo
-                  </p>
-                  <p className="text-xs text-gray-400 mt-1">
-                    This will be the main image on the memorial
-                  </p>
-                </>
-              )}
+              <ImagePlus className="h-10 w-10 text-gray-400 mb-2" />
+              <p className="text-sm font-medium text-gray-700">
+                Add a favorite photo
+              </p>
+              <p className="text-xs text-gray-400 mt-1">
+                This will be the main image on the memorial
+              </p>
             </button>
           )}
           <input

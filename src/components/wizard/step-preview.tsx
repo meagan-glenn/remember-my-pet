@@ -5,7 +5,6 @@ import type { PetDetails, WizardPhoto } from "@/hooks/use-memorial-wizard";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Pencil, Check, GripVertical } from "lucide-react";
-import Image from "next/image";
 import {
   DndContext,
   closestCenter,
@@ -44,12 +43,11 @@ function SortablePhoto({ photo }: { photo: WizardPhoto }) {
       style={style}
       className="relative aspect-square rounded-lg overflow-hidden group"
     >
-      <Image
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
         src={photo.url}
         alt=""
-        fill
-        sizes="(max-width: 640px) 33vw, 150px"
-        className="object-cover"
+        className="absolute inset-0 h-full w-full object-cover"
       />
       <button
         type="button"
@@ -154,13 +152,11 @@ export function StepPreview({
         {/* Hero image */}
         {heroPhoto && (
           <div className="relative aspect-[16/9] w-full overflow-hidden">
-            <Image
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
               src={heroPhoto}
               alt={petDetails.petName}
-              fill
-              sizes="(max-width: 640px) 100vw, 512px"
-              className="object-cover"
-              priority
+              className="absolute inset-0 h-full w-full object-cover"
             />
           </div>
         )}

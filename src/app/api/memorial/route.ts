@@ -70,7 +70,7 @@ export async function POST(request: Request) {
       );
     }
     for (const url of photoUrls) {
-      if (typeof url !== "string" || (supabaseUrl && !url.startsWith(supabaseUrl))) {
+      if (typeof url !== "string" || !supabaseUrl || !url.startsWith(supabaseUrl)) {
         return NextResponse.json(
           { error: "Invalid photo URL" },
           { status: 400 }

@@ -4,7 +4,6 @@ import { useCallback, useRef, useState } from "react";
 import type { WizardPhoto } from "@/hooks/use-memorial-wizard";
 import { Button } from "@/components/ui/button";
 import { X, Upload, ImagePlus } from "lucide-react";
-import Image from "next/image";
 
 interface StepPhotoUploadProps {
   photos: WizardPhoto[];
@@ -40,12 +39,11 @@ export function StepPhotoUpload({
   const totalPhotos = photos.length + (heroPhoto ? 1 : 0);
   const needsMore = totalPhotos < MIN_TOTAL_PHOTOS;
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [uploadingCount, setUploadingCount] = useState(0);
   const [error, setError] = useState("");
   const [dragOver, setDragOver] = useState(false);
 
-  const uploadFile = useCallback(
-    async (file: File): Promise<void> => {
+  const addLocalFile = useCallback(
+    (file: File): void => {
       if (file.size > MAX_SIZE_MB * 1024 * 1024) {
         setError(`File too large (max ${MAX_SIZE_MB}MB)`);
         return;
@@ -55,29 +53,13 @@ export function StepPhotoUpload({
         return;
       }
 
-      setUploadingCount((c) => c + 1);
-
-      try {
-        const formData = new FormData();
-        formData.append("file", file);
-
-        const res = await fetch("/api/upload", { method: "POST", body: formData });
-        if (!res.ok) {
-          const data = await res.json();
-          throw new Error(data.error || "Upload failed");
-        }
-
-        const { url } = await res.json();
-        onAddPhoto({
-          id: crypto.randomUUID(),
-          url,
-          sortOrder: photos.length,
-        });
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Upload failed");
-      } finally {
-        setUploadingCount((c) => c - 1);
-      }
+      const url = URL.createObjectURL(file);
+      onAddPhoto({
+        id: crypto.randomUUID(),
+        url,
+        file,
+        sortOrder: photos.length,
+      });
     },
     [photos.length, onAddPhoto]
   );
@@ -91,9 +73,9 @@ export function StepPhotoUpload({
       if (files.length > remaining) {
         setError(`Only ${remaining} more photo(s) allowed`);
       }
-      Promise.all(batch.map((file) => uploadFile(file)));
+      batch.forEach((file) => addLocalFile(file));
     },
-    [uploadFile, photos.length]
+    [addLocalFile, photos.length]
   );
 
   const handleDrop = useCallback(
@@ -136,22 +118,13 @@ export function StepPhotoUpload({
             : "border-gray-200 hover:border-gray-300 bg-gray-50"
         }`}
       >
-        {uploadingCount > 0 ? (
-          <div className="flex flex-col items-center gap-2">
-            <div className="h-8 w-8 animate-spin rounded-full border-2 border-amber-500 border-t-transparent" />
-            <p className="text-sm text-gray-500">Uploading...</p>
-          </div>
-        ) : (
-          <>
-            <ImagePlus className="h-10 w-10 text-gray-400 mb-2" />
-            <p className="text-sm font-medium text-gray-700">
-              Tap to add photos
-            </p>
-            <p className="text-xs text-gray-400 mt-1">
-              or drag and drop on desktop
-            </p>
-          </>
-        )}
+        <ImagePlus className="h-10 w-10 text-gray-400 mb-2" />
+        <p className="text-sm font-medium text-gray-700">
+          Tap to add photos
+        </p>
+        <p className="text-xs text-gray-400 mt-1">
+          or drag and drop on desktop
+        </p>
         <input
           ref={fileInputRef}
           type="file"
@@ -169,12 +142,11 @@ export function StepPhotoUpload({
         <div className="grid grid-cols-3 gap-2">
           {photos.map((photo) => (
             <div key={photo.id} className="relative aspect-square group">
-              <Image
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
                 src={photo.url}
                 alt=""
-                fill
-                sizes="(max-width: 640px) 33vw, 150px"
-                className="rounded-lg object-cover"
+                className="absolute inset-0 h-full w-full rounded-lg object-cover"
               />
               <button
                 type="button"

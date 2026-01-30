@@ -15,7 +15,51 @@ function CreateMemorialInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  const uploadFile = useCallback(async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append("file", file);
+    const res = await fetch("/api/upload", { method: "POST", body: formData });
+    if (res.status === 401) throw new Error("__AUTH_REQUIRED__");
+    if (!res.ok) {
+      const data = await res.json();
+      throw new Error(data.error || "Upload failed");
+    }
+    const { url } = await res.json();
+    return url;
+  }, []);
+
   const handleSave = useCallback(async () => {
+    // Upload all local files to Supabase first
+    const photoUrls: string[] = [];
+
+    try {
+      // Upload hero photo
+      const heroFile = wizard.heroPhotoFileRef.current;
+      if (heroFile) {
+        const heroUrl = await uploadFile(heroFile);
+        photoUrls.push(heroUrl);
+      }
+
+      // Upload gallery photos in parallel
+      const galleryUploads = wizard.photos
+        .map((p) => {
+          const file = wizard.photoFilesRef.current.get(p.id);
+          return file ? uploadFile(file) : null;
+        })
+        .filter((p): p is Promise<string> => p !== null);
+
+      const galleryUrls = await Promise.all(galleryUploads);
+      photoUrls.push(...galleryUrls);
+    } catch (err) {
+      if (err instanceof Error && err.message === "__AUTH_REQUIRED__") {
+        // Redirect to sign-in; wizard state + IndexedDB files persist
+        router.push("/sign-in?redirect=/create?step=4");
+        return;
+      }
+      throw err;
+    }
+
+    // Save memorial with real Supabase URLs
     const res = await fetch("/api/memorial", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -28,10 +72,7 @@ function CreateMemorialInner() {
         birthDate: wizard.petDetails.birthDate || null,
         deathDate: wizard.petDetails.deathDate || null,
         tribute: wizard.generatedTribute,
-        photoUrls: [
-          ...(wizard.petDetails.heroPhoto ? [wizard.petDetails.heroPhoto] : []),
-          ...wizard.photos.map((p) => p.url),
-        ],
+        photoUrls,
       }),
     });
 
@@ -43,7 +84,7 @@ function CreateMemorialInner() {
     const { slug } = await res.json();
     wizard.reset();
     router.push(`/dashboard?created=${slug}`);
-  }, [wizard.petDetails, wizard.generatedTribute, wizard.photos, wizard.reset, router]);
+  }, [wizard, uploadFile, router]);
 
   // Resume from auth redirect (e.g. ?step=3)
   useEffect(() => {
@@ -81,6 +122,7 @@ function CreateMemorialInner() {
               <StepPetDetails
                 data={wizard.petDetails}
                 onUpdate={wizard.updatePetDetails}
+                onSetHeroFile={wizard.setHeroPhotoFile}
                 onNext={wizard.nextStep}
               />
             )}
