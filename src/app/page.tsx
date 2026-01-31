@@ -147,7 +147,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50/60 via-orange-50/30 to-white">
       {/* Hero Section */}
-      <section className="flex flex-col items-center justify-center px-4 pt-24 pb-16 md:pt-32 md:pb-24">
+      <section className="flex flex-col items-center justify-center px-4 pt-16 pb-10 md:pt-20 md:pb-14">
         <AnimatePresence mode="wait">
           {!started ? (
             <motion.div
@@ -162,7 +162,7 @@ export default function Home() {
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.1, duration: 0.5 }}
-                className="mx-auto mb-8 flex h-16 w-16 items-center justify-center rounded-full bg-amber-100"
+                className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-amber-100"
               >
                 <PawPrint className="h-8 w-8 text-amber-600" />
               </motion.div>
