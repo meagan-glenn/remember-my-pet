@@ -22,7 +22,7 @@ function pickOpeningQuestion() {
 const CONVERSATION_STEPS = [
   {
     question: (name: string) =>
-      `I'm so sorry about ${name}. What kind of animal was ${name}?`,
+      `I'm so sorry about ${name}. What kind of animal were they?`,
     options: ["Dog", "Cat", "Other"],
   },
 ];

@@ -70,6 +70,7 @@ export interface MemorialState {
   videos: WizardVideo[];
   videoClips: VideoClip[];
   compilationUrl: string;
+  introComplete: boolean;
 }
 
 const STORAGE_KEY = "petmemorial-wizard-state";
@@ -95,6 +96,7 @@ const initialState: MemorialState = {
   videos: [],
   videoClips: [],
   compilationUrl: "",
+  introComplete: false,
 };
 
 function loadState(): MemorialState {
@@ -446,6 +448,12 @@ export function useMemorialState() {
     []
   );
 
+  const setIntroComplete = useCallback(
+    (complete: boolean) =>
+      setState((prev) => ({ ...prev, introComplete: complete })),
+    []
+  );
+
   const reset = useCallback(() => {
     setState(initialState);
     if (typeof window !== "undefined") {
@@ -477,9 +485,10 @@ export function useMemorialState() {
       removeClip,
       reorderClips,
       setCompilationUrl,
+      setIntroComplete,
       reset,
     }),
-    [updatePetDetails, addPhoto, removePhoto, setPhotoCaption, reorderPhotos, addChatMessage, setTribute, setHeroPhotoFile, setHomepageMemory, setTributeMode, setHasPassedTransition, setSupportContext, addVideo, removeVideo, reorderVideos, addClip, updateClip, removeClip, reorderClips, setCompilationUrl, reset]
+    [updatePetDetails, addPhoto, removePhoto, setPhotoCaption, reorderPhotos, addChatMessage, setTribute, setHeroPhotoFile, setHomepageMemory, setTributeMode, setHasPassedTransition, setSupportContext, addVideo, removeVideo, reorderVideos, addClip, updateClip, removeClip, reorderClips, setCompilationUrl, setIntroComplete, reset]
   );
 
   return useMemo(
@@ -496,6 +505,7 @@ export function useMemorialState() {
       videos: state.videos,
       videoClips: state.videoClips,
       compilationUrl: state.compilationUrl,
+      introComplete: state.introComplete,
       hydrated,
       heroPhotoFileRef,
       photoFilesRef,

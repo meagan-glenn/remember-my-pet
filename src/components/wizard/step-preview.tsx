@@ -4,7 +4,7 @@ import { useState } from "react";
 import type { PetDetails, WizardPhoto } from "@/hooks/use-memorial-state";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Pencil, Check, GripVertical } from "lucide-react";
+import { Pencil, Check, GripVertical, PawPrint } from "lucide-react";
 import {
   DndContext,
   closestCenter,
@@ -38,25 +38,26 @@ function SortablePhoto({ photo }: { photo: WizardPhoto }) {
   };
 
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className="relative aspect-square rounded-lg overflow-hidden group"
-    >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={photo.url}
-        alt=""
-        className="absolute inset-0 h-full w-full object-cover"
-      />
-      <button
-        type="button"
-        {...attributes}
-        {...listeners}
-        className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-colors cursor-grab active:cursor-grabbing"
-      >
-        <GripVertical className="h-5 w-5 text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-lg" />
-      </button>
+    <div ref={setNodeRef} style={style} className="space-y-2">
+      <div className="relative aspect-square overflow-hidden rounded-xl group">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={photo.url}
+          alt={photo.caption || ""}
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        <button
+          type="button"
+          {...attributes}
+          {...listeners}
+          className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-colors cursor-grab active:cursor-grabbing"
+        >
+          <GripVertical className="h-5 w-5 text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-lg" />
+        </button>
+      </div>
+      {photo.caption && (
+        <p className="text-sm text-gray-500 italic px-1">{photo.caption}</p>
+      )}
     </div>
   );
 }
@@ -89,7 +90,9 @@ export function StepPreview({
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 5 } })
+    useSensor(TouchSensor, {
+      activationConstraint: { delay: 200, tolerance: 5 },
+    })
   );
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -105,10 +108,6 @@ export function StepPreview({
     reordered.splice(newIndex, 0, moved);
     onReorderPhotos(reordered.map((p, i) => ({ ...p, sortOrder: i })));
   };
-  const species =
-    petDetails.species === "other"
-      ? petDetails.customSpecies
-      : petDetails.species;
 
   const formatDate = (dateStr: string) => {
     if (!dateStr) return "";
@@ -118,6 +117,9 @@ export function StepPreview({
       year: "numeric",
     });
   };
+
+  const birthFormatted = formatDate(petDetails.birthDate);
+  const deathFormatted = formatDate(petDetails.deathDate);
 
   const handleSaveTribute = () => {
     onUpdateTribute(editedTribute);
@@ -136,8 +138,9 @@ export function StepPreview({
   };
 
   return (
-    <div className="space-y-6">
-      <div className="text-center space-y-2">
+    <div className="min-h-screen bg-gradient-to-b from-amber-50/60 via-orange-50/30 to-white">
+      {/* Header */}
+      <div className="text-center space-y-2 pt-8 pb-4 px-4">
         <h1 className="text-2xl font-semibold text-gray-900">
           Preview your tribute
         </h1>
@@ -147,143 +150,165 @@ export function StepPreview({
         </p>
       </div>
 
-      {/* Memorial preview card */}
-      <div className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden">
-        {/* Hero image */}
-        {heroPhoto && (
-          <div className="relative aspect-[16/9] w-full overflow-hidden">
+      {/* Hero Section */}
+      <section className="relative">
+        {heroPhoto ? (
+          <div className="relative h-[50vh] min-h-[320px] max-h-[500px] w-full sm:h-[60vh]">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={heroPhoto}
               alt={petDetails.petName}
               className="absolute inset-0 h-full w-full object-cover"
             />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+            <div className="absolute inset-x-0 bottom-0 p-6 text-white sm:p-10">
+              <h2 className="font-serif text-4xl font-medium tracking-tight sm:text-5xl">
+                {petDetails.petName}
+              </h2>
+              {(birthFormatted || deathFormatted) && (
+                <p className="mt-2 text-lg text-white/80">
+                  {birthFormatted && deathFormatted
+                    ? `${birthFormatted} — ${deathFormatted}`
+                    : deathFormatted
+                      ? `Passed ${deathFormatted}`
+                      : `Born ${birthFormatted}`}
+                </p>
+              )}
+            </div>
           </div>
-        )}
-
-        <div className="p-6 space-y-4">
-          {/* Pet info */}
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-gray-900">
+        ) : (
+          <div className="flex h-[40vh] min-h-[280px] w-full flex-col items-center justify-center bg-gradient-to-b from-amber-100 to-amber-50">
+            <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-amber-200/60">
+              <PawPrint className="h-10 w-10 text-amber-600" />
+            </div>
+            <h2 className="font-serif text-4xl font-medium tracking-tight text-gray-900 sm:text-5xl">
               {petDetails.petName}
             </h2>
-            {species && (
-              <p className="text-gray-500 capitalize mt-1">{species}</p>
-            )}
-            {(petDetails.birthDate || petDetails.deathDate) && (
-              <p className="text-sm text-gray-400 mt-1">
-                {petDetails.birthDate && formatDate(petDetails.birthDate)}
-                {petDetails.birthDate && petDetails.deathDate && " — "}
-                {petDetails.deathDate && formatDate(petDetails.deathDate)}
+            {(birthFormatted || deathFormatted) && (
+              <p className="mt-3 text-lg text-gray-500">
+                {birthFormatted && deathFormatted
+                  ? `${birthFormatted} — ${deathFormatted}`
+                  : deathFormatted
+                    ? `Passed ${deathFormatted}`
+                    : `Born ${birthFormatted}`}
               </p>
             )}
           </div>
+        )}
+      </section>
 
-          {/* Tribute text */}
-          <div className="relative">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide">
-                Tribute
-              </h3>
-              <button
-                type="button"
-                onClick={() => {
-                  if (editingTribute) {
-                    handleSaveTribute();
-                  } else {
-                    setEditingTribute(true);
-                  }
-                }}
-                className="flex items-center gap-1 text-sm text-amber-600 hover:text-amber-700"
-              >
-                {editingTribute ? (
-                  <>
-                    <Check className="h-3.5 w-3.5" /> Done
-                  </>
-                ) : (
-                  <>
-                    <Pencil className="h-3.5 w-3.5" /> Edit
-                  </>
-                )}
-              </button>
-            </div>
-
-            {editingTribute ? (
-              <Textarea
-                value={editedTribute}
-                onChange={(e) => setEditedTribute(e.target.value)}
-                rows={10}
-                className="text-base leading-relaxed"
-              />
-            ) : (
-              <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
-                {tribute}
-              </p>
-            )}
+      {/* Tribute */}
+      <section className="mx-auto max-w-2xl px-4 py-8 sm:px-6">
+        <div className="rounded-2xl border border-amber-100 bg-white/80 p-6 shadow-sm backdrop-blur-sm sm:p-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-serif text-2xl font-medium text-gray-900">
+              A Tribute
+            </h2>
+            <button
+              type="button"
+              onClick={() => {
+                if (editingTribute) {
+                  handleSaveTribute();
+                } else {
+                  setEditingTribute(true);
+                }
+              }}
+              className="flex items-center gap-1 text-sm text-amber-600 hover:text-amber-700"
+            >
+              {editingTribute ? (
+                <>
+                  <Check className="h-3.5 w-3.5" /> Done
+                </>
+              ) : (
+                <>
+                  <Pencil className="h-3.5 w-3.5" /> Edit
+                </>
+              )}
+            </button>
           </div>
 
-          {/* Photo gallery */}
-          {photos.length > 0 && (
-            <div>
-              <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-2">
-                Photos
-                <span className="ml-2 text-xs font-normal text-gray-400 normal-case">
-                  drag to reorder
-                </span>
-              </h3>
-              <DndContext
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragEnd={handleDragEnd}
-              >
-                <SortableContext
-                  items={photos.map((p) => p.id)}
-                  strategy={rectSortingStrategy}
-                >
-                  <div className="grid grid-cols-3 gap-2">
-                    {photos.map((photo) => (
-                      <SortablePhoto key={photo.id} photo={photo} />
-                    ))}
-                  </div>
-                </SortableContext>
-              </DndContext>
+          {editingTribute ? (
+            <Textarea
+              value={editedTribute}
+              onChange={(e) => setEditedTribute(e.target.value)}
+              rows={10}
+              className="text-base leading-relaxed"
+            />
+          ) : tribute ? (
+            <div className="whitespace-pre-line text-base leading-relaxed text-gray-700">
+              {tribute}
             </div>
+          ) : (
+            <p className="text-gray-400 italic">
+              No tribute yet. Click Edit to add one.
+            </p>
           )}
         </div>
-      </div>
+      </section>
 
-      <p className="text-center text-sm text-gray-400">
-        Your memorial will be private until you choose to share it.
-      </p>
+      {/* Photo Gallery */}
+      {photos.length > 0 && (
+        <section className="mx-auto max-w-3xl px-4 pb-16 sm:px-6">
+          <div className="flex items-baseline gap-3 mb-6">
+            <h2 className="font-serif text-2xl font-medium text-gray-900">
+              Photos
+            </h2>
+            <span className="text-sm text-gray-400">drag to reorder</span>
+          </div>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={photos.map((p) => p.id)}
+              strategy={rectSortingStrategy}
+            >
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+                {photos.map((photo) => (
+                  <SortablePhoto key={photo.id} photo={photo} />
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
+        </section>
+      )}
 
-      {error && <p className="text-sm text-red-500 text-center">{error}</p>}
+      {/* Actions */}
+      <div className="mx-auto max-w-2xl px-4 pb-12 sm:px-6 space-y-4">
+        <p className="text-center text-sm text-gray-400">
+          Your memorial will be private until you choose to share it.
+        </p>
 
-      <div className="flex gap-3">
-        {onBack && (
+        {error && <p className="text-sm text-red-500 text-center">{error}</p>}
+
+        <div className="flex gap-3">
+          {onBack && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onBack}
+              className="h-12 flex-1"
+            >
+              Back
+            </Button>
+          )}
           <Button
             type="button"
-            variant="outline"
-            onClick={onBack}
-            className="h-12 flex-1"
+            onClick={handleSaveMemorial}
+            disabled={saving}
+            className="h-12 flex-1 bg-amber-600 hover:bg-amber-700"
           >
-            Back
+            {saving ? (
+              <span className="flex items-center gap-2">
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                Saving...
+              </span>
+            ) : (
+              "Save Memorial"
+            )}
           </Button>
-        )}
-        <Button
-          type="button"
-          onClick={handleSaveMemorial}
-          disabled={saving}
-          className="h-12 flex-1 bg-amber-600 hover:bg-amber-700"
-        >
-          {saving ? (
-            <span className="flex items-center gap-2">
-              <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-              Saving...
-            </span>
-          ) : (
-            "Save Memorial"
-          )}
-        </Button>
+        </div>
       </div>
     </div>
   );

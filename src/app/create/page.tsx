@@ -21,7 +21,7 @@ function LoadingSkeleton() {
 // ── Intro Mode: Pet details form ──────────────────────────────────────────────
 
 function IntroForm() {
-  const { petDetails, updatePetDetails, setHeroPhotoFile, hydrated } = useMemorialContext();
+  const { petDetails, updatePetDetails, setHeroPhotoFile, setIntroComplete, hydrated } = useMemorialContext();
   const [errors, setErrors] = useState<Record<string, string>>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -63,7 +63,7 @@ function IntroForm() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (validate()) {
-      // Pet name is now set — component will re-render into dashboard mode
+      setIntroComplete(true);
     }
   };
 
@@ -475,12 +475,12 @@ function PetDetailsEditor({
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
 export default function CreateMemorial() {
-  const { petDetails, hydrated } = useMemorialContext();
+  const { introComplete, hydrated } = useMemorialContext();
 
   if (!hydrated) return <LoadingSkeleton />;
 
-  // Show intro form until pet name is set, then show dashboard
-  if (!petDetails.petName.trim()) {
+  // Show intro form until user explicitly submits it
+  if (!introComplete) {
     return <IntroForm />;
   }
 
