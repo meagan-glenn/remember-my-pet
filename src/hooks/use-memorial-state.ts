@@ -59,6 +59,7 @@ export interface SupportContextEntry {
 
 export interface MemorialState {
   petDetails: PetDetails;
+  ownerLastName: string;
   photos: WizardPhoto[];
   chatMessages: { role: "assistant" | "user"; content: string }[];
   generatedTribute: string;
@@ -70,6 +71,7 @@ export interface MemorialState {
   videos: WizardVideo[];
   videoClips: VideoClip[];
   compilationUrl: string;
+  introComplete: boolean;
 }
 
 const STORAGE_KEY = "petmemorial-wizard-state";
@@ -84,6 +86,7 @@ const initialState: MemorialState = {
     deathDate: "",
     heroPhoto: "",
   },
+  ownerLastName: "",
   photos: [],
   chatMessages: [],
   generatedTribute: "",
@@ -95,6 +98,7 @@ const initialState: MemorialState = {
   videos: [],
   videoClips: [],
   compilationUrl: "",
+  introComplete: false,
 };
 
 function loadState(): MemorialState {
@@ -446,6 +450,17 @@ export function useMemorialState() {
     []
   );
 
+  const setOwnerLastName = useCallback(
+    (name: string) => setState((prev) => ({ ...prev, ownerLastName: name })),
+    []
+  );
+
+  const setIntroComplete = useCallback(
+    (complete: boolean) =>
+      setState((prev) => ({ ...prev, introComplete: complete })),
+    []
+  );
+
   const reset = useCallback(() => {
     setState(initialState);
     if (typeof window !== "undefined") {
@@ -476,10 +491,12 @@ export function useMemorialState() {
       updateClip,
       removeClip,
       reorderClips,
+      setOwnerLastName,
       setCompilationUrl,
+      setIntroComplete,
       reset,
     }),
-    [updatePetDetails, addPhoto, removePhoto, setPhotoCaption, reorderPhotos, addChatMessage, setTribute, setHeroPhotoFile, setHomepageMemory, setTributeMode, setHasPassedTransition, setSupportContext, addVideo, removeVideo, reorderVideos, addClip, updateClip, removeClip, reorderClips, setCompilationUrl, reset]
+    [updatePetDetails, addPhoto, removePhoto, setPhotoCaption, reorderPhotos, addChatMessage, setTribute, setHeroPhotoFile, setHomepageMemory, setTributeMode, setHasPassedTransition, setSupportContext, addVideo, removeVideo, reorderVideos, addClip, updateClip, removeClip, reorderClips, setOwnerLastName, setCompilationUrl, setIntroComplete, reset]
   );
 
   return useMemo(
@@ -495,7 +512,9 @@ export function useMemorialState() {
       supportContext: state.supportContext,
       videos: state.videos,
       videoClips: state.videoClips,
+      ownerLastName: state.ownerLastName,
       compilationUrl: state.compilationUrl,
+      introComplete: state.introComplete,
       hydrated,
       heroPhotoFileRef,
       photoFilesRef,

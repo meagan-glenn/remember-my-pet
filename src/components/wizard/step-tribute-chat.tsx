@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from "react";
 import { createBrowserSupabase } from "@/lib/supabase";
 import { AuthModal } from "./auth-modal";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Dialog,
   DialogContent,
@@ -658,17 +657,22 @@ export function StepTributeChat({
                   !supportPhaseComplete && (
                     <div className="space-y-2">
                       <div className="flex gap-2">
-                        <Input
+                        <textarea
                           placeholder="Type your answer..."
                           value={input}
-                          onChange={(e) => setInput(e.target.value)}
+                          onChange={(e) => {
+                            setInput(e.target.value);
+                            e.target.style.height = "auto";
+                            e.target.style.height = e.target.scrollHeight + "px";
+                          }}
                           onKeyDown={(e) => {
                             if (e.key === "Enter" && !e.shiftKey) {
                               e.preventDefault();
                               handleSend();
                             }
                           }}
-                          className="h-12 text-base"
+                          className="flex-1 min-h-[48px] rounded-md border border-input bg-background px-3 py-3 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none overflow-hidden"
+                          rows={1}
                           autoFocus
                           disabled={supportLoading || isTyping || chatLoading}
                         />

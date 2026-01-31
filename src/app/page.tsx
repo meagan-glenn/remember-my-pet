@@ -22,7 +22,7 @@ function pickOpeningQuestion() {
 const CONVERSATION_STEPS = [
   {
     question: (name: string) =>
-      `I'm so sorry about ${name}. What kind of animal was ${name}?`,
+      `I'm so sorry about ${name}. What kind of animal were they?`,
     options: ["Dog", "Cat", "Other"],
   },
 ];
@@ -147,7 +147,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50/60 via-orange-50/30 to-white">
       {/* Hero Section */}
-      <section className="flex flex-col items-center justify-center px-4 pt-24 pb-16 md:pt-32 md:pb-24">
+      <section className="flex flex-col items-center justify-center px-4 pt-16 pb-10 md:pt-20 md:pb-14">
         <AnimatePresence mode="wait">
           {!started ? (
             <motion.div
@@ -162,7 +162,7 @@ export default function Home() {
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.1, duration: 0.5 }}
-                className="mx-auto mb-8 flex h-16 w-16 items-center justify-center rounded-full bg-amber-100"
+                className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-amber-100"
               >
                 <PawPrint className="h-8 w-8 text-amber-600" />
               </motion.div>
@@ -289,11 +289,22 @@ export default function Home() {
                     onSubmit={handleMemorySubmit}
                     className="mt-4 flex gap-2"
                   >
-                    <Input
+                    <textarea
                       value={userInput}
-                      onChange={(e) => setUserInput(e.target.value)}
+                      onChange={(e) => {
+                        setUserInput(e.target.value);
+                        e.target.style.height = "auto";
+                        e.target.style.height = e.target.scrollHeight + "px";
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && !e.shiftKey) {
+                          e.preventDefault();
+                          if (userInput.trim()) handleMemorySubmit(e as unknown as React.FormEvent);
+                        }
+                      }}
                       placeholder="Share a memory..."
-                      className="h-10 flex-1 rounded-full border-amber-200 text-sm"
+                      className="flex-1 rounded-2xl border border-amber-200 bg-white px-4 py-2 text-sm resize-none overflow-hidden leading-snug focus:outline-none focus:ring-2 focus:ring-amber-300 focus:border-amber-300"
+                      rows={1}
                       autoFocus
                     />
                     <Button

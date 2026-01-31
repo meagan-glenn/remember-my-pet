@@ -64,6 +64,7 @@ export default function PreviewPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         petName: ctx.petDetails.petName,
+        ownerLastName: ctx.ownerLastName,
         species:
           ctx.petDetails.species === "other"
             ? ctx.petDetails.customSpecies
@@ -94,29 +95,29 @@ export default function PreviewPage() {
   }
 
   return (
-    <div className="py-8 px-4">
-      <div className="mx-auto max-w-lg">
+    <div>
+      <div className="px-4 pt-4 sm:px-6">
         <Button
           variant="ghost"
           size="sm"
           onClick={() => router.push("/create")}
-          className="mb-4 -ml-2 text-gray-600 hover:text-gray-900"
+          className="mb-2 -ml-2 text-gray-600 hover:text-gray-900"
         >
           <ArrowLeft className="h-4 w-4 mr-1" />
           Back to workspace
         </Button>
-
-        <StepPreview
-          petDetails={ctx.petDetails}
-          photos={ctx.photos}
-          heroPhoto={ctx.petDetails.heroPhoto}
-          tribute={ctx.generatedTribute}
-          onUpdateTribute={ctx.setTribute}
-          onReorderPhotos={ctx.reorderPhotos}
-          onSave={handleSave}
-          onBack={() => router.push("/create")}
-        />
       </div>
+
+      <StepPreview
+        petDetails={ctx.petDetails}
+        photos={ctx.photos}
+        heroPhoto={ctx.petDetails.heroPhoto}
+        tribute={ctx.generatedTribute}
+        onUpdateTribute={ctx.setTribute}
+        onReorderPhotos={ctx.reorderPhotos}
+        onSave={handleSave}
+        onBack={() => router.push("/create")}
+      />
     </div>
   );
 }
