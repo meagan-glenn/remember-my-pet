@@ -289,11 +289,22 @@ export default function Home() {
                     onSubmit={handleMemorySubmit}
                     className="mt-4 flex gap-2"
                   >
-                    <Input
+                    <textarea
                       value={userInput}
-                      onChange={(e) => setUserInput(e.target.value)}
+                      onChange={(e) => {
+                        setUserInput(e.target.value);
+                        e.target.style.height = "auto";
+                        e.target.style.height = e.target.scrollHeight + "px";
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && !e.shiftKey) {
+                          e.preventDefault();
+                          if (userInput.trim()) handleMemorySubmit(e as unknown as React.FormEvent);
+                        }
+                      }}
                       placeholder="Share a memory..."
-                      className="h-10 flex-1 rounded-full border-amber-200 text-sm"
+                      className="flex-1 rounded-2xl border border-amber-200 bg-white px-4 py-2 text-sm resize-none overflow-hidden leading-snug focus:outline-none focus:ring-2 focus:ring-amber-300 focus:border-amber-300"
+                      rows={1}
                       autoFocus
                     />
                     <Button
