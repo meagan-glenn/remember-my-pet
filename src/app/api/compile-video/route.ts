@@ -205,6 +205,21 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Missing memorialId or clips" }, { status: 400 });
   }
 
+  // Validate clip inputs
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  for (const clip of clips) {
+    // Prevent SSRF: only allow Supabase-hosted video URLs
+    if (!supabaseUrl || typeof clip.videoUrl !== "string" || !clip.videoUrl.startsWith(supabaseUrl)) {
+      return NextResponse.json({ error: "Invalid video URL" }, { status: 400 });
+    }
+    // Prevent command injection: enforce numeric types at runtime
+    if (typeof clip.startTime !== "number" || !isFinite(clip.startTime) ||
+        typeof clip.endTime !== "number" || !isFinite(clip.endTime) ||
+        clip.startTime < 0 || clip.endTime <= clip.startTime) {
+      return NextResponse.json({ error: "Invalid clip times" }, { status: 400 });
+    }
+  }
+
   // Validate total duration
   const totalDuration = clips.reduce((sum, c) => sum + (c.endTime - c.startTime), 0);
   if (totalDuration > MAX_OUTPUT_DURATION) {
