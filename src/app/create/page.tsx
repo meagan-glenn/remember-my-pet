@@ -225,6 +225,8 @@ function Dashboard() {
     chatMessages,
     generatedTribute,
     tributeMode,
+    videos,
+    compilationUrl,
     updatePetDetails,
     setHeroPhotoFile,
     hydrated,
@@ -311,9 +313,21 @@ function Dashboard() {
           />
           <FeatureCard
             title="Create Video Reel"
-            description="Turn your photos into a video memory"
-            status="Coming Soon"
-            statusType="disabled"
+            description="Upload videos and compile a memorial reel"
+            status={
+              compilationUrl
+                ? "Complete"
+                : videos.length === 0
+                  ? "Not started"
+                  : `${videos.length} video${videos.length !== 1 ? "s" : ""} uploaded`
+            }
+            statusType={
+              compilationUrl
+                ? "complete"
+                : videos.length === 0
+                  ? "not-started"
+                  : "in-progress"
+            }
             href="/create/reel"
             icon={<Film className="h-6 w-6" />}
           />

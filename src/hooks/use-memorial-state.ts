@@ -10,6 +10,12 @@ import {
   removePhotoFile,
   clearPhotoStore,
 } from "@/lib/photo-store";
+import {
+  saveVideoFile,
+  loadVideoFiles,
+  removeVideoFile,
+  clearVideoStore,
+} from "@/lib/video-store";
 
 export interface PetDetails {
   petName: string;
@@ -24,6 +30,24 @@ export interface WizardPhoto {
   id: string;
   url: string;
   file?: File; // local File for deferred upload
+  sortOrder: number;
+}
+
+export interface WizardVideo {
+  id: string;
+  url: string; // blob URL for preview, Supabase URL after upload
+  filename: string;
+  durationSeconds?: number;
+  thumbnailUrl?: string; // blob URL of first-frame thumbnail
+  sortOrder: number;
+}
+
+export interface VideoClip {
+  id: string;
+  videoId: string;
+  startTime: number; // seconds
+  endTime: number; // seconds
+  tag: string;
   sortOrder: number;
 }
 
@@ -42,6 +66,9 @@ export interface MemorialState {
   tributeMode: "celebrate" | "support" | "";
   hasPassedTransition: boolean;
   supportContext: SupportContextEntry[];
+  videos: WizardVideo[];
+  videoClips: VideoClip[];
+  compilationUrl: string;
 }
 
 const STORAGE_KEY = "petmemorial-wizard-state";
@@ -64,6 +91,9 @@ const initialState: MemorialState = {
   tributeMode: "",
   hasPassedTransition: false,
   supportContext: [],
+  videos: [],
+  videoClips: [],
+  compilationUrl: "",
 };
 
 function loadState(): MemorialState {
@@ -101,6 +131,7 @@ export function useMemorialState() {
   // File refs for deferred upload (not serializable)
   const heroPhotoFileRef = useRef<File | null>(null);
   const photoFilesRef = useRef<Map<string, File>>(new Map());
+  const videoFilesRef = useRef<Map<string, File>>(new Map());
 
   // Hydrate from localStorage + IndexedDB on mount
   useEffect(() => {
@@ -152,6 +183,23 @@ export function useMemorialState() {
         }
       } catch {
         // IndexedDB unavailable — files lost, user can re-add
+      }
+
+      // Restore video files from IndexedDB
+      try {
+        const videoFiles = await loadVideoFiles();
+        if (videoFiles.size > 0) {
+          videoFilesRef.current = videoFiles;
+          loaded.videos = loaded.videos.map((v) => {
+            const file = videoFiles.get(v.id);
+            if (file) {
+              return { ...v, url: URL.createObjectURL(file) };
+            }
+            return v;
+          });
+        }
+      } catch {
+        // IndexedDB unavailable
       }
 
       setState(loaded);
@@ -301,11 +349,97 @@ export function useMemorialState() {
     []
   );
 
+  const addVideo = useCallback(
+    (video: WizardVideo & { file?: File }) => {
+      if (video.file) {
+        videoFilesRef.current.set(video.id, video.file);
+        saveVideoFile(video.id, video.file).catch(() => {});
+      }
+      setState((prev) => ({
+        ...prev,
+        videos: [...prev.videos, {
+          id: video.id,
+          url: video.url,
+          filename: video.filename,
+          durationSeconds: video.durationSeconds,
+          thumbnailUrl: video.thumbnailUrl,
+          sortOrder: video.sortOrder,
+        }],
+      }));
+    },
+    []
+  );
+
+  const removeVideo = useCallback(
+    (id: string) => {
+      const file = videoFilesRef.current.get(id);
+      if (file) {
+        const video = stateRef.current.videos.find((v) => v.id === id);
+        if (video?.url.startsWith("blob:")) URL.revokeObjectURL(video.url);
+        if (video?.thumbnailUrl?.startsWith("blob:")) URL.revokeObjectURL(video.thumbnailUrl);
+        videoFilesRef.current.delete(id);
+        removeVideoFile(id).catch(() => {});
+      }
+      setState((prev) => ({
+        ...prev,
+        videos: prev.videos.filter((v) => v.id !== id),
+        // Also remove any clips from this video
+        videoClips: prev.videoClips.filter((c) => c.videoId !== id),
+      }));
+    },
+    []
+  );
+
+  const reorderVideos = useCallback(
+    (videos: WizardVideo[]) => setState((prev) => ({ ...prev, videos })),
+    []
+  );
+
+  const addClip = useCallback(
+    (clip: VideoClip) =>
+      setState((prev) => ({
+        ...prev,
+        videoClips: [...prev.videoClips, clip],
+      })),
+    []
+  );
+
+  const updateClip = useCallback(
+    (id: string, updates: Partial<VideoClip>) =>
+      setState((prev) => ({
+        ...prev,
+        videoClips: prev.videoClips.map((c) =>
+          c.id === id ? { ...c, ...updates } : c
+        ),
+      })),
+    []
+  );
+
+  const removeClip = useCallback(
+    (id: string) =>
+      setState((prev) => ({
+        ...prev,
+        videoClips: prev.videoClips.filter((c) => c.id !== id),
+      })),
+    []
+  );
+
+  const reorderClips = useCallback(
+    (clips: VideoClip[]) => setState((prev) => ({ ...prev, videoClips: clips })),
+    []
+  );
+
+  const setCompilationUrl = useCallback(
+    (url: string) => setState((prev) => ({ ...prev, compilationUrl: url })),
+    []
+  );
+
   const reset = useCallback(() => {
     setState(initialState);
     if (typeof window !== "undefined") {
       localStorage.removeItem(STORAGE_KEY);
       clearPhotoStore().catch(() => {});
+      clearVideoStore().catch(() => {});
     }
   }, []);
 
@@ -322,9 +456,17 @@ export function useMemorialState() {
       setTributeMode,
       setHasPassedTransition,
       setSupportContext,
+      addVideo,
+      removeVideo,
+      reorderVideos,
+      addClip,
+      updateClip,
+      removeClip,
+      reorderClips,
+      setCompilationUrl,
       reset,
     }),
-    [updatePetDetails, addPhoto, removePhoto, reorderPhotos, addChatMessage, setTribute, setHeroPhotoFile, setHomepageMemory, setTributeMode, setHasPassedTransition, setSupportContext, reset]
+    [updatePetDetails, addPhoto, removePhoto, reorderPhotos, addChatMessage, setTribute, setHeroPhotoFile, setHomepageMemory, setTributeMode, setHasPassedTransition, setSupportContext, addVideo, removeVideo, reorderVideos, addClip, updateClip, removeClip, reorderClips, setCompilationUrl, reset]
   );
 
   return useMemo(
@@ -338,9 +480,13 @@ export function useMemorialState() {
       tributeMode: state.tributeMode,
       hasPassedTransition: state.hasPassedTransition,
       supportContext: state.supportContext,
+      videos: state.videos,
+      videoClips: state.videoClips,
+      compilationUrl: state.compilationUrl,
       hydrated,
       heroPhotoFileRef,
       photoFilesRef,
+      videoFilesRef,
       ...actions,
     }),
     [state, hydrated, actions]

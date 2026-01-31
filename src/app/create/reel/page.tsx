@@ -1,11 +1,22 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Film } from "lucide-react";
+import { ArrowLeft, Scissors } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useMemorialContext } from "@/contexts/memorial-state-context";
+import { StepVideoUpload } from "@/components/wizard/step-video-upload";
 
 export default function ReelPage() {
   const router = useRouter();
+  const { videos, petDetails, addVideo, removeVideo, hydrated } = useMemorialContext();
+
+  if (!hydrated) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-amber-500 border-t-transparent" />
+      </div>
+    );
+  }
 
   return (
     <div className="py-8 px-4">
@@ -20,15 +31,24 @@ export default function ReelPage() {
           Back to workspace
         </Button>
 
-        <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
-          <div className="rounded-2xl bg-gray-100 p-6">
-            <Film className="h-12 w-12 text-gray-400" />
+        <StepVideoUpload
+          videos={videos}
+          onAddVideo={addVideo}
+          onRemoveVideo={removeVideo}
+          petName={petDetails.petName}
+        />
+
+        {videos.length > 0 && (
+          <div className="mt-6">
+            <Button
+              onClick={() => router.push("/create/reel/clips")}
+              className="w-full h-12 text-base bg-amber-600 hover:bg-amber-700 gap-2"
+            >
+              <Scissors className="h-5 w-5" />
+              Create Clips
+            </Button>
           </div>
-          <h2 className="text-xl font-semibold text-gray-900">Video Reel</h2>
-          <p className="text-gray-500 max-w-xs">
-            Turn your photos into a beautiful video memory. This feature is coming soon.
-          </p>
-        </div>
+        )}
       </div>
     </div>
   );
