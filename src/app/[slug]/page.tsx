@@ -26,6 +26,7 @@ interface Memorial {
   tribute: string | null;
   is_published: boolean;
   photos: Photo[];
+  compilation_url?: string | null;
 }
 
 async function getMemorial(slug: string) {
@@ -55,7 +56,22 @@ async function getMemorial(slug: string) {
     );
   }
 
-  return { memorial: memorial as Memorial, isOwner };
+  // Fetch latest completed video compilation
+  const { data: compilation } = await supabase
+    .from("video_compilations")
+    .select("url")
+    .eq("memorial_id", memorial.id)
+    .eq("status", "complete")
+    .order("completed_at", { ascending: false })
+    .limit(1)
+    .single();
+
+  const memorialData: Memorial = {
+    ...(memorial as Memorial),
+    compilation_url: compilation?.url ?? null,
+  };
+
+  return { memorial: memorialData, isOwner };
 }
 
 function formatDate(dateStr: string | null): string | null {
@@ -208,6 +224,25 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
           </div>
         </section>
       ) : null}
+
+      {/* Video Compilation */}
+      {memorial.compilation_url && (
+        <section className="mx-auto max-w-2xl px-4 pb-8 sm:px-6">
+          <h2 className="mb-4 font-serif text-2xl font-medium text-gray-900">
+            Video Memories
+          </h2>
+          <div className="rounded-2xl overflow-hidden bg-black">
+            {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+            <video
+              src={memorial.compilation_url}
+              controls
+              playsInline
+              poster={heroPhoto?.url}
+              className="w-full"
+            />
+          </div>
+        </section>
+      )}
 
       {/* Photo Gallery */}
       {galleryPhotos.length > 0 && (
