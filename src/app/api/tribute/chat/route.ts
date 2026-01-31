@@ -66,7 +66,7 @@ export async function POST(request: Request) {
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
   const message = await anthropic.messages.create({
-    model: "claude-haiku-4-20250414",
+    model: "claude-haiku-4-20250514",
     max_tokens: 200,
     system: `You are sitting with a pet owner who just lost their ${safeSpecies}, ${safePetName}. They chose to celebrate ${safePetName}'s life by sharing memories with you. You genuinely want to hear about this pet — you're not interviewing them or extracting information. You're a friend at the kitchen table, listening.
 
