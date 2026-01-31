@@ -7,6 +7,7 @@ import { ArrowLeft } from "lucide-react";
 import { PricingCards } from "@/components/checkout/pricing-cards";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 
 function PreviewContent() {
   const ctx = useMemorialContext();
@@ -15,6 +16,7 @@ function PreviewContent() {
   const autoSave = searchParams.get("autoSave") === "1";
   const autoSaveTriggered = useRef(false);
   const [saving, setSaving] = useState(false);
+  const [autoSaveFailed, setAutoSaveFailed] = useState(false);
   const [savedMemorial, setSavedMemorial] = useState<{
     id: string;
     slug: string;
@@ -62,7 +64,8 @@ function PreviewContent() {
       photos.push(...galleryResults);
     } catch (err) {
       if (err instanceof Error && err.message === "__AUTH_REQUIRED__") {
-        router.push("/sign-in?redirect=" + encodeURIComponent("/create/preview?autoSave=1"));
+        toast.info("Sign in to save your memorial — your progress is safe.");
+        router.push("/sign-in?redirect=" + encodeURIComponent("/create/preview?autoSave=1") + "&context=save");
         return;
       }
       throw err;
@@ -103,7 +106,12 @@ function PreviewContent() {
     // Strip autoSave param from URL
     router.replace("/create/preview", { scroll: false });
     setSaving(true);
-    handleSave().catch(() => {}).finally(() => setSaving(false));
+    handleSave()
+      .catch((err) => {
+        toast.error(err instanceof Error ? err.message : "Failed to save memorial. Please try again.");
+        setAutoSaveFailed(true);
+      })
+      .finally(() => setSaving(false));
   }, [autoSave, ctx.hydrated, handleSave, router]);
 
   if (!ctx.hydrated || saving) {
@@ -114,6 +122,32 @@ function PreviewContent() {
           {saving && (
             <p className="text-sm text-gray-500">Saving your memorial...</p>
           )}
+        </div>
+      </div>
+    );
+  }
+
+  if (autoSaveFailed) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-center space-y-4 px-4">
+          <p className="text-gray-700">Something went wrong saving your memorial.</p>
+          <p className="text-sm text-gray-500">Your progress is safe — you can try again.</p>
+          <Button
+            onClick={() => {
+              setAutoSaveFailed(false);
+              setSaving(true);
+              handleSave()
+                .catch((err) => {
+                  toast.error(err instanceof Error ? err.message : "Failed to save memorial. Please try again.");
+                  setAutoSaveFailed(true);
+                })
+                .finally(() => setSaving(false));
+            }}
+            className="bg-amber-600 hover:bg-amber-700"
+          >
+            Try again
+          </Button>
         </div>
       </div>
     );

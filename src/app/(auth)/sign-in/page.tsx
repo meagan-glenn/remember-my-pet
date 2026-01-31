@@ -21,6 +21,7 @@ function SignInForm() {
   const redirect = rawRedirect.startsWith("/") && !rawRedirect.startsWith("//")
     ? rawRedirect
     : "/dashboard";
+  const context = searchParams.get("context");
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
@@ -55,12 +56,14 @@ function SignInForm() {
     <Card>
       <CardHeader className="text-center">
         <CardTitle className="text-2xl">
-          {sent ? "Check your email" : "Welcome back"}
+          {sent ? "Check your email" : context === "save" ? "Save your memorial" : "Welcome back"}
         </CardTitle>
         <CardDescription>
           {sent
             ? `We sent a sign-in link to ${email}`
-            : "Enter your email to sign in with a magic link"}
+            : context === "save"
+              ? "Sign in or create an account to save — your progress is safe"
+              : "Enter your email to sign in with a magic link"}
         </CardDescription>
       </CardHeader>
       <CardContent>
