@@ -37,6 +37,7 @@
     "posthog-js": "^1.336.1",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "react-image-crop": "^11.0.10",
     "resend": "^6.9.1",
     "sonner": "^2.0.7",
     "stripe": "^20.3.0",

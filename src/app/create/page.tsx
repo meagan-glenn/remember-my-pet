@@ -9,6 +9,7 @@ import { ImagePlus, X, Camera, PenLine, Film, Eye } from "lucide-react";
 import Link from "next/link";
 import { useState, useRef, useCallback } from "react";
 import type { PetDetails } from "@/hooks/use-memorial-state";
+import { ImageCropModal } from "@/components/image-crop-modal";
 
 function LoadingSkeleton() {
   return (
@@ -23,6 +24,7 @@ function LoadingSkeleton() {
 function IntroForm() {
   const { petDetails, ownerLastName, setOwnerLastName, updatePetDetails, setHeroPhotoFile, setIntroComplete, hydrated } = useMemorialContext();
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [cropSrc, setCropSrc] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleHeroUpload = useCallback(
@@ -39,9 +41,9 @@ function IntroForm() {
         const { heroPhoto: _, ...rest } = prev;
         return rest;
       });
-      setHeroPhotoFile(file);
+      setCropSrc(URL.createObjectURL(file));
     },
-    [setHeroPhotoFile]
+    []
   );
 
   const validate = (): boolean => {
@@ -167,12 +169,12 @@ function IntroForm() {
             <div className="space-y-2">
               <Label>Primary photo</Label>
               {petDetails.heroPhoto ? (
-                <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl">
+                <div className="relative w-full overflow-hidden rounded-xl bg-gray-100">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={petDetails.heroPhoto}
                     alt={petDetails.petName || "Pet photo"}
-                    className="absolute inset-0 h-full w-full object-cover"
+                    className="w-full object-contain"
                   />
                   <button
                     type="button"
@@ -222,6 +224,21 @@ function IntroForm() {
             Continue
           </Button>
         </form>
+        {cropSrc && (
+          <ImageCropModal
+            imageSrc={cropSrc}
+            open={!!cropSrc}
+            onClose={() => {
+              URL.revokeObjectURL(cropSrc);
+              setCropSrc(null);
+            }}
+            onCropComplete={(croppedFile) => {
+              URL.revokeObjectURL(cropSrc);
+              setCropSrc(null);
+              setHeroPhotoFile(croppedFile);
+            }}
+          />
+        )}
       </div>
     </div>
   );
@@ -380,6 +397,7 @@ function PetDetailsEditor({
   onSetHeroFile: (file: File | null) => void;
 }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [cropSrc, setCropSrc] = useState<string | null>(null);
 
   return (
     <div className="rounded-2xl border border-gray-200 bg-white p-5 space-y-4">
@@ -459,12 +477,12 @@ function PetDetailsEditor({
       <div className="space-y-2">
         <Label>Primary photo</Label>
         {petDetails.heroPhoto ? (
-          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl">
+          <div className="relative w-full overflow-hidden rounded-xl bg-gray-100">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={petDetails.heroPhoto}
               alt={petDetails.petName || "Pet photo"}
-              className="absolute inset-0 h-full w-full object-cover"
+              className="w-full object-contain"
             />
             <button
               type="button"
@@ -491,13 +509,28 @@ function PetDetailsEditor({
           onChange={(e) => {
             const file = e.target.files?.[0];
             if (file && file.size <= 10 * 1024 * 1024 && file.type.startsWith("image/")) {
-              onSetHeroFile(file);
+              setCropSrc(URL.createObjectURL(file));
             }
             e.target.value = "";
           }}
           className="hidden"
         />
       </div>
+      {cropSrc && (
+        <ImageCropModal
+          imageSrc={cropSrc}
+          open={!!cropSrc}
+          onClose={() => {
+            URL.revokeObjectURL(cropSrc);
+            setCropSrc(null);
+          }}
+          onCropComplete={(croppedFile) => {
+            URL.revokeObjectURL(cropSrc);
+            setCropSrc(null);
+            onSetHeroFile(croppedFile);
+          }}
+        />
+      )}
     </div>
   );
 }

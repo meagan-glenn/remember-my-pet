@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ImagePlus, X } from "lucide-react";
+import { ImageCropModal } from "@/components/image-crop-modal";
 
 interface StepPetDetailsProps {
   data: PetDetails;
@@ -16,6 +17,7 @@ interface StepPetDetailsProps {
 
 export function StepPetDetails({ data, onUpdate, onSetHeroFile, onNext }: StepPetDetailsProps) {
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [cropSrc, setCropSrc] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleHeroUpload = useCallback(
@@ -34,9 +36,9 @@ export function StepPetDetails({ data, onUpdate, onSetHeroFile, onNext }: StepPe
         return rest;
       });
 
-      onSetHeroFile(file);
+      setCropSrc(URL.createObjectURL(file));
     },
-    [onSetHeroFile]
+    []
   );
 
   const validate = (): boolean => {
@@ -145,12 +147,12 @@ export function StepPetDetails({ data, onUpdate, onSetHeroFile, onNext }: StepPe
         <div className="space-y-2">
           <Label>Primary photo</Label>
           {data.heroPhoto ? (
-            <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl">
+            <div className="relative w-full overflow-hidden rounded-xl bg-gray-100">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={data.heroPhoto}
                 alt={data.petName || "Pet photo"}
-                className="absolute inset-0 h-full w-full object-cover"
+                className="w-full object-contain"
               />
               <button
                 type="button"
@@ -199,6 +201,21 @@ export function StepPetDetails({ data, onUpdate, onSetHeroFile, onNext }: StepPe
       >
         Continue
       </Button>
+      {cropSrc && (
+        <ImageCropModal
+          imageSrc={cropSrc}
+          open={!!cropSrc}
+          onClose={() => {
+            URL.revokeObjectURL(cropSrc);
+            setCropSrc(null);
+          }}
+          onCropComplete={(croppedFile) => {
+            URL.revokeObjectURL(cropSrc);
+            setCropSrc(null);
+            onSetHeroFile(croppedFile);
+          }}
+        />
+      )}
     </form>
   );
 }
