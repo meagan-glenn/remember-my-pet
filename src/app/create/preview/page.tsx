@@ -5,12 +5,16 @@ import { StepPreview } from "@/components/wizard/step-preview";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { PricingCards } from "@/components/checkout/pricing-cards";
-import { useRouter } from "next/navigation";
-import { useCallback, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 
-export default function PreviewPage() {
+function PreviewContent() {
   const ctx = useMemorialContext();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const autoSave = searchParams.get("autoSave") === "1";
+  const autoSaveTriggered = useRef(false);
+  const [saving, setSaving] = useState(false);
   const [savedMemorial, setSavedMemorial] = useState<{
     id: string;
     slug: string;
@@ -57,7 +61,7 @@ export default function PreviewPage() {
       photos.push(...galleryResults);
     } catch (err) {
       if (err instanceof Error && err.message === "__AUTH_REQUIRED__") {
-        router.push("/sign-in?redirect=/create/preview");
+        router.push("/sign-in?redirect=" + encodeURIComponent("/create/preview?autoSave=1"));
         return;
       }
       throw err;
@@ -91,10 +95,25 @@ export default function PreviewPage() {
     setSavedMemorial({ id: memorialId, slug });
   }, [ctx, uploadFile, router]);
 
-  if (!ctx.hydrated) {
+  // Auto-trigger save when returning from auth redirect
+  useEffect(() => {
+    if (!autoSave || !ctx.hydrated || autoSaveTriggered.current) return;
+    autoSaveTriggered.current = true;
+    // Strip autoSave param from URL
+    router.replace("/create/preview", { scroll: false });
+    setSaving(true);
+    handleSave().catch(() => {}).finally(() => setSaving(false));
+  }, [autoSave, ctx.hydrated, handleSave, router]);
+
+  if (!ctx.hydrated || saving) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-amber-500 border-t-transparent" />
+        <div className="text-center space-y-3">
+          <div className="h-8 w-8 mx-auto animate-spin rounded-full border-2 border-amber-500 border-t-transparent" />
+          {saving && (
+            <p className="text-sm text-gray-500">Saving your memorial...</p>
+          )}
+        </div>
       </div>
     );
   }
@@ -135,5 +154,13 @@ export default function PreviewPage() {
         onBack={() => router.push("/create")}
       />
     </div>
+  );
+}
+
+export default function PreviewPage() {
+  return (
+    <Suspense>
+      <PreviewContent />
+    </Suspense>
   );
 }
