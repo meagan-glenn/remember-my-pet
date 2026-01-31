@@ -224,6 +224,7 @@ function Dashboard() {
     photos,
     chatMessages,
     generatedTribute,
+    tributeMode,
     updatePetDetails,
     setHeroPhotoFile,
     hydrated,
@@ -239,12 +240,13 @@ function Dashboard() {
     : `${photoCount} photo${photoCount !== 1 ? "s" : ""} uploaded`;
   const photoStatusType = photoCount === 0 ? "not-started" as const : "in-progress" as const;
 
-  const tributeStatus = chatMessages.length === 0 && !generatedTribute
+  const tributeNotStarted = !tributeMode && chatMessages.length === 0 && !generatedTribute;
+  const tributeStatus = tributeNotStarted
     ? "Not started"
     : generatedTribute
       ? "Complete"
       : "In progress";
-  const tributeStatusType = chatMessages.length === 0 && !generatedTribute
+  const tributeStatusType = tributeNotStarted
     ? "not-started" as const
     : generatedTribute
       ? "complete" as const

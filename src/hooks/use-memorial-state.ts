@@ -27,6 +27,11 @@ export interface WizardPhoto {
   sortOrder: number;
 }
 
+export interface SupportContextEntry {
+  userConcern: string;
+  aiReframing: string;
+}
+
 export interface MemorialState {
   petDetails: PetDetails;
   photos: WizardPhoto[];
@@ -34,6 +39,9 @@ export interface MemorialState {
   generatedTribute: string;
   memorialId: string;
   homepageMemory: string;
+  tributeMode: "celebrate" | "support" | "";
+  hasPassedTransition: boolean;
+  supportContext: SupportContextEntry[];
 }
 
 const STORAGE_KEY = "petmemorial-wizard-state";
@@ -53,6 +61,9 @@ const initialState: MemorialState = {
   generatedTribute: "",
   memorialId: "",
   homepageMemory: "",
+  tributeMode: "",
+  hasPassedTransition: false,
+  supportContext: [],
 };
 
 function loadState(): MemorialState {
@@ -265,6 +276,31 @@ export function useMemorialState() {
     []
   );
 
+  const setTributeMode = useCallback(
+    (mode: "celebrate" | "support" | "") =>
+      setState((prev) => ({
+        ...prev,
+        tributeMode: mode,
+        chatMessages: [],
+        generatedTribute: "",
+        hasPassedTransition: false,
+        supportContext: [],
+      })),
+    []
+  );
+
+  const setHasPassedTransition = useCallback(
+    (passed: boolean) =>
+      setState((prev) => ({ ...prev, hasPassedTransition: passed })),
+    []
+  );
+
+  const setSupportContext = useCallback(
+    (ctx: SupportContextEntry[]) =>
+      setState((prev) => ({ ...prev, supportContext: ctx })),
+    []
+  );
+
   const reset = useCallback(() => {
     setState(initialState);
     if (typeof window !== "undefined") {
@@ -283,9 +319,12 @@ export function useMemorialState() {
       setTribute,
       setHeroPhotoFile,
       setHomepageMemory,
+      setTributeMode,
+      setHasPassedTransition,
+      setSupportContext,
       reset,
     }),
-    [updatePetDetails, addPhoto, removePhoto, reorderPhotos, addChatMessage, setTribute, setHeroPhotoFile, setHomepageMemory, reset]
+    [updatePetDetails, addPhoto, removePhoto, reorderPhotos, addChatMessage, setTribute, setHeroPhotoFile, setHomepageMemory, setTributeMode, setHasPassedTransition, setSupportContext, reset]
   );
 
   return useMemo(
@@ -296,6 +335,9 @@ export function useMemorialState() {
       generatedTribute: state.generatedTribute,
       memorialId: state.memorialId,
       homepageMemory: state.homepageMemory,
+      tributeMode: state.tributeMode,
+      hasPassedTransition: state.hasPassedTransition,
+      supportContext: state.supportContext,
       hydrated,
       heroPhotoFileRef,
       photoFilesRef,
