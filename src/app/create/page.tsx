@@ -21,7 +21,7 @@ function LoadingSkeleton() {
 // ── Intro Mode: Pet details form ──────────────────────────────────────────────
 
 function IntroForm() {
-  const { petDetails, updatePetDetails, setHeroPhotoFile, setIntroComplete, hydrated } = useMemorialContext();
+  const { petDetails, ownerLastName, setOwnerLastName, updatePetDetails, setHeroPhotoFile, setIntroComplete, hydrated } = useMemorialContext();
   const [errors, setErrors] = useState<Record<string, string>>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -96,6 +96,17 @@ function IntroForm() {
               {errors.petName && (
                 <p className="text-sm text-red-500">{errors.petName}</p>
               )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="ownerLastName">Your last name</Label>
+              <Input
+                id="ownerLastName"
+                placeholder="Used for the memorial URL"
+                value={ownerLastName}
+                onChange={(e) => setOwnerLastName(e.target.value)}
+                className="h-12 text-base"
+              />
             </div>
 
             <div className="space-y-2">
@@ -227,6 +238,8 @@ function Dashboard() {
     tributeMode,
     videos,
     compilationUrl,
+    ownerLastName,
+    setOwnerLastName,
     updatePetDetails,
     setHeroPhotoFile,
     hydrated,
@@ -288,6 +301,8 @@ function Dashboard() {
         {editingDetails && (
           <PetDetailsEditor
             petDetails={petDetails}
+            ownerLastName={ownerLastName}
+            onOwnerLastNameChange={setOwnerLastName}
             onUpdate={updatePetDetails}
             onSetHeroFile={setHeroPhotoFile}
           />
@@ -353,10 +368,14 @@ function Dashboard() {
 
 function PetDetailsEditor({
   petDetails,
+  ownerLastName,
+  onOwnerLastNameChange,
   onUpdate,
   onSetHeroFile,
 }: {
   petDetails: PetDetails;
+  ownerLastName: string;
+  onOwnerLastNameChange: (name: string) => void;
   onUpdate: (details: Partial<PetDetails>) => void;
   onSetHeroFile: (file: File | null) => void;
 }) {
@@ -370,6 +389,17 @@ function PetDetailsEditor({
           id="edit-petName"
           value={petDetails.petName}
           onChange={(e) => onUpdate({ petName: e.target.value })}
+          className="h-12 text-base"
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="edit-ownerLastName">Your last name</Label>
+        <Input
+          id="edit-ownerLastName"
+          placeholder="Used for the memorial URL"
+          value={ownerLastName}
+          onChange={(e) => onOwnerLastNameChange(e.target.value)}
           className="h-12 text-base"
         />
       </div>

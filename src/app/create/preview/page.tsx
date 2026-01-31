@@ -64,6 +64,7 @@ export default function PreviewPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         petName: ctx.petDetails.petName,
+        ownerLastName: ctx.ownerLastName,
         species:
           ctx.petDetails.species === "other"
             ? ctx.petDetails.customSpecies

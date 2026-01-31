@@ -7,15 +7,15 @@ const MAX_TRIBUTE = 5000;
 const MAX_PHOTOS = 20;
 const MAX_SLUG_ATTEMPTS = 10;
 
-function generateSlug(petName: string, deathDate: string | null): string {
-  const name = petName
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
+function generateSlug(petName: string, ownerLastName: string, deathDate: string | null): string {
+  const normalize = (s: string) =>
+    s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  const name = normalize(petName);
+  const lastName = normalize(ownerLastName);
   const year = deathDate
     ? new Date(deathDate).getFullYear()
     : new Date().getFullYear();
-  return `${name}-${year}`;
+  return lastName ? `${name}-${lastName}-${year}` : `${name}-${year}`;
 }
 
 export async function POST(request: Request) {
@@ -36,7 +36,7 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json();
-  const { petName, species, birthDate, deathDate, tribute } = body;
+  const { petName, species, birthDate, deathDate, tribute, ownerLastName } = body;
   // Support both new { url, caption } format and legacy string[] format
   const photoItems: { url: string; caption?: string }[] = body.photos
     ? body.photos.map((p: { url: string; caption?: string }) => p)
@@ -87,7 +87,7 @@ export async function POST(request: Request) {
     .upsert({ id: user.id, email: user.email }, { onConflict: "id" });
 
   // Generate unique slug (capped attempts)
-  const baseSlug = generateSlug(petName, deathDate);
+  const baseSlug = generateSlug(petName, ownerLastName || "", deathDate);
   let slug = baseSlug;
   let found = false;
 
