@@ -5,6 +5,18 @@ import type { WizardPhoto } from "@/hooks/use-memorial-state";
 import { Button } from "@/components/ui/button";
 import { X, Upload, ImagePlus } from "lucide-react";
 
+function fileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result as string;
+      resolve(result.split(",")[1]);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
 interface StepPhotoUploadProps {
   photos: WizardPhoto[];
   heroPhoto: string;
@@ -43,6 +55,7 @@ export function StepPhotoUpload({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState("");
   const [dragOver, setDragOver] = useState(false);
+  const [captioning, setCaptioning] = useState<Set<string>>(new Set());
 
   const addLocalFile = useCallback(
     (file: File): void => {
@@ -56,14 +69,39 @@ export function StepPhotoUpload({
       }
 
       const url = URL.createObjectURL(file);
-      onAddPhoto({
-        id: crypto.randomUUID(),
-        url,
-        file,
-        sortOrder: photos.length,
-      });
+      const id = crypto.randomUUID();
+      onAddPhoto({ id, url, file, sortOrder: photos.length });
+
+      // Auto-generate caption in background
+      if (onSetCaption) {
+        setCaptioning((prev) => new Set(prev).add(id));
+        fileToBase64(file)
+          .then((base64) =>
+            fetch("/api/caption", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                imageBase64: base64,
+                mimeType: file.type,
+                petName,
+              }),
+            })
+          )
+          .then((res) => res.json())
+          .then(({ caption }) => {
+            if (caption) onSetCaption(id, caption);
+          })
+          .catch(() => {})
+          .finally(() =>
+            setCaptioning((prev) => {
+              const next = new Set(prev);
+              next.delete(id);
+              return next;
+            })
+          );
+      }
     },
-    [photos.length, onAddPhoto]
+    [photos.length, onAddPhoto, onSetCaption, petName]
   );
 
   const handleFiles = useCallback(
@@ -165,10 +203,10 @@ export function StepPhotoUpload({
               {onSetCaption && (
                 <input
                   type="text"
-                  placeholder="Add a caption..."
+                  placeholder={captioning.has(photo.id) ? "Generating caption..." : "Add a caption..."}
                   value={photo.caption || ""}
                   onChange={(e) => onSetCaption(photo.id, e.target.value)}
-                  className="w-full rounded-md border border-gray-200 px-2 py-1 text-xs text-gray-700 placeholder:text-gray-400 focus:border-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-400"
+                  className={`w-full rounded-md border border-gray-200 px-2 py-1 text-xs text-gray-700 placeholder:text-gray-400 focus:border-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-400 ${captioning.has(photo.id) ? "animate-pulse bg-amber-50" : ""}`}
                   maxLength={200}
                 />
               )}
