@@ -16,11 +16,13 @@ import {
 import { Heart, CloudRain } from "lucide-react";
 import { detectCrisisKeywords } from "@/lib/crisis-detection";
 import {
-  CELEBRATE_PROMPTS,
   SUPPORT_PROMPTS,
   SUPPORT_CELEBRATE_PROMPTS,
 } from "@/lib/tribute-prompts";
 import type { SupportContextEntry } from "@/hooks/use-memorial-state";
+
+const FIRST_CELEBRATE_QUESTION = (name: string) =>
+  `I'd love to hear about ${name}. What was ${name}'s favorite thing to do?`;
 
 interface StepTributeChatProps {
   petName: string;
@@ -73,6 +75,8 @@ export function StepTributeChat({
   const [switchConfirmOpen, setSwitchConfirmOpen] = useState(false);
   const [pendingSwitchMode, setPendingSwitchMode] = useState<"celebrate" | "support" | "">("");
   const [supportLoading, setSupportLoading] = useState(false);
+  const [readyForTribute, setReadyForTribute] = useState(false);
+  const [chatLoading, setChatLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const modeCardRef = useRef<HTMLButtonElement>(null);
 
@@ -99,12 +103,17 @@ export function StepTributeChat({
   // Send first prompt when mode is selected and no messages yet
   useEffect(() => {
     if (authChecked && !needsAuth && tributeMode && chatMessages.length === 0) {
-      const prompts =
-        tributeMode === "support" ? SUPPORT_PROMPTS : CELEBRATE_PROMPTS;
-      onAddMessage({
-        role: "assistant",
-        content: prompts[0](petName || "your pet"),
-      });
+      if (tributeMode === "support") {
+        onAddMessage({
+          role: "assistant",
+          content: SUPPORT_PROMPTS[0](petName || "your pet"),
+        });
+      } else {
+        onAddMessage({
+          role: "assistant",
+          content: FIRST_CELEBRATE_QUESTION(petName || "your pet"),
+        });
+      }
     }
   }, [authChecked, needsAuth, tributeMode, chatMessages.length, petName, onAddMessage]);
 
@@ -112,14 +121,6 @@ export function StepTributeChat({
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chatMessages]);
-
-  // Determine which prompts to use based on mode + transition state
-  const activePrompts =
-    tributeMode === "support"
-      ? hasPassedTransition
-        ? SUPPORT_CELEBRATE_PROMPTS
-        : SUPPORT_PROMPTS
-      : CELEBRATE_PROMPTS;
 
   // Count user messages to determine progress
   const userMessages = chatMessages.filter((m) => m.role === "user");
@@ -131,22 +132,16 @@ export function StepTributeChat({
   const showTransitionInterstitial =
     tributeMode === "support" && !hasPassedTransition && supportPhaseComplete && !isTyping;
 
-  // For celebrate prompts (either mode after transition, or celebrate mode)
-  const celebratePrompts =
-    tributeMode === "support" ? SUPPORT_CELEBRATE_PROMPTS : CELEBRATE_PROMPTS;
-  const celebrateOffset =
-    tributeMode === "support" ? SUPPORT_PROMPTS.length : 0;
+  // For support→celebrate transition: still use hardcoded prompts
+  const celebratePrompts = SUPPORT_CELEBRATE_PROMPTS;
+  const celebrateOffset = SUPPORT_PROMPTS.length;
   const celebrateUserMessages = Math.max(0, supportUserMessages - celebrateOffset);
-  const currentCelebrateIndex = Math.floor(
-    (chatMessages.length - celebrateOffset * 2) / 2
-  );
 
-  // Overall prompt progress
-  const currentPromptIndex = Math.floor(chatMessages.length / 2);
+  // Overall prompt progress — celebrate mode uses AI-driven readyForTribute flag
   const allPromptsAnswered =
     tributeMode === "support"
       ? hasPassedTransition && celebrateUserMessages >= celebratePrompts.length
-      : currentPromptIndex >= CELEBRATE_PROMPTS.length;
+      : readyForTribute;
 
   const sendNextPrompt = (prompts: ((name: string) => string)[], nextIndex: number) => {
     if (nextIndex < prompts.length) {
@@ -158,6 +153,47 @@ export function StepTributeChat({
           content: prompts[nextIndex](petName || "your pet"),
         });
       }, 1500);
+    }
+  };
+
+  const handleCelebrateChat = async (newUserMessage: string) => {
+    setChatLoading(true);
+    setIsTyping(true);
+    setError("");
+    try {
+      const history = [
+        ...chatMessages,
+        { role: "user" as const, content: newUserMessage },
+      ];
+      const res = await fetch("/api/tribute/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          petName: petDetails.petName,
+          species:
+            petDetails.species === "other"
+              ? petDetails.customSpecies
+              : petDetails.species,
+          chatHistory: history,
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Failed to get response");
+      }
+
+      const { reply, readyForTribute: ready } = await res.json();
+      setIsTyping(false);
+      onAddMessage({ role: "assistant", content: reply });
+      if (ready) {
+        setReadyForTribute(true);
+      }
+    } catch (err) {
+      setIsTyping(false);
+      setError(err instanceof Error ? err.message : "Something went wrong");
+    } finally {
+      setChatLoading(false);
     }
   };
 
@@ -175,6 +211,7 @@ export function StepTributeChat({
               ? petDetails.customSpecies
               : petDetails.species,
           concern,
+          priorContext: supportContext,
         }),
       });
 
@@ -232,14 +269,14 @@ export function StepTributeChat({
     if (tributeMode === "support" && !hasPassedTransition) {
       // In support phase — trigger AI reframing
       handleSupportReframing(text);
+    } else if (tributeMode === "support" && hasPassedTransition) {
+      // Support mode celebrate phase — still uses hardcoded prompts
+      const offset = SUPPORT_PROMPTS.length;
+      const nextCelebrateMessages = userMessages.length + 1 - offset;
+      sendNextPrompt(SUPPORT_CELEBRATE_PROMPTS, nextCelebrateMessages);
     } else {
-      // In celebrate phase
-      const prompts =
-        tributeMode === "support" ? SUPPORT_CELEBRATE_PROMPTS : CELEBRATE_PROMPTS;
-      const offset = tributeMode === "support" ? SUPPORT_PROMPTS.length : 0;
-      // Calculate the next celebrate prompt index
-      const celebrateMessages = userMessages.length + 1 - offset;
-      sendNextPrompt(prompts, celebrateMessages);
+      // Celebrate mode — AI-driven conversation
+      handleCelebrateChat(text);
     }
   };
 
@@ -252,12 +289,13 @@ export function StepTributeChat({
       if (nextSupportIndex < SUPPORT_PROMPTS.length) {
         sendNextPrompt(SUPPORT_PROMPTS, nextSupportIndex);
       }
+    } else if (tributeMode === "support" && hasPassedTransition) {
+      const offset = SUPPORT_PROMPTS.length;
+      const nextCelebrateMessages = userMessages.length + 1 - offset;
+      sendNextPrompt(SUPPORT_CELEBRATE_PROMPTS, nextCelebrateMessages);
     } else {
-      const prompts =
-        tributeMode === "support" ? SUPPORT_CELEBRATE_PROMPTS : CELEBRATE_PROMPTS;
-      const offset = tributeMode === "support" ? SUPPORT_PROMPTS.length : 0;
-      const celebrateMessages = userMessages.length + 1 - offset;
-      sendNextPrompt(prompts, celebrateMessages);
+      // Celebrate mode — ask AI for next question (skip counts as thin answer)
+      handleCelebrateChat("(skipped)");
     }
   };
 
@@ -409,7 +447,7 @@ export function StepTributeChat({
             <p className="text-gray-500">
               {tributeMode === "support"
                 ? "We\u2019re here to listen. Take your time."
-                : "Answer a few questions and we\u2019ll write a tribute for you."}
+                : "Share some memories and we\u2019ll write a tribute together."}
             </p>
           )}
         </div>
@@ -525,7 +563,7 @@ export function StepTributeChat({
                   </div>
                 </div>
               ))}
-              {(isTyping || supportLoading) && (
+              {(isTyping || supportLoading || chatLoading) && (
                 <div className="flex justify-start">
                   <div className="rounded-2xl px-4 py-3 bg-gray-100 flex items-center gap-1">
                     <span
@@ -632,12 +670,12 @@ export function StepTributeChat({
                           }}
                           className="h-12 text-base"
                           autoFocus
-                          disabled={supportLoading || isTyping}
+                          disabled={supportLoading || isTyping || chatLoading}
                         />
                         <Button
                           onClick={handleSend}
                           disabled={
-                            !input.trim() || isTyping || supportLoading
+                            !input.trim() || isTyping || supportLoading || chatLoading
                           }
                           className="h-12 px-6 bg-amber-600 hover:bg-amber-700"
                         >
@@ -647,7 +685,7 @@ export function StepTributeChat({
                       <button
                         type="button"
                         onClick={handleSkip}
-                        disabled={supportLoading || isTyping}
+                        disabled={supportLoading || isTyping || chatLoading}
                         className="text-sm text-gray-400 hover:text-gray-500 disabled:opacity-50"
                       >
                         Skip this question
