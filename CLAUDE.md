@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-PetMemorial.ai — an AI-powered platform for creating digital pet memorials with collaborative memory walls and print-on-demand physical products.
+PetMemorial.ai — an AI-powered platform for creating digital pet memorials with collaborative memory walls, print-on-demand physical products, and an optional mobile grief companion app with AI journaling.
 
 ## Commands
 
@@ -24,7 +24,8 @@ npm run lint     # Run ESLint
 | Database & Storage | Supabase (PostgreSQL + Storage) |
 | CDN | Cloudflare R2 |
 | Auth | Supabase Auth (magic links) |
-| AI | Claude Haiku (tribute generation), Claude Sonnet (photo captions), Gemini Flash (vision analysis) |
+| AI | Claude Haiku (tribute generation, theme detection), Claude Sonnet (decision support, journal responses), Gemini Flash (photo captions/vision) |
+| Mobile | React Native (iOS + Android), Firebase Cloud Messaging, AsyncStorage |
 | Payments | Stripe Checkout + Customer Portal |
 | Print-on-Demand | Gelato API (primary), Printful (backup) |
 | Hosting | Vercel |
@@ -38,6 +39,11 @@ npm run lint     # Run ESLint
 - **Cloudflare R2** as CDN for photo/media assets
 - Memorial pages served at `rainbowbridge.pet/petname-year` slug pattern
 
+### Two-Part Product Architecture
+
+- **Web Memorial (Core Product)**: Memorial creation — photos, tribute, videos, memory wall. One-time purchase $49-99.
+- **Mobile App (Optional Add-On)**: Daily grief companion — AI journaling, morning/evening reminders, quick memorial access. Free with memorial purchase.
+
 ### Database Schema (Key Tables)
 
 ```sql
@@ -46,6 +52,13 @@ memorials: id, user_id, pet_name, slug, birth_date, death_date, tribute, decisio
 photos: id, memorial_id, url, caption, ai_detected_tags, sort_order, uploaded_by, created_at
 memories: id, memorial_id, contributor_name, contributor_email, content, photo_urls, is_approved, moderation_status, created_at, approved_at
 contributors: id, memorial_id, email, name, became_creator, created_at
+
+-- Mobile app tables (v3.3)
+journal_entries: id, memorial_id, user_id, entry_date, entry_text, voice_recording_url, attached_photo_urls, attached_video_urls, ai_detected_themes[], ai_response_text, sentiment_score, related_memorial_content_ids, is_private (default true), added_to_memorial (default false), created_at
+journal_themes: id, memorial_id, theme_name, frequency_count, first_mentioned, last_mentioned, ai_suggested_resources
+notification_settings: id, user_id, memorial_id, morning_time, evening_time, enabled, frequency, last_sent_at
+journal_streaks: id, user_id, memorial_id, current_streak_days, longest_streak_days, last_entry_date
+app_sessions: id, user_id, memorial_id, session_start, session_end, features_used[], journal_entries_created, created_at
 ```
 
 ## Critical Product Constraints
@@ -57,6 +70,9 @@ contributors: id, memorial_id, email, name, became_creator, created_at
 - **Private creation period**: After purchase, memorials default to private. Sharing with others is a deliberate later step.
 - **Moderation**: Memory wall contributions are pre-moderated by default (pending queue with approve/edit/delete)
 - **No pressure tactics**: No countdown timers, pop-ups, or urgency messaging
+- **AI journaling must be pet-aware**: Prompts reference specific memorial content (tribute, photos, videos). Never generic grief prompts.
+- **Journal entries private by default**: User explicitly chooses which entries to add to memorial
+- **Mobile app is optional**: Web memorial is the core product. App enhances but is never required.
 
 ## Implementation Progress
 
@@ -107,7 +123,26 @@ contributors: id, memorial_id, email, name, became_creator, created_at
 - **State persistence**: `tributeMode`, `hasPassedTransition`, `supportContext` in localStorage via `useMemorialState`
 - **Dashboard status**: Workspace shows "In progress" once mode is selected
 - **Error recovery**: Support API failure shows "Try again" / "Skip to memories" options
-- **Prompts extracted**: `src/lib/tribute-prompts.ts` — `CELEBRATE_PROMPTS`, `SUPPORT_PROMPTS`, `SUPPORT_CELEBRATE_PROMPTS`
+- **Prompts extracted**: `src/lib/tribute-prompts.ts` — `SUPPORT_PROMPTS`, `SUPPORT_CELEBRATE_PROMPTS` (celebrate mode no longer uses hardcoded prompts)
+
+### Conversational AI Tribute Chat (Prompt Rework)
+- **AI-driven celebrate flow**: Celebrate mode no longer uses hardcoded `CELEBRATE_PROMPTS` array. After the first question, each response comes from `/api/tribute/chat` — the AI acknowledges what the user shared, decides whether to dig deeper or move to a new topic, and signals when it has enough material via `[READY_FOR_TRIBUTE]` marker.
+- **Chat API**: `/api/tribute/chat` — POST, authenticated, rate limit 10/min. Takes `petName`, `species`, `chatHistory`. Returns `{ reply, readyForTribute }`.
+- **Prompt design philosophy**: All prompts across chat, tribute generation, and support use a "friend at the kitchen table" framing, not a therapist or interviewer. Key principles:
+  - **Emotional register matching**: AI matches the user's energy — light for funny stories, gentle for tender/bittersweet ones. Never jokes when the user is being vulnerable.
+  - **Specific reactions**: AI references the actual detail the user shared ("She really had your number, didn't she?"), never reacts generically ("That's beautiful").
+  - **Grief-bleed handling**: If a user in celebrate mode expresses sadness/guilt, the AI sits with it briefly before gently guiding back to happy memories. No immediate redirect.
+  - **Graceful closing**: The AI's final message feels like a natural ending ("I can really picture Skylar doing all of this...") before the Generate Tribute button appears.
+  - **Banned language**: "Thank you for sharing," "What a special bond," "crossed the rainbow bridge," "forever in our hearts," "healing journey," "processing" — all explicitly banned across all prompts.
+- **Tribute generation prompts** (`/api/tribute`): Completely reworked for both celebrate and support modes:
+  - Uses pet name 4-5 times naturally
+  - Quotes/paraphrases the owner's actual words ("she'd stare at me until I caved" not "she was persistent")
+  - Opens with a vivid moment from the stories, not "This is a tribute to..."
+  - Bans pet loss clichés and generic padding
+  - Conversation context passed as `Interviewer:/Owner:` format (preserves emotional nuance from AI acknowledgments)
+- **Support prompt** (`/api/tribute/support`): Now stateful — receives `priorContext` array so second reframing can build on the first. Reframed as "kind friend who understands grief" not "grief counselor."
+- **Support→celebrate transition**: Still uses hardcoded `SUPPORT_CELEBRATE_PROMPTS` (3 questions). Only the primary celebrate mode is AI-driven.
+- **First message**: Changed from cold "What was [name]'s favorite thing to do?" to "I'd love to hear about [name]. What was [name]'s favorite thing to do?"
 
 ### Video Compilation Tool (Issues #11, #12, #13)
 - **Video upload** (`/create/reel`): Drag-and-drop upload (mp4/mov/webm, 100MB max), client-side blob URL previews, first-frame canvas thumbnails, duration extraction via `<video>` `loadedmetadata`, IndexedDB persistence (`src/lib/video-store.ts`), max 10 videos
@@ -133,7 +168,7 @@ contributors: id, memorial_id, email, name, became_creator, created_at
 - **Public display**: Approved memories shown in "Memories & Stories" section on memorial page
 - **Pre-moderation by default**: Nothing appears publicly until owner approves
 
-### Not Yet Built
+### Not Yet Built (Web)
 - Stripe payment integration (checkout + customer portal)
 - Photo captions (Claude Sonnet vision)
 - Photo analysis/tagging (Gemini Flash)
@@ -142,9 +177,25 @@ contributors: id, memorial_id, email, name, became_creator, created_at
 - Cloudflare R2 CDN integration
 - Sign-in redirect callback for `/create/preview` return flow (sign-in page needs to honor `redirect` query param)
 
+### Not Yet Built (Mobile App — v3.3)
+- React Native app setup (iOS + Android)
+- Firebase push notifications (morning/evening reminders)
+- AI grief journaling — pet-aware prompts via Claude Sonnet, theme detection via Claude Haiku
+- Daily check-in system ("What would you tell them today?") with progressive prompt evolution
+- Journal entry timeline with auto-tagged themes (missing routines, guilt, happy memories, etc.)
+- Voice-to-text journaling (for when user is crying)
+- Journal ↔ memorial integration (AI suggests adding journal content to memorial)
+- Streak tracking and engagement counters
+- Quick memorial viewing (mobile-optimized)
+- Offline journaling with AsyncStorage sync
+- Journal export as PDF
+
 ## Reference Documents
 
 - [PRD.md](PRD.md) — Consolidated product requirements (v3.1)
 - [PRD_v3.0.md](PRD_v3.0.md) — Detailed previous version
 - [PRD_v3.1.md](PRD_v3.1.md) — Latest version with user research updates
 - [USER_RESEARCH.md](USER_RESEARCH.md) — User interview insights
+- [PetMemorial_PRD_v3_3.md](PetMemorial_PRD_v3_3.md) — v3.3 PRD with mobile app + AI grief journaling
+- [PetMemorial_PRD_v3_3_Changes_Summary.md](PetMemorial_PRD_v3_3_Changes_Summary.md) — v3.2 → v3.3 change summary
+- [PetMemorial_Day2_Interview_Report.md](PetMemorial_Day2_Interview_Report.md) — Day 2 user research
