@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { createServerSupabase } from "@/lib/supabase-server";
 import type { Metadata } from "next";
 import Image from "next/image";
-import { PawPrint } from "lucide-react";
+import { PawPrint, Gift } from "lucide-react";
 import { ShareButton } from "./share-button";
 import { MemoryList } from "@/components/memory-wall/memory-list";
 import { MemoryForm } from "@/components/memory-wall/memory-form";
@@ -277,20 +277,46 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
           </h2>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
             {galleryPhotos.map((photo) => (
-              <div
-                key={photo.id}
-                className="relative aspect-square overflow-hidden rounded-xl"
-              >
-                <Image
-                  src={photo.url}
-                  alt={photo.caption || memorial.pet_name}
-                  fill
-                  sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
-                  className="object-cover"
-                />
+              <div key={photo.id} className="space-y-2">
+                <div className="relative aspect-square overflow-hidden rounded-xl">
+                  <Image
+                    src={photo.url}
+                    alt={photo.caption || memorial.pet_name}
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
+                    className="object-cover"
+                  />
+                </div>
+                {photo.caption && (
+                  <p className="text-sm text-gray-500 italic px-1">
+                    {photo.caption}
+                  </p>
+                )}
               </div>
             ))}
           </div>
+        </section>
+      )}
+
+      {/* Keepsake CTA (owner only) */}
+      {isOwner && (
+        <section className="mx-auto max-w-2xl px-4 pb-8 sm:px-6 print:hidden">
+          <a
+            href={`/${memorial.slug}/shop`}
+            className="flex items-center gap-4 rounded-2xl border border-amber-100 bg-white/80 p-6 shadow-sm backdrop-blur-sm hover:border-amber-200 transition-colors"
+          >
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-amber-100">
+              <Gift className="h-6 w-6 text-amber-600" />
+            </div>
+            <div>
+              <h3 className="font-serif text-lg font-medium text-gray-900">
+                Create a Keepsake
+              </h3>
+              <p className="text-sm text-gray-500">
+                Turn this memorial into a memory book or canvas print.
+              </p>
+            </div>
+          </a>
         </section>
       )}
 

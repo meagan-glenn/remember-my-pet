@@ -25,26 +25,31 @@ export default function PreviewPage() {
   }, []);
 
   const handleSave = useCallback(async () => {
-    const photoUrls: string[] = [];
+    const photos: { url: string; caption?: string }[] = [];
 
     try {
       // Upload hero photo
       const heroFile = ctx.heroPhotoFileRef.current;
       if (heroFile) {
         const heroUrl = await uploadFile(heroFile);
-        photoUrls.push(heroUrl);
+        photos.push({ url: heroUrl });
       }
 
       // Upload gallery photos in parallel
-      const galleryUploads = ctx.photos
-        .map((p) => {
-          const file = ctx.photoFilesRef.current.get(p.id);
-          return file ? uploadFile(file) : null;
-        })
-        .filter((p): p is Promise<string> => p !== null);
+      const galleryResults = await Promise.all(
+        ctx.photos
+          .map((p) => {
+            const file = ctx.photoFilesRef.current.get(p.id);
+            if (!file) return null;
+            return uploadFile(file).then((url) => ({
+              url,
+              caption: p.caption || undefined,
+            }));
+          })
+          .filter((p) => p !== null)
+      );
 
-      const galleryUrls = await Promise.all(galleryUploads);
-      photoUrls.push(...galleryUrls);
+      photos.push(...galleryResults);
     } catch (err) {
       if (err instanceof Error && err.message === "__AUTH_REQUIRED__") {
         router.push("/sign-in?redirect=/create/preview");
@@ -66,7 +71,7 @@ export default function PreviewPage() {
         birthDate: ctx.petDetails.birthDate || null,
         deathDate: ctx.petDetails.deathDate || null,
         tribute: ctx.generatedTribute,
-        photoUrls,
+        photos,
       }),
     });
 

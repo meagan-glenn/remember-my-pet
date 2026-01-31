@@ -35,8 +35,12 @@ export async function POST(request: Request) {
     );
   }
 
-  const { petName, species, birthDate, deathDate, tribute, photoUrls } =
-    await request.json();
+  const body = await request.json();
+  const { petName, species, birthDate, deathDate, tribute } = body;
+  // Support both new { url, caption } format and legacy string[] format
+  const photoItems: { url: string; caption?: string }[] = body.photos
+    ? body.photos.map((p: { url: string; caption?: string }) => p)
+    : (body.photoUrls || []).map((url: string) => ({ url }));
 
   // Input validation
   if (!petName || typeof petName !== "string" || !tribute || typeof tribute !== "string") {
@@ -60,22 +64,20 @@ export async function POST(request: Request) {
     );
   }
 
-  // Validate photoUrls
+  // Validate photo URLs
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  if (photoUrls && Array.isArray(photoUrls)) {
-    if (photoUrls.length > MAX_PHOTOS) {
+  if (photoItems.length > MAX_PHOTOS) {
+    return NextResponse.json(
+      { error: `Maximum ${MAX_PHOTOS} photos allowed` },
+      { status: 400 }
+    );
+  }
+  for (const item of photoItems) {
+    if (typeof item.url !== "string" || !supabaseUrl || !item.url.startsWith(supabaseUrl)) {
       return NextResponse.json(
-        { error: `Maximum ${MAX_PHOTOS} photos allowed` },
+        { error: "Invalid photo URL" },
         { status: 400 }
       );
-    }
-    for (const url of photoUrls) {
-      if (typeof url !== "string" || !supabaseUrl || !url.startsWith(supabaseUrl)) {
-        return NextResponse.json(
-          { error: "Invalid photo URL" },
-          { status: 400 }
-        );
-      }
     }
   }
 
@@ -132,10 +134,11 @@ export async function POST(request: Request) {
   }
 
   // Insert photos
-  if (photoUrls?.length) {
-    const photosData = photoUrls.slice(0, MAX_PHOTOS).map((url: string, index: number) => ({
+  if (photoItems.length > 0) {
+    const photosData = photoItems.slice(0, MAX_PHOTOS).map((item, index) => ({
       memorial_id: memorial.id,
-      url,
+      url: item.url,
+      caption: item.caption?.slice(0, 200) || null,
       sort_order: index,
       uploaded_by: user.id,
     }));

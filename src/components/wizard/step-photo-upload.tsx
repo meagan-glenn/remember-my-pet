@@ -10,6 +10,7 @@ interface StepPhotoUploadProps {
   heroPhoto: string;
   onAddPhoto: (photo: WizardPhoto) => void;
   onRemovePhoto: (id: string) => void;
+  onSetCaption?: (id: string, caption: string) => void;
   onNext?: () => void;
   onBack?: () => void;
   petName: string;
@@ -32,6 +33,7 @@ export function StepPhotoUpload({
   heroPhoto,
   onAddPhoto,
   onRemovePhoto,
+  onSetCaption,
   onNext,
   onBack,
   petName,
@@ -141,23 +143,35 @@ export function StepPhotoUpload({
       {photos.length > 0 && (
         <div className="grid grid-cols-3 gap-2">
           {photos.map((photo) => (
-            <div key={photo.id} className="relative aspect-square group">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={photo.url}
-                alt=""
-                className="absolute inset-0 h-full w-full rounded-lg object-cover"
-              />
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onRemovePhoto(photo.id);
-                }}
-                className="absolute top-1 right-1 rounded-full bg-black/50 p-1 text-white opacity-0 group-hover:opacity-100 transition-opacity"
-              >
-                <X className="h-4 w-4" />
-              </button>
+            <div key={photo.id} className="space-y-1">
+              <div className="relative aspect-square group">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={photo.url}
+                  alt=""
+                  className="absolute inset-0 h-full w-full rounded-lg object-cover"
+                />
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onRemovePhoto(photo.id);
+                  }}
+                  className="absolute top-1 right-1 rounded-full bg-black/50 p-1 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+              {onSetCaption && (
+                <input
+                  type="text"
+                  placeholder="Add a caption..."
+                  value={photo.caption || ""}
+                  onChange={(e) => onSetCaption(photo.id, e.target.value)}
+                  className="w-full rounded-md border border-gray-200 px-2 py-1 text-xs text-gray-700 placeholder:text-gray-400 focus:border-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-400"
+                  maxLength={200}
+                />
+              )}
             </div>
           ))}
           {photos.length < MAX_PHOTOS && (
