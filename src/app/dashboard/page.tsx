@@ -74,9 +74,19 @@ export default async function Dashboard() {
                         {memorial.pet_name}
                       </CardTitle>
                       <Badge
-                        variant={memorial.is_published ? "default" : "secondary"}
+                        variant={
+                          memorial.is_published
+                            ? "default"
+                            : memorial.is_paid
+                              ? "default"
+                              : "secondary"
+                        }
                       >
-                        {memorial.is_published ? "Published" : "Draft"}
+                        {memorial.is_published
+                          ? "Published"
+                          : memorial.is_paid
+                            ? "Paid"
+                            : "Draft"}
                       </Badge>
                     </div>
                     <CardDescription>
@@ -84,13 +94,21 @@ export default async function Dashboard() {
                       {new Date(memorial.created_at).toLocaleDateString()}
                     </CardDescription>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="flex items-center gap-4">
                     <Link
                       href={`/${memorial.slug}`}
                       className="text-sm text-amber-600 hover:underline"
                     >
                       View memorial
                     </Link>
+                    {!memorial.is_paid && (
+                      <Link
+                        href={`/${memorial.slug}/checkout`}
+                        className="text-sm font-medium text-amber-700 bg-amber-100 hover:bg-amber-200 px-3 py-1 rounded-full transition-colors"
+                      >
+                        Publish
+                      </Link>
+                    )}
                   </CardContent>
                 </Card>
               ))}

@@ -4,12 +4,17 @@ import { useMemorialContext } from "@/contexts/memorial-state-context";
 import { StepPreview } from "@/components/wizard/step-preview";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import { PricingCards } from "@/components/checkout/pricing-cards";
 import { useRouter } from "next/navigation";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 
 export default function PreviewPage() {
   const ctx = useMemorialContext();
   const router = useRouter();
+  const [savedMemorial, setSavedMemorial] = useState<{
+    id: string;
+    slug: string;
+  } | null>(null);
 
   const uploadFile = useCallback(async (file: File): Promise<string> => {
     const formData = new FormData();
@@ -81,15 +86,26 @@ export default function PreviewPage() {
       throw new Error(data.error || "Failed to save memorial");
     }
 
-    const { slug } = await res.json();
+    const { memorialId, slug } = await res.json();
     ctx.reset();
-    router.push(`/dashboard?created=${slug}`);
+    setSavedMemorial({ id: memorialId, slug });
   }, [ctx, uploadFile, router]);
 
   if (!ctx.hydrated) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="h-8 w-8 animate-spin rounded-full border-2 border-amber-500 border-t-transparent" />
+      </div>
+    );
+  }
+
+  if (savedMemorial) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-amber-50/60 via-orange-50/30 to-white py-12 px-4">
+        <PricingCards
+          memorialId={savedMemorial.id}
+          slug={savedMemorial.slug}
+        />
       </div>
     );
   }
