@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { rateLimit } from "@/lib/rate-limit";
-import { generatePhotoCaption } from "@/lib/gemini";
+import { generatePhotoMetadata } from "@/lib/gemini";
 
 export async function POST(request: Request) {
   const ip = request.headers.get("x-forwarded-for") || "unknown";
@@ -12,7 +12,7 @@ export async function POST(request: Request) {
   }
 
   if (!process.env.GOOGLE_AI_API_KEY) {
-    return NextResponse.json({ caption: "" });
+    return NextResponse.json({ caption: "", tags: [] });
   }
 
   try {
@@ -20,15 +20,15 @@ export async function POST(request: Request) {
 
     if (!imageBase64 || !mimeType || !petName) {
       return NextResponse.json(
-        { error: "Missing required fields", caption: "" },
+        { error: "Missing required fields", caption: "", tags: [] },
         { status: 400 }
       );
     }
 
-    const caption = await generatePhotoCaption(imageBase64, mimeType, petName);
-    return NextResponse.json({ caption });
+    const { caption, tags } = await generatePhotoMetadata(imageBase64, mimeType, petName);
+    return NextResponse.json({ caption, tags });
   } catch (error) {
     console.error("Caption generation failed:", error);
-    return NextResponse.json({ caption: "" });
+    return NextResponse.json({ caption: "", tags: [] });
   }
 }

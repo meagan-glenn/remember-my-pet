@@ -34,7 +34,7 @@ function PreviewContent() {
   }, []);
 
   const handleSave = useCallback(async () => {
-    const photos: { url: string; caption?: string }[] = [];
+    const photos: { url: string; caption?: string; aiDetectedTags?: string[] }[] = [];
 
     try {
       // Upload hero photo
@@ -53,6 +53,7 @@ function PreviewContent() {
             return uploadFile(file).then((url) => ({
               url,
               caption: p.caption || undefined,
+              aiDetectedTags: p.aiDetectedTags?.length ? p.aiDetectedTags : undefined,
             }));
           })
           .filter((p) => p !== null)

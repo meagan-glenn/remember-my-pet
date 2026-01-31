@@ -14,13 +14,30 @@ function getClient(): GoogleGenAI {
   return _ai;
 }
 
-export async function generatePhotoCaption(
+export interface PhotoMetadata {
+  caption: string;
+  tags: string[];
+}
+
+export async function generatePhotoMetadata(
   imageBase64: string,
   mimeType: string,
   petName: string
-): Promise<string> {
+): Promise<PhotoMetadata> {
   const contents = createUserContent([
-    `Describe this photo of a pet named ${petName} in one short, warm sentence suitable for a memorial photo caption. Focus on what the pet is doing or the setting. Keep it under 150 characters. Do not use quotes. Do not use clichés like "rainbow bridge," "forever in our hearts," or "best friend."`,
+    `Analyze this photo of a pet named ${petName} and return a JSON object with two fields:
+
+1. "caption": A short, warm sentence suitable for a memorial photo caption. Focus on what the pet is doing or the setting. Keep it under 150 characters. Do not use quotes or clichés like "rainbow bridge," "forever in our hearts," or "best friend."
+
+2. "tags": An array of relevant tags from these categories:
+   - Life stage: "puppy", "kitten", "young", "adult", "senior"
+   - Habits: "sunny_spot", "favorite_toy", "nap_time", "meal_time", "grooming"
+   - Connection: "eye_contact", "lap_time", "cuddling", "playing", "walking"
+   - Setting: "outdoor", "indoor", "beach", "park", "home", "car"
+   Only include tags that clearly apply. Use 1-5 tags.
+
+Return ONLY valid JSON, no markdown fences. Example:
+{"caption": "Stretching out in a warm patch of sunlight", "tags": ["sunny_spot", "indoor", "senior"]}`,
     createPartFromBase64(imageBase64, mimeType),
   ]);
 
@@ -29,5 +46,16 @@ export async function generatePhotoCaption(
     contents,
   });
 
-  return response.text?.trim() || "";
+  const text = response.text?.trim() || "";
+
+  try {
+    const parsed = JSON.parse(text);
+    return {
+      caption: typeof parsed.caption === "string" ? parsed.caption : "",
+      tags: Array.isArray(parsed.tags) ? parsed.tags.filter((t: unknown) => typeof t === "string") : [],
+    };
+  } catch {
+    // Fallback: treat entire response as caption (backward compat)
+    return { caption: text, tags: [] };
+  }
 }

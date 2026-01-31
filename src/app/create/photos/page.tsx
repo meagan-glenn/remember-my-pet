@@ -7,7 +7,7 @@ import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export default function PhotosPage() {
-  const { photos, petDetails, addPhoto, removePhoto, setPhotoCaption, hydrated } = useMemorialContext();
+  const { photos, petDetails, addPhoto, removePhoto, setPhotoCaption, setPhotoTags, hydrated } = useMemorialContext();
   const router = useRouter();
 
   if (!hydrated) {
@@ -37,6 +37,7 @@ export default function PhotosPage() {
           onAddPhoto={addPhoto}
           onRemovePhoto={removePhoto}
           onSetCaption={setPhotoCaption}
+          onSetTags={setPhotoTags}
           onNext={() => router.push("/create")}
           onBack={() => router.push("/create")}
           petName={petDetails.petName}

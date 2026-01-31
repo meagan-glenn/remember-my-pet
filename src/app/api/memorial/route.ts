@@ -37,9 +37,9 @@ export async function POST(request: Request) {
 
   const body = await request.json();
   const { petName, species, birthDate, deathDate, tribute, ownerLastName } = body;
-  // Support both new { url, caption } format and legacy string[] format
-  const photoItems: { url: string; caption?: string }[] = body.photos
-    ? body.photos.map((p: { url: string; caption?: string }) => p)
+  // Support both new { url, caption, aiDetectedTags } format and legacy string[] format
+  const photoItems: { url: string; caption?: string; aiDetectedTags?: string[] }[] = body.photos
+    ? body.photos.map((p: { url: string; caption?: string; aiDetectedTags?: string[] }) => p)
     : (body.photoUrls || []).map((url: string) => ({ url }));
 
   // Input validation
@@ -139,6 +139,7 @@ export async function POST(request: Request) {
       memorial_id: memorial.id,
       url: item.url,
       caption: item.caption?.slice(0, 200) || null,
+      ai_detected_tags: item.aiDetectedTags || [],
       sort_order: index,
       uploaded_by: user.id,
     }));

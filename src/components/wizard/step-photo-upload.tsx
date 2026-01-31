@@ -23,6 +23,7 @@ interface StepPhotoUploadProps {
   onAddPhoto: (photo: WizardPhoto) => void;
   onRemovePhoto: (id: string) => void;
   onSetCaption?: (id: string, caption: string) => void;
+  onSetTags?: (id: string, tags: string[]) => void;
   onNext?: () => void;
   onBack?: () => void;
   petName: string;
@@ -46,6 +47,7 @@ export function StepPhotoUpload({
   onAddPhoto,
   onRemovePhoto,
   onSetCaption,
+  onSetTags,
   onNext,
   onBack,
   petName,
@@ -88,8 +90,9 @@ export function StepPhotoUpload({
             })
           )
           .then((res) => res.json())
-          .then(({ caption }) => {
+          .then(({ caption, tags }) => {
             if (caption) onSetCaption(id, caption);
+            if (tags?.length && onSetTags) onSetTags(id, tags);
           })
           .catch(() => {})
           .finally(() =>
@@ -101,7 +104,7 @@ export function StepPhotoUpload({
           );
       }
     },
-    [photos.length, onAddPhoto, onSetCaption, petName]
+    [photos.length, onAddPhoto, onSetCaption, onSetTags, petName]
   );
 
   const handleFiles = useCallback(

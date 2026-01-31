@@ -32,6 +32,7 @@ export interface WizardPhoto {
   file?: File; // local File for deferred upload
   sortOrder: number;
   caption?: string;
+  aiDetectedTags?: string[];
 }
 
 export interface WizardVideo {
@@ -314,6 +315,17 @@ export function useMemorialState() {
     []
   );
 
+  const setPhotoTags = useCallback(
+    (id: string, tags: string[]) =>
+      setState((prev) => ({
+        ...prev,
+        photos: prev.photos.map((p) =>
+          p.id === id ? { ...p, aiDetectedTags: tags } : p
+        ),
+      })),
+    []
+  );
+
   const reorderPhotos = useCallback(
     (photos: WizardPhoto[]) => setState((prev) => ({ ...prev, photos })),
     []
@@ -476,6 +488,7 @@ export function useMemorialState() {
       addPhoto,
       removePhoto,
       setPhotoCaption,
+      setPhotoTags,
       reorderPhotos,
       addChatMessage,
       setTribute,
@@ -496,7 +509,7 @@ export function useMemorialState() {
       setIntroComplete,
       reset,
     }),
-    [updatePetDetails, addPhoto, removePhoto, setPhotoCaption, reorderPhotos, addChatMessage, setTribute, setHeroPhotoFile, setHomepageMemory, setTributeMode, setHasPassedTransition, setSupportContext, addVideo, removeVideo, reorderVideos, addClip, updateClip, removeClip, reorderClips, setOwnerLastName, setCompilationUrl, setIntroComplete, reset]
+    [updatePetDetails, addPhoto, removePhoto, setPhotoCaption, setPhotoTags, reorderPhotos, addChatMessage, setTribute, setHeroPhotoFile, setHomepageMemory, setTributeMode, setHasPassedTransition, setSupportContext, addVideo, removeVideo, reorderVideos, addClip, updateClip, removeClip, reorderClips, setOwnerLastName, setCompilationUrl, setIntroComplete, reset]
   );
 
   return useMemo(
