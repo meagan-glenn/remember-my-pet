@@ -97,17 +97,50 @@ contributors: id, memorial_id, email, name, became_creator, created_at
 - **Hero fallback**: Paw-print placeholder when no photos exist; tribute "Add a tribute" CTA for owners
 - **Bug fix**: Corrected `eulogy` → `tribute` column name in memorial API route
 
+### Decision Support Mode (Issue #10)
+- **Mode selection screen**: Two-card UI on `/create/tribute` — "Celebrate their life" (amber) or "I'm struggling with guilt or what-ifs" (blue)
+- **Support flow**: AI compassionate reframing via `/api/tribute/support` endpoint (Claude Haiku, rate limit 3/min). Asks about specific regrets, responds with 2-4 sentence reframing, then transitions to celebration questions
+- **Transition interstitial**: User-initiated "When you're ready, let's celebrate what made [Pet] special" card with Continue button (no auto-advance)
+- **Crisis detection**: Client-side keyword scan on submit (`src/lib/crisis-detection.ts`), non-blocking 988 Lifeline banner, no logging/storage
+- **Mode switching**: Allowed freely before 2 messages; confirmation dialog after (clears chat)
+- **Support-aware tribute generation**: `/api/tribute` accepts `mode` and `supportContext`, adjusts system prompt to weave healing themes
+- **State persistence**: `tributeMode`, `hasPassedTransition`, `supportContext` in localStorage via `useMemorialState`
+- **Dashboard status**: Workspace shows "In progress" once mode is selected
+- **Error recovery**: Support API failure shows "Try again" / "Skip to memories" options
+- **Prompts extracted**: `src/lib/tribute-prompts.ts` — `CELEBRATE_PROMPTS`, `SUPPORT_PROMPTS`, `SUPPORT_CELEBRATE_PROMPTS`
+
+### Video Compilation Tool (Issues #11, #12, #13)
+- **Video upload** (`/create/reel`): Drag-and-drop upload (mp4/mov/webm, 100MB max), client-side blob URL previews, first-frame canvas thumbnails, duration extraction via `<video>` `loadedmetadata`, IndexedDB persistence (`src/lib/video-store.ts`), max 10 videos
+- **Upload API**: `/api/upload-video` — Supabase `memorial-videos` bucket, rate limited (5/window)
+- **Video clipper** (`/create/reel/clips`): Custom HTML5 `<video>` player, dual-handle range selector (pointer events, 44px+ touch targets), "Set Start"/"Set End" buttons for mobile, tag input, clip preview playback
+- **Clip list**: Drag-to-reorder, tag badges, duration display, click-to-edit, total compilation duration
+- **FFmpeg compilation** (`/api/compile-video`): Server-side via `fluent-ffmpeg` + `ffmpeg-static`, Node.js runtime, 300s max. Supports cut/fade/dissolve transitions. Downloads sources to `/tmp`, renders, uploads to `memorial-videos/compilations/`
+- **Status polling**: `/api/compile-video/status` — GET with compilationId for async progress tracking
+- **Compile UI** (`/create/reel/compile`): Transition selector (Cut/Fade/Dissolve), progress spinner, result video player, error + retry
+- **Memorial page embed**: Compiled video shown after tribute section on public page (`/[slug]`)
+- **State management**: `WizardVideo`, `VideoClip` interfaces + 8 new actions in `useMemorialState`, IndexedDB hydration for video files
+- **Database**: `videos`, `video_clips`, `video_compilations` tables with RLS (`supabase/migrations/002_video_tables.sql`)
+- **Security**: URL allowlist (SSRF prevention — only Supabase-hosted URLs), runtime numeric validation on clip times (command injection prevention)
+- **Dashboard**: Reel feature card shows dynamic status ("Not started" / "X videos uploaded" / "Complete")
+
+### Memory Wall (Epic 5)
+- **Contributor submission form**: "Share a Memory" section on published memorial pages (`/[slug]`). Name (required), email (optional), text (500 words max), up to 3 photos. No account required.
+- **Anonymous photo upload**: `/api/memories/upload` uses service role client for unauthenticated uploads, validates memorial is published
+- **Memory submission API**: `/api/memories` — IP rate-limited (5/min), validates content, creates memory with `moderation_status: 'pending'`
+- **Moderation API**: `/api/memories/[memoryId]` — PATCH (approve/reject/edit) and DELETE, owner-only with auth
+- **Email notifications**: Resend integration (`src/lib/email.ts`) sends owner an email when a new memory is submitted
+- **Moderation queue**: Dashboard tab "Pending Memories" with count badge. Approve, edit (Dialog), or delete pending memories
+- **Public display**: Approved memories shown in "Memories & Stories" section on memorial page
+- **Pre-moderation by default**: Nothing appears publicly until owner approves
+
 ### Not Yet Built
 - Stripe payment integration (checkout + customer portal)
-- Memory wall (contributor submissions, moderation queue)
 - Photo captions (Claude Sonnet vision)
 - Photo analysis/tagging (Gemini Flash)
 - Print-on-demand integration (Gelato/Printful)
-- Decision Support Mode in tribute flow
-- Email notifications (Resend)
 - Analytics (PostHog)
 - Cloudflare R2 CDN integration
-- Sign-in redirect callback for `/create?step=4` return flow (sign-in page needs to honor `redirect` query param)
+- Sign-in redirect callback for `/create/preview` return flow (sign-in page needs to honor `redirect` query param)
 
 ## Reference Documents
 

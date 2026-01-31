@@ -4,6 +4,8 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { PawPrint } from "lucide-react";
 import { ShareButton } from "./share-button";
+import { MemoryList } from "@/components/memory-wall/memory-list";
+import { MemoryForm } from "@/components/memory-wall/memory-form";
 
 interface MemorialPageProps {
   params: Promise<{ slug: string }>;
@@ -14,6 +16,19 @@ interface Photo {
   url: string;
   caption: string | null;
   sort_order: number;
+}
+
+interface MemoryRow {
+  id: string;
+  memorial_id: string;
+  contributor_name: string;
+  contributor_email: string | null;
+  content: string;
+  photo_urls: string[] | null;
+  is_approved: boolean;
+  moderation_status: string;
+  created_at: string;
+  approved_at: string | null;
 }
 
 interface Memorial {
@@ -27,6 +42,7 @@ interface Memorial {
   is_published: boolean;
   photos: Photo[];
   compilation_url?: string | null;
+  memories: MemoryRow[];
 }
 
 async function getMemorial(slug: string) {
@@ -66,9 +82,18 @@ async function getMemorial(slug: string) {
     .limit(1)
     .single();
 
+  // Fetch approved memories
+  const { data: memories } = await supabase
+    .from("memories")
+    .select("*")
+    .eq("memorial_id", memorial.id)
+    .eq("is_approved", true)
+    .order("created_at", { ascending: false });
+
   const memorialData: Memorial = {
     ...(memorial as Memorial),
     compilation_url: compilation?.url ?? null,
+    memories: (memories as MemoryRow[]) || [],
   };
 
   return { memorial: memorialData, isOwner };
@@ -265,6 +290,19 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
                 />
               </div>
             ))}
+          </div>
+        </section>
+      )}
+
+      {/* Memory Wall */}
+      {memorial.is_published && (
+        <section className="mx-auto max-w-2xl px-4 pb-16 sm:px-6">
+          <h2 className="mb-6 font-serif text-2xl font-medium text-gray-900">
+            Memories &amp; Stories
+          </h2>
+          <div className="space-y-6">
+            <MemoryList memories={memorial.memories} petName={memorial.pet_name} />
+            <MemoryForm memorialId={memorial.id} petName={memorial.pet_name} />
           </div>
         </section>
       )}

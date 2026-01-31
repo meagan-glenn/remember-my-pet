@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/card";
 import Link from "next/link";
 import { SignOutButton } from "./sign-out-button";
+import { DashboardTabs } from "./dashboard-tabs";
 
 export default async function Dashboard() {
   const supabase = await createServerSupabase();
@@ -28,6 +29,18 @@ export default async function Dashboard() {
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
 
+  // Count pending memories across all user's memorials
+  const memorialIds = memorials?.map((m) => m.id) || [];
+  let pendingCount = 0;
+  if (memorialIds.length > 0) {
+    const { count } = await supabase
+      .from("memories")
+      .select("*", { count: "exact", head: true })
+      .in("memorial_id", memorialIds)
+      .eq("moderation_status", "pending");
+    pendingCount = count || 0;
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white py-8 px-4">
       <div className="mx-auto max-w-2xl space-y-6">
@@ -42,46 +55,48 @@ export default async function Dashboard() {
           </Button>
         </Link>
 
-        {!memorials?.length ? (
-          <Card>
-            <CardContent className="py-12 text-center">
-              <p className="text-muted-foreground">
-                You haven&apos;t created any memorials yet.
-              </p>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="space-y-3">
-            {memorials.map((memorial) => (
-              <Card key={memorial.id}>
-                <CardHeader className="pb-2">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">
-                      {memorial.pet_name}
-                    </CardTitle>
-                    <Badge
-                      variant={memorial.is_published ? "default" : "secondary"}
+        <DashboardTabs pendingCount={pendingCount}>
+          {!memorials?.length ? (
+            <Card>
+              <CardContent className="py-12 text-center">
+                <p className="text-muted-foreground">
+                  You haven&apos;t created any memorials yet.
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="space-y-3">
+              {memorials.map((memorial) => (
+                <Card key={memorial.id}>
+                  <CardHeader className="pb-2">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-lg">
+                        {memorial.pet_name}
+                      </CardTitle>
+                      <Badge
+                        variant={memorial.is_published ? "default" : "secondary"}
+                      >
+                        {memorial.is_published ? "Published" : "Draft"}
+                      </Badge>
+                    </div>
+                    <CardDescription>
+                      Created{" "}
+                      {new Date(memorial.created_at).toLocaleDateString()}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Link
+                      href={`/${memorial.slug}`}
+                      className="text-sm text-amber-600 hover:underline"
                     >
-                      {memorial.is_published ? "Published" : "Draft"}
-                    </Badge>
-                  </div>
-                  <CardDescription>
-                    Created{" "}
-                    {new Date(memorial.created_at).toLocaleDateString()}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Link
-                    href={`/${memorial.slug}`}
-                    className="text-sm text-amber-600 hover:underline"
-                  >
-                    View memorial
-                  </Link>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
+                      View memorial
+                    </Link>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </DashboardTabs>
       </div>
     </div>
   );
