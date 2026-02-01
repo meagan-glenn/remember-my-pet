@@ -23,7 +23,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const { petName, species, birthDate, deathDate, chatHistory, mode, supportContext } =
+  const { petName, species, birthDate, deathDate, chatHistory, mode, supportContext, previousTribute, refinementFeedback } =
     await request.json();
 
   if (!petName || typeof petName !== "string" || !Array.isArray(chatHistory) || !chatHistory.length) {
@@ -140,7 +140,20 @@ Rules:
     messages: [
       {
         role: "user",
-        content: `Pet: ${safePetName} (${safeSpecies})${dateInfo ? ` | ${dateInfo}` : ""}
+        content: previousTribute && refinementFeedback
+          ? `Pet: ${safePetName} (${safeSpecies})${dateInfo ? ` | ${dateInfo}` : ""}
+${supportSummary ? `\nOwner's emotional journey:\n${supportSummary}\n` : ""}
+Conversation with the owner:
+${conversationSummary}
+
+Here is the previous tribute you wrote:
+${String(previousTribute).slice(0, MAX_PROMPT_CHARS)}
+
+The owner wants these changes:
+${String(refinementFeedback).slice(0, MAX_MESSAGE_LENGTH)}
+
+Rewrite ${safePetName}'s tribute incorporating that feedback. Keep everything else that was working well.`
+          : `Pet: ${safePetName} (${safeSpecies})${dateInfo ? ` | ${dateInfo}` : ""}
 ${supportSummary ? `\nOwner's emotional journey:\n${supportSummary}\n` : ""}
 Conversation with the owner:
 ${conversationSummary}

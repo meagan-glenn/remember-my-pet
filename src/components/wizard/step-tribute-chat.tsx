@@ -73,6 +73,8 @@ export function StepTributeChat({
   const [supportLoading, setSupportLoading] = useState(false);
   const [readyForTribute, setReadyForTribute] = useState(false);
   const [chatLoading, setChatLoading] = useState(false);
+  const [showRefinementInput, setShowRefinementInput] = useState(false);
+  const [refinementFeedback, setRefinementFeedback] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const modeCardRef = useRef<HTMLButtonElement>(null);
 
@@ -322,7 +324,7 @@ export function StepTributeChat({
     }, 1500);
   };
 
-  const handleGenerateTribute = async () => {
+  const handleGenerateTribute = async (feedback?: string) => {
     setGenerating(true);
     setError("");
 
@@ -340,6 +342,8 @@ export function StepTributeChat({
           deathDate: petDetails.deathDate,
           mode: tributeMode || "celebrate",
           supportContext: tributeMode === "support" ? supportContext : undefined,
+          previousTribute: feedback ? generatedTribute : undefined,
+          refinementFeedback: feedback || undefined,
           chatHistory: [
             ...(homepageMemory
               ? [
@@ -365,6 +369,8 @@ export function StepTributeChat({
 
       const { tribute } = await res.json();
       onSetTribute(tribute);
+      setShowRefinementInput(false);
+      setRefinementFeedback("");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
@@ -425,15 +431,22 @@ export function StepTributeChat({
       <div className="space-y-6">
         <div className="text-center space-y-2">
           <h1 className="text-2xl font-semibold text-gray-900">
-            {!tributeMode
-              ? `How would you like to remember ${petName || "your pet"}?`
-              : `Tell us about ${petName || "your pet"}`}
+            {generatedTribute
+              ? `${petName || "Your pet"}\u2019s Tribute`
+              : !tributeMode
+                ? `How would you like to remember ${petName || "your pet"}?`
+                : `Tell us about ${petName || "your pet"}`}
           </h1>
-          {tributeMode && (
+          {!generatedTribute && tributeMode && (
             <p className="text-gray-500">
               {tributeMode === "support"
                 ? "We\u2019re here to listen. Take your time."
                 : "Share some memories and we\u2019ll write a tribute together."}
+            </p>
+          )}
+          {generatedTribute && (
+            <p className="text-gray-500">
+              Review your tribute below, then continue to preview your memorial.
             </p>
           )}
         </div>
@@ -621,7 +634,7 @@ export function StepTributeChat({
                 {allPromptsAnswered ? (
                   <div className="space-y-3">
                     <Button
-                      onClick={handleGenerateTribute}
+                      onClick={() => handleGenerateTribute()}
                       disabled={generating}
                       className="w-full h-12 bg-amber-600 hover:bg-amber-700"
                     >
@@ -704,7 +717,7 @@ export function StepTributeChat({
         {/* Generated tribute display */}
         {generatedTribute && (
           <div className="space-y-4">
-            <div className="rounded-xl bg-amber-50 border border-amber-100 p-6">
+            <div className="rounded-xl bg-white border border-amber-200 p-6 shadow-sm">
               <h2 className="font-semibold text-gray-900 mb-3">
                 Your Tribute
               </h2>
@@ -712,24 +725,54 @@ export function StepTributeChat({
                 {generatedTribute}
               </div>
             </div>
-            <div className="flex gap-3">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  onSetTribute("");
-                  handleGenerateTribute();
-                }}
-                className="h-12 flex-1"
-              >
-                Regenerate
-              </Button>
-              <Button
-                onClick={onNext}
-                className="h-12 flex-1 bg-amber-600 hover:bg-amber-700"
-              >
-                Continue to Preview
-              </Button>
-            </div>
+            {showRefinementInput && (
+              <div className="space-y-3">
+                <textarea
+                  value={refinementFeedback}
+                  onChange={(e) => setRefinementFeedback(e.target.value)}
+                  placeholder="What would you like to change? e.g. &quot;Remove the part about car rides&quot; or &quot;It says 'your' a few times — make it third person&quot;"
+                  className="w-full rounded-lg border border-gray-300 p-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500 resize-none"
+                  rows={3}
+                  maxLength={1000}
+                />
+                <div className="flex gap-3">
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setShowRefinementInput(false);
+                      setRefinementFeedback("");
+                    }}
+                    className="h-10 flex-1"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={() => handleGenerateTribute(refinementFeedback)}
+                    disabled={generating || !refinementFeedback.trim()}
+                    className="h-10 flex-1 bg-amber-600 hover:bg-amber-700"
+                  >
+                    {generating ? "Rewriting…" : "Rewrite Tribute"}
+                  </Button>
+                </div>
+              </div>
+            )}
+            {!showRefinementInput && (
+              <div className="flex gap-3">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowRefinementInput(true)}
+                  className="h-12 flex-1"
+                >
+                  Revise
+                </Button>
+                <Button
+                  onClick={onNext}
+                  className="h-12 flex-1 bg-amber-600 hover:bg-amber-700"
+                >
+                  Continue to Preview
+                </Button>
+              </div>
+            )}
           </div>
         )}
       </div>
