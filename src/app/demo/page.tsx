@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { PawPrint, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 
 export const metadata: Metadata = {
@@ -37,10 +38,10 @@ const DEMO_MEMORIES = [
 ];
 
 const DEMO_PHOTOS = [
-  { caption: "Lake day — his happy place" },
-  { caption: "First snow, age 2" },
-  { caption: "The tennis ball collection" },
-  { caption: "Nap time with his favorite human" },
+  { src: "/demo/lake.jpg", caption: "Lake day — his happy place" },
+  { src: "/demo/snow.jpg", caption: "First snow, age 2" },
+  { src: "/demo/ball.jpg", caption: "The tennis ball collection" },
+  { src: "/demo/nap.jpg", caption: "Nap time with his favorite human" },
 ];
 
 export default function DemoPage() {
@@ -54,18 +55,25 @@ export default function DemoPage() {
         </Link>
       </div>
 
-      {/* Hero (placeholder — no real image) */}
+      {/* Hero */}
       <section className="relative">
-        <div className="flex h-[50vh] min-h-[320px] max-h-[500px] w-full flex-col items-center justify-center bg-gradient-to-b from-amber-100 to-amber-50 sm:h-[60vh]">
-          <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-amber-200/60">
-            <PawPrint className="h-10 w-10 text-amber-600" />
+        <div className="relative h-[50vh] min-h-[320px] max-h-[500px] w-full sm:h-[60vh]">
+          <Image
+            src="/demo/hero.jpg"
+            alt="Buddy the golden retriever"
+            fill
+            className="object-cover"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+          <div className="absolute inset-0 flex flex-col items-center justify-end pb-10">
+            <h1 className="font-serif text-4xl font-medium tracking-tight text-white sm:text-5xl drop-shadow-lg">
+              Buddy
+            </h1>
+            <p className="mt-3 text-lg text-white/80 drop-shadow">
+              March 12, 2010 — November 8, 2024
+            </p>
           </div>
-          <h1 className="font-serif text-4xl font-medium tracking-tight text-gray-900 sm:text-5xl">
-            Buddy
-          </h1>
-          <p className="mt-3 text-lg text-gray-500">
-            March 12, 2010 — November 8, 2024
-          </p>
         </div>
       </section>
 
@@ -89,8 +97,13 @@ export default function DemoPage() {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           {DEMO_PHOTOS.map((photo, i) => (
             <div key={i} className="space-y-2">
-              <div className="relative aspect-square overflow-hidden rounded-xl bg-gradient-to-br from-amber-100 to-amber-50 flex items-center justify-center">
-                <PawPrint className="h-12 w-12 text-amber-300" />
+              <div className="relative aspect-square overflow-hidden rounded-xl">
+                <Image
+                  src={photo.src}
+                  alt={photo.caption}
+                  fill
+                  className="object-cover"
+                />
               </div>
               <p className="text-sm text-gray-500 italic px-1">
                 {photo.caption}
