@@ -66,7 +66,7 @@ export interface MemorialState {
   chatMessages: { role: "assistant" | "user"; content: string }[];
   generatedTribute: string;
   memorialId: string;
-  homepageMemory: string;
+  homepageConversation: { role: "assistant" | "user"; content: string }[];
   tributeMode: "celebrate" | "support" | "";
   hasPassedTransition: boolean;
   supportContext: SupportContextEntry[];
@@ -94,7 +94,7 @@ const initialState: MemorialState = {
   chatMessages: [],
   generatedTribute: "",
   memorialId: "",
-  homepageMemory: "",
+  homepageConversation: [],
   tributeMode: "",
   hasPassedTransition: false,
   supportContext: [],
@@ -158,9 +158,15 @@ export function useMemorialState() {
               species: normalizedSpecies || loaded.petDetails.species,
             };
           }
-          // Store homepage memory for tribute integration
-          if (seed.memory && !loaded.homepageMemory) {
-            loaded.homepageMemory = seed.memory;
+          // Store homepage conversation for tribute integration
+          if (seed.conversation && Array.isArray(seed.conversation)) {
+            loaded.homepageConversation = seed.conversation;
+          } else if (seed.memory && typeof seed.memory === "string" && !loaded.homepageConversation.length) {
+            // Backward compat: convert old single-memory format
+            loaded.homepageConversation = [
+              { role: "assistant" as const, content: `What's your favorite memory with ${seed.petName}?` },
+              { role: "user" as const, content: seed.memory },
+            ];
           }
         }
       } catch {
@@ -350,9 +356,9 @@ export function useMemorialState() {
     []
   );
 
-  const setHomepageMemory = useCallback(
-    (memory: string) =>
-      setState((prev) => ({ ...prev, homepageMemory: memory })),
+  const setHomepageConversation = useCallback(
+    (conversation: { role: "assistant" | "user"; content: string }[]) =>
+      setState((prev) => ({ ...prev, homepageConversation: conversation })),
     []
   );
 
@@ -497,7 +503,7 @@ export function useMemorialState() {
       addChatMessage,
       setTribute,
       setHeroPhotoFile,
-      setHomepageMemory,
+      setHomepageConversation,
       setTributeMode,
       setHasPassedTransition,
       setSupportContext,
@@ -513,7 +519,7 @@ export function useMemorialState() {
       setIntroComplete,
       reset,
     }),
-    [updatePetDetails, addPhoto, removePhoto, setPhotoCaption, setPhotoTags, reorderPhotos, addChatMessage, setTribute, setHeroPhotoFile, setHomepageMemory, setTributeMode, setHasPassedTransition, setSupportContext, addVideo, removeVideo, reorderVideos, addClip, updateClip, removeClip, reorderClips, setOwnerLastName, setCompilationUrl, setIntroComplete, reset]
+    [updatePetDetails, addPhoto, removePhoto, setPhotoCaption, setPhotoTags, reorderPhotos, addChatMessage, setTribute, setHeroPhotoFile, setHomepageConversation, setTributeMode, setHasPassedTransition, setSupportContext, addVideo, removeVideo, reorderVideos, addClip, updateClip, removeClip, reorderClips, setOwnerLastName, setCompilationUrl, setIntroComplete, reset]
   );
 
   return useMemo(
@@ -523,7 +529,7 @@ export function useMemorialState() {
       chatMessages: state.chatMessages,
       generatedTribute: state.generatedTribute,
       memorialId: state.memorialId,
-      homepageMemory: state.homepageMemory,
+      homepageConversation: state.homepageConversation,
       tributeMode: state.tributeMode,
       hasPassedTransition: state.hasPassedTransition,
       supportContext: state.supportContext,

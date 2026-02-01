@@ -32,7 +32,7 @@ interface StepTributeChatProps {
   };
   chatMessages: { role: "assistant" | "user"; content: string }[];
   generatedTribute: string;
-  homepageMemory?: string;
+  homepageConversation?: { role: "assistant" | "user"; content: string }[];
   tributeMode: "celebrate" | "support" | "";
   hasPassedTransition: boolean;
   supportContext: SupportContextEntry[];
@@ -52,7 +52,7 @@ export function StepTributeChat({
   generatedTribute,
   onAddMessage,
   onSetTribute,
-  homepageMemory,
+  homepageConversation,
   tributeMode,
   hasPassedTransition,
   supportContext,
@@ -345,17 +345,8 @@ export function StepTributeChat({
           previousTribute: feedback ? generatedTribute : undefined,
           refinementFeedback: feedback || undefined,
           chatHistory: [
-            ...(homepageMemory
-              ? [
-                  {
-                    role: "assistant" as const,
-                    content:
-                      "Tell me a memory about " +
-                      (petDetails.petName || "your pet") +
-                      ".",
-                  },
-                  { role: "user" as const, content: homepageMemory },
-                ]
+            ...(homepageConversation && homepageConversation.length > 0
+              ? homepageConversation
               : []),
             ...chatMessages.filter((m) => m.content !== "(skipped)"),
           ],

@@ -13,7 +13,7 @@ export default function TributePage() {
     petDetails,
     chatMessages,
     generatedTribute,
-    homepageMemory,
+    homepageConversation,
     tributeMode,
     hasPassedTransition,
     supportContext,
@@ -60,7 +60,7 @@ export default function TributePage() {
           petDetails={petDetails}
           chatMessages={chatMessages}
           generatedTribute={generatedTribute}
-          homepageMemory={homepageMemory}
+          homepageConversation={homepageConversation}
           tributeMode={tributeMode}
           hasPassedTransition={hasPassedTransition}
           supportContext={supportContext}
