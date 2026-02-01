@@ -210,7 +210,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50/60 via-orange-50/30 to-white">
       {/* Hero Section */}
-      <section className="flex flex-col items-center justify-center px-4 pt-16 pb-10 md:pt-20 md:pb-14">
+      <section className="flex flex-col items-center justify-center px-4 pt-10 pb-6 md:pt-14 md:pb-8">
         <AnimatePresence mode="wait">
           {!started ? (
             <motion.div
@@ -404,7 +404,7 @@ export default function Home() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8, duration: 0.6 }}
-            className="px-4 py-16 sm:py-20"
+            className="px-4 py-10 sm:py-12"
           >
             <div className="mx-auto max-w-4xl">
               <h2 className="text-center font-serif text-3xl font-medium text-gray-900 md:text-4xl">
@@ -436,7 +436,7 @@ export default function Home() {
           </motion.section>
 
           {/* Example Memorial */}
-          <section className="px-4 py-16 sm:py-20 bg-amber-50/40">
+          <section className="px-4 py-10 sm:py-12 bg-amber-50/40">
             <div className="mx-auto max-w-3xl text-center">
               <h2 className="font-serif text-3xl font-medium text-gray-900 md:text-4xl">
                 See what a memorial looks like
@@ -455,7 +455,7 @@ export default function Home() {
           </section>
 
           {/* Pricing */}
-          <section id="pricing" className="px-4 py-16 sm:py-20">
+          <section id="pricing" className="px-4 py-10 sm:py-12">
             <div className="mx-auto max-w-3xl">
               <h2 className="text-center font-serif text-3xl font-medium text-gray-900 md:text-4xl">
                 Simple, one-time pricing
@@ -521,7 +521,7 @@ export default function Home() {
           </section>
 
           {/* Testimonial + Trust Signals */}
-          <section className="px-4 py-16 sm:py-20 bg-amber-50/40">
+          <section className="px-4 py-10 sm:py-12 bg-amber-50/40">
             <div className="mx-auto max-w-2xl text-center">
               <blockquote className="font-serif text-xl italic text-gray-600 md:text-2xl">
                 &ldquo;I finally felt like I could breathe again. Like she was
