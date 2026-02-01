@@ -5,7 +5,17 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Heart, Camera, Users, Film, ArrowRight, PawPrint } from "lucide-react";
+import {
+  Heart,
+  Users,
+  Film,
+  ShoppingBag,
+  ArrowRight,
+  PawPrint,
+  Camera,
+  Check,
+} from "lucide-react";
+import Link from "next/link";
 
 const OPENING_QUESTIONS = [
   (name: string) => `What's your favorite memory with ${name}?`,
@@ -42,6 +52,61 @@ function TypingIndicator() {
   );
 }
 
+const FEATURES = [
+  {
+    icon: Heart,
+    title: "AI-Written Tribute",
+    description:
+      "Share your memories in a guided conversation and we'll craft a heartfelt tribute that captures who they were.",
+  },
+  {
+    icon: Camera,
+    title: "Photo Gallery",
+    description:
+      "Upload your favorite photos with AI-generated captions. Arrange them into a beautiful gallery.",
+  },
+  {
+    icon: Users,
+    title: "Memory Wall",
+    description:
+      "Invite friends and family to share their favorite moments, stories, and photos.",
+  },
+  {
+    icon: Film,
+    title: "Video Reel",
+    description:
+      "Turn your photos and clips into a beautiful keepsake video to share or keep forever.",
+  },
+];
+
+const PRICING_TIERS = [
+  {
+    name: "Basic",
+    price: "$49",
+    description: "Everything you need to honor their memory",
+    features: [
+      "AI-written tribute",
+      "Photo gallery with captions",
+      "Permanent memorial page",
+      "Shareable link",
+      "Memory wall for friends & family",
+    ],
+  },
+  {
+    name: "Premium",
+    price: "$99",
+    description: "The complete memorial experience",
+    features: [
+      "Everything in Basic",
+      "Video reel compilation",
+      "Printed memory book",
+      "Canvas print",
+      "Priority support",
+    ],
+    popular: true,
+  },
+];
+
 export default function Home() {
   const router = useRouter();
   const [petName, setPetName] = useState("");
@@ -65,7 +130,6 @@ export default function Home() {
     if (!petName.trim()) return;
     setStarted(true);
     setIsTyping(true);
-    // Longer delay to feel like a real person pausing before responding
     setTimeout(() => {
       setIsTyping(false);
       setMessages([
@@ -113,7 +177,6 @@ export default function Home() {
           content: `That's beautiful. I'd love to help you create a tribute for ${petName.trim()}. Let's make sure ${petName.trim()} is remembered the way they deserve.`,
         },
       ]);
-      // Save to localStorage so the wizard can pick it up
       const wizardSeed = {
         petName: petName.trim(),
         species: species === "Other" ? "" : species,
@@ -299,7 +362,10 @@ export default function Home() {
                       onKeyDown={(e) => {
                         if (e.key === "Enter" && !e.shiftKey) {
                           e.preventDefault();
-                          if (userInput.trim()) handleMemorySubmit(e as unknown as React.FormEvent);
+                          if (userInput.trim())
+                            handleMemorySubmit(
+                              e as unknown as React.FormEvent
+                            );
                         }
                       }}
                       placeholder="Share a memory..."
@@ -330,76 +396,151 @@ export default function Home() {
         </AnimatePresence>
       </section>
 
-      {/* Features Section (below fold) */}
+      {/* Below-fold content — hidden when conversation is active */}
       {!started && (
-        <motion.section
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.8, duration: 0.6 }}
-          className="px-4 pb-24"
-        >
-          <div className="mx-auto max-w-2xl">
-            <div className="grid gap-6 sm:grid-cols-3">
-              <div className="rounded-2xl border border-amber-100 bg-white/60 p-6 text-center">
-                <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-amber-50">
-                  <Heart className="h-5 w-5 text-amber-600" />
-                </div>
-                <h3 className="font-serif text-base font-medium text-gray-800">
-                  Personal Tribute
-                </h3>
-                <p className="mt-2 text-sm text-gray-500">
-                  Share your memories and we&apos;ll help you find the words
-                  that capture who they were.
-                </p>
-              </div>
+        <>
+          {/* Features Section */}
+          <motion.section
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8, duration: 0.6 }}
+            className="px-4 py-16 sm:py-20"
+          >
+            <div className="mx-auto max-w-4xl">
+              <h2 className="text-center font-serif text-3xl font-medium text-gray-900 md:text-4xl">
+                Everything you need to honor their memory
+              </h2>
+              <p className="mt-4 text-center text-gray-500">
+                A permanent, beautiful space to celebrate the life you shared.
+              </p>
 
-              <div className="rounded-2xl border border-amber-100 bg-white/60 p-6 text-center">
-                <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-amber-50">
-                  <Users className="h-5 w-5 text-amber-600" />
-                </div>
-                <h3 className="font-serif text-base font-medium text-gray-800">
-                  Memory Wall
-                </h3>
-                <p className="mt-2 text-sm text-gray-500">
-                  Invite friends and family to share their favorite moments and
-                  photos.
-                </p>
-              </div>
-
-              <div className="rounded-2xl border border-amber-100 bg-white/60 p-6 text-center">
-                <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-amber-50">
-                  <Film className="h-5 w-5 text-amber-600" />
-                </div>
-                <h3 className="font-serif text-base font-medium text-gray-800">
-                  Video Reel
-                </h3>
-                <p className="mt-2 text-sm text-gray-500">
-                  Turn your photos and clips into a beautiful keepsake video.
-                </p>
+              <div className="mt-12 grid gap-6 sm:grid-cols-2">
+                {FEATURES.map((feature) => (
+                  <div
+                    key={feature.title}
+                    className="rounded-2xl border border-amber-100 bg-white/60 p-6"
+                  >
+                    <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-amber-50">
+                      <feature.icon className="h-5 w-5 text-amber-600" />
+                    </div>
+                    <h3 className="font-serif text-lg font-medium text-gray-800">
+                      {feature.title}
+                    </h3>
+                    <p className="mt-2 text-sm leading-relaxed text-gray-500">
+                      {feature.description}
+                    </p>
+                  </div>
+                ))}
               </div>
             </div>
+          </motion.section>
 
-            {/* Testimonial */}
-            <div className="mt-16 text-center">
-              <blockquote className="font-serif text-lg italic text-gray-600">
+          {/* Example Memorial */}
+          <section className="px-4 py-16 sm:py-20 bg-amber-50/40">
+            <div className="mx-auto max-w-3xl text-center">
+              <h2 className="font-serif text-3xl font-medium text-gray-900 md:text-4xl">
+                See what a memorial looks like
+              </h2>
+              <p className="mt-4 text-gray-500">
+                Browse a sample memorial to see what you&apos;ll create.
+              </p>
+              <Link
+                href="/demo"
+                className="mt-8 inline-flex items-center gap-2 rounded-full bg-amber-600 px-8 py-3 text-base font-medium text-white hover:bg-amber-700 transition-colors"
+              >
+                View example memorial
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+          </section>
+
+          {/* Pricing */}
+          <section id="pricing" className="px-4 py-16 sm:py-20">
+            <div className="mx-auto max-w-3xl">
+              <h2 className="text-center font-serif text-3xl font-medium text-gray-900 md:text-4xl">
+                Simple, one-time pricing
+              </h2>
+              <p className="mt-4 text-center text-gray-500">
+                No subscriptions. Your memorial is permanent.
+              </p>
+
+              <div className="mt-12 grid gap-6 sm:grid-cols-2">
+                {PRICING_TIERS.map((tier) => (
+                  <div
+                    key={tier.name}
+                    className={`relative rounded-2xl border p-6 sm:p-8 ${
+                      tier.popular
+                        ? "border-amber-300 bg-amber-50/50 shadow-md"
+                        : "border-amber-100 bg-white/60"
+                    }`}
+                  >
+                    {tier.popular && (
+                      <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-amber-600 px-3 py-0.5 text-xs font-medium text-white">
+                        Most Popular
+                      </span>
+                    )}
+                    <h3 className="font-serif text-xl font-medium text-gray-900">
+                      {tier.name}
+                    </h3>
+                    <p className="mt-1 text-sm text-gray-500">
+                      {tier.description}
+                    </p>
+                    <p className="mt-4">
+                      <span className="text-4xl font-semibold text-gray-900">
+                        {tier.price}
+                      </span>
+                      <span className="ml-1 text-sm text-gray-400">
+                        one-time
+                      </span>
+                    </p>
+                    <ul className="mt-6 space-y-3">
+                      {tier.features.map((feature) => (
+                        <li
+                          key={feature}
+                          className="flex items-start gap-2 text-sm text-gray-600"
+                        >
+                          <Check className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
+                          {feature}
+                        </li>
+                      ))}
+                    </ul>
+                    <Button
+                      onClick={() => router.push("/create")}
+                      className={`mt-8 w-full h-12 rounded-full text-base font-medium ${
+                        tier.popular
+                          ? "bg-amber-600 hover:bg-amber-700"
+                          : "bg-gray-900 hover:bg-gray-800"
+                      }`}
+                    >
+                      Get started
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* Testimonial + Trust Signals */}
+          <section className="px-4 py-16 sm:py-20 bg-amber-50/40">
+            <div className="mx-auto max-w-2xl text-center">
+              <blockquote className="font-serif text-xl italic text-gray-600 md:text-2xl">
                 &ldquo;I finally felt like I could breathe again. Like she was
                 being remembered the way she deserved.&rdquo;
               </blockquote>
-              <p className="mt-3 text-sm text-gray-400">
+              <p className="mt-4 text-sm text-gray-400">
                 &mdash; Sarah, remembering Luna
               </p>
-            </div>
 
-            {/* Trust signals */}
-            <div className="mt-16 flex flex-wrap items-center justify-center gap-6 text-xs text-gray-400">
-              <span className="flex items-center gap-1.5">
-                <Camera className="h-3.5 w-3.5" /> Your photos stay private
-              </span>
-              <span>No pressure, no timers</span>
-              <span>Hosted permanently</span>
+              <div className="mt-12 flex flex-wrap items-center justify-center gap-6 text-sm text-gray-400">
+                <span className="flex items-center gap-1.5">
+                  <Camera className="h-4 w-4" /> Your photos stay private
+                </span>
+                <span>No pressure, no timers</span>
+                <span>Hosted permanently</span>
+              </div>
             </div>
-          </div>
-        </motion.section>
+          </section>
+        </>
       )}
     </div>
   );
