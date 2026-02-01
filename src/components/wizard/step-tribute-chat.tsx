@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { createBrowserSupabase } from "@/lib/supabase";
-import { AuthModal } from "./auth-modal";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -64,7 +62,6 @@ export function StepTributeChat({
   onNext,
   onBack,
 }: StepTributeChatProps) {
-  const [needsAuth, setNeedsAuth] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
   const [input, setInput] = useState("");
   const [generating, setGenerating] = useState(false);
@@ -79,29 +76,21 @@ export function StepTributeChat({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const modeCardRef = useRef<HTMLButtonElement>(null);
 
-  // Check auth on mount
+  // Auth is deferred to save time — no gate here
   useEffect(() => {
-    const check = async () => {
-      const supabase = createBrowserSupabase();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      setNeedsAuth(!user);
-      setAuthChecked(true);
-    };
-    check();
+    setAuthChecked(true);
   }, []);
 
   // Focus first mode card on mount
   useEffect(() => {
-    if (authChecked && !needsAuth && !tributeMode) {
+    if (authChecked && !tributeMode) {
       modeCardRef.current?.focus();
     }
-  }, [authChecked, needsAuth, tributeMode]);
+  }, [authChecked, tributeMode]);
 
   // Send first prompt when mode is selected and no messages yet
   useEffect(() => {
-    if (authChecked && !needsAuth && tributeMode && chatMessages.length === 0) {
+    if (authChecked && tributeMode && chatMessages.length === 0) {
       if (tributeMode === "support") {
         onAddMessage({
           role: "assistant",
@@ -114,11 +103,14 @@ export function StepTributeChat({
         });
       }
     }
-  }, [authChecked, needsAuth, tributeMode, chatMessages.length, petName, onAddMessage]);
+  }, [authChecked, tributeMode, chatMessages.length, petName, onAddMessage]);
 
-  // Scroll to bottom on new messages
+  // Scroll to bottom on new messages (within container only, not the page)
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    const el = messagesEndRef.current;
+    if (el?.parentElement) {
+      el.parentElement.scrollTop = el.parentElement.scrollHeight;
+    }
   }, [chatMessages]);
 
   // Count user messages to determine progress
@@ -403,11 +395,6 @@ export function StepTributeChat({
 
   return (
     <>
-      <AuthModal
-        open={needsAuth}
-        onAuthenticated={() => setNeedsAuth(false)}
-      />
-
       {/* Mode switch confirmation dialog */}
       <Dialog open={switchConfirmOpen} onOpenChange={setSwitchConfirmOpen}>
         <DialogContent>

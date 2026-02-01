@@ -24,6 +24,7 @@ export interface PetDetails {
   birthDate: string;
   deathDate: string;
   heroPhoto: string;
+  heroPhotoCropY: number; // 0-100, vertical focal point percentage
 }
 
 export interface WizardPhoto {
@@ -86,6 +87,7 @@ const initialState: MemorialState = {
     birthDate: "",
     deathDate: "",
     heroPhoto: "",
+    heroPhotoCropY: 50,
   },
   ownerLastName: "",
   photos: [],
@@ -148,12 +150,12 @@ export function useMemorialState() {
         const seedRaw = localStorage.getItem("petmemorial-wizard-seed");
         if (seedRaw) {
           const seed = JSON.parse(seedRaw);
-          localStorage.removeItem("petmemorial-wizard-seed");
-          if (!loaded.petDetails.petName && seed.petName) {
+          if (seed.petName) {
+            const normalizedSpecies = seed.species ? seed.species.toLowerCase() : "";
             loaded.petDetails = {
               ...loaded.petDetails,
               petName: seed.petName,
-              species: seed.species || loaded.petDetails.species,
+              species: normalizedSpecies || loaded.petDetails.species,
             };
           }
           // Store homepage memory for tribute integration
@@ -210,6 +212,8 @@ export function useMemorialState() {
 
       setState(loaded);
       setHydrated(true);
+      // Remove seed after state is applied (deferred to avoid React Strict Mode double-run)
+      localStorage.removeItem("petmemorial-wizard-seed");
     }
     hydrate();
   }, []);

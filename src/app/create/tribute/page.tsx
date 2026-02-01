@@ -69,7 +69,7 @@ export default function TributePage() {
           onSetTributeMode={setTributeMode}
           onSetHasPassedTransition={setHasPassedTransition}
           onSetSupportContext={setSupportContext}
-          onNext={() => router.push("/create")}
+          onNext={() => router.push("/create/preview")}
           onBack={() => router.push("/create")}
         />
       </div>
