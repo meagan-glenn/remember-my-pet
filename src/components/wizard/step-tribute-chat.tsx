@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Heart, CloudRain } from "lucide-react";
 import { detectCrisisKeywords } from "@/lib/crisis-detection";
+import { EarlyAuthBanner } from "@/components/wizard/early-auth-banner";
 import {
   SUPPORT_PROMPTS,
   SUPPORT_CELEBRATE_PROMPTS,
@@ -716,6 +717,7 @@ export function StepTributeChat({
                 {generatedTribute}
               </div>
             </div>
+            <EarlyAuthBanner petName={petName} />
             {showRefinementInput && (
               <div className="space-y-3">
                 <textarea

@@ -4,6 +4,7 @@ import { useCallback, useRef, useState } from "react";
 import type { WizardPhoto } from "@/hooks/use-memorial-state";
 import { Button } from "@/components/ui/button";
 import { X, Upload, ImagePlus } from "lucide-react";
+import { EarlyAuthBanner } from "@/components/wizard/early-auth-banner";
 
 function fileToBase64(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -225,6 +226,10 @@ export function StepPhotoUpload({
             </button>
           )}
         </div>
+      )}
+
+      {photos.length > 0 && (
+        <EarlyAuthBanner petName={petName} />
       )}
 
       {(onBack || onNext) && (
