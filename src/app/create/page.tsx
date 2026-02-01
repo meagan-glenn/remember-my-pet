@@ -5,9 +5,9 @@ import { FeatureCard } from "@/components/workspace/feature-card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ImagePlus, X, Camera, PenLine, Film, Eye } from "lucide-react";
+import { ImagePlus, X, Camera, PenLine, Film, Eye, Check } from "lucide-react";
 import Link from "next/link";
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import type { PetDetails } from "@/hooks/use-memorial-state";
 import { ImageCropModal } from "@/components/image-crop-modal";
 
@@ -246,6 +246,8 @@ function IntroForm() {
 
 // ── Dashboard Mode: Workspace with feature cards ──────────────────────────────
 
+const AUTOSAVE_DISMISSED_KEY = "petmemorial-autosave-dismissed";
+
 function Dashboard() {
   const {
     petDetails,
@@ -260,9 +262,26 @@ function Dashboard() {
     updatePetDetails,
     setHeroPhotoFile,
     cameFromSeed,
+    lastSaved,
     hydrated,
   } = useMemorialContext();
   const [editingDetails, setEditingDetails] = useState(false);
+  const [showPulse, setShowPulse] = useState(false);
+  const [showAutoSaveMsg, setShowAutoSaveMsg] = useState(false);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    if (!localStorage.getItem(AUTOSAVE_DISMISSED_KEY)) {
+      setShowAutoSaveMsg(true);
+    }
+  }, [hydrated]);
+
+  useEffect(() => {
+    if (lastSaved === null) return;
+    setShowPulse(true);
+    const timer = setTimeout(() => setShowPulse(false), 2000);
+    return () => clearTimeout(timer);
+  }, [lastSaved]);
 
   if (!hydrated) return <LoadingSkeleton />;
 
@@ -308,6 +327,14 @@ function Dashboard() {
           <p className="text-gray-500">
             What would you like to do next?
           </p>
+          {lastSaved !== null && (
+            <div className={`flex items-center justify-center gap-1.5 text-xs transition-opacity duration-700 ${
+              showPulse ? 'opacity-100' : 'opacity-50'
+            }`}>
+              <Check className="h-3 w-3 text-green-600" />
+              <span className="text-gray-400">Saved to this device</span>
+            </div>
+          )}
           <button
             type="button"
             onClick={() => setEditingDetails(!editingDetails)}
@@ -316,6 +343,27 @@ function Dashboard() {
             {editingDetails ? "Done editing" : "Edit pet details"}
           </button>
         </div>
+
+        {/* One-time auto-save message */}
+        {showAutoSaveMsg && (
+          <div className="rounded-xl border border-blue-200 bg-blue-50/50 p-4 flex items-start gap-3">
+            <Check className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+            <p className="flex-1 text-sm text-gray-700">
+              Your work saves automatically on this device. When you&apos;re ready, you&apos;ll create an account to publish.
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                localStorage.setItem(AUTOSAVE_DISMISSED_KEY, "true");
+                setShowAutoSaveMsg(false);
+              }}
+              className="flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors"
+              aria-label="Dismiss"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        )}
 
         {/* Inline pet details editor */}
         {editingDetails && (

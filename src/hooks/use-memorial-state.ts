@@ -131,6 +131,7 @@ export function useMemorialState() {
   const [state, setState] = useState<MemorialState>(initialState);
   const [hydrated, setHydrated] = useState(false);
   const [cameFromSeed, setCameFromSeed] = useState(false);
+  const [lastSaved, setLastSaved] = useState<number | null>(null);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const stateRef = useRef(state);
   useEffect(() => {
@@ -231,7 +232,14 @@ export function useMemorialState() {
   useEffect(() => {
     if (!hydrated) return;
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
-    saveTimerRef.current = setTimeout(() => saveState(state), SAVE_DEBOUNCE_MS);
+    saveTimerRef.current = setTimeout(() => {
+      try {
+        saveState(state);
+        setLastSaved(Date.now());
+      } catch {
+        // localStorage full or unavailable — don't update lastSaved
+      }
+    }, SAVE_DEBOUNCE_MS);
     return () => {
       if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     };
@@ -542,13 +550,14 @@ export function useMemorialState() {
       compilationUrl: state.compilationUrl,
       introComplete: state.introComplete,
       cameFromSeed,
+      lastSaved,
       hydrated,
       heroPhotoFileRef,
       photoFilesRef,
       videoFilesRef,
       ...actions,
     }),
-    [state, hydrated, actions]
+    [state, hydrated, lastSaved, actions]
   );
 }
 
