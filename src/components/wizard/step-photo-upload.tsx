@@ -30,8 +30,6 @@ interface StepPhotoUploadProps {
   petName: string;
 }
 
-const MIN_TOTAL_PHOTOS = 5;
-
 const MAX_PHOTOS = 20;
 const MAX_SIZE_MB = 10;
 const ACCEPTED_TYPES = [
@@ -54,7 +52,6 @@ export function StepPhotoUpload({
   petName,
 }: StepPhotoUploadProps) {
   const totalPhotos = photos.length + (heroPhoto ? 1 : 0);
-  const needsMore = totalPhotos < MIN_TOTAL_PHOTOS;
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState("");
   const [dragOver, setDragOver] = useState(false);
@@ -140,9 +137,9 @@ export function StepPhotoUpload({
         <p className="text-gray-500">
           Share your favorite photos. You can add up to {MAX_PHOTOS}.
         </p>
-        {needsMore && (
-          <p className="text-sm text-amber-600">
-            {MIN_TOTAL_PHOTOS - totalPhotos} more photo{MIN_TOTAL_PHOTOS - totalPhotos !== 1 ? "s" : ""} needed
+        {totalPhotos < 5 && (
+          <p className="text-sm text-gray-500">
+            The more photos you add, the richer {petName || "your pet"}&apos;s gallery will be.
           </p>
         )}
       </div>
@@ -195,11 +192,12 @@ export function StepPhotoUpload({
                 />
                 <button
                   type="button"
+                  aria-label="Remove photo"
                   onClick={(e) => {
                     e.stopPropagation();
                     onRemovePhoto(photo.id);
                   }}
-                  className="absolute top-1 right-1 rounded-full bg-black/50 p-1 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="absolute top-1 right-1 rounded-full bg-black/50 p-1.5 text-white opacity-60 hover:opacity-100 transition-opacity"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -248,7 +246,7 @@ export function StepPhotoUpload({
             <Button
               type="button"
               onClick={onNext}
-              disabled={needsMore}
+
               className="h-12 flex-1 bg-amber-600 hover:bg-amber-700"
             >
               Continue
