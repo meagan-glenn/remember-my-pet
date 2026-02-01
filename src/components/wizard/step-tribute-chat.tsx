@@ -105,9 +105,12 @@ export function StepTributeChat({
     }
   }, [authChecked, tributeMode, chatMessages.length, petName, onAddMessage]);
 
-  // Scroll to bottom on new messages
+  // Scroll to bottom on new messages (within container only, not the page)
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    const el = messagesEndRef.current;
+    if (el?.parentElement) {
+      el.parentElement.scrollTop = el.parentElement.scrollHeight;
+    }
   }, [chatMessages]);
 
   // Count user messages to determine progress

@@ -118,11 +118,15 @@ export default function Home() {
   const [userInput, setUserInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [species, setSpecies] = useState("");
+  const [readyToCreate, setReadyToCreate] = useState(false);
   const [openingQuestion] = useState(() => pickOpeningQuestion());
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    const el = chatEndRef.current;
+    if (el?.parentElement) {
+      el.parentElement.scrollTop = el.parentElement.scrollHeight;
+    }
   }, [messages, isTyping]);
 
   const handleNameSubmit = (e: React.FormEvent) => {
@@ -186,9 +190,7 @@ export default function Home() {
         "petmemorial-wizard-seed",
         JSON.stringify(wizardSeed)
       );
-      setTimeout(() => {
-        router.push("/create");
-      }, 2000);
+      setReadyToCreate(true);
     }, 1200);
   };
 
@@ -283,7 +285,7 @@ export default function Home() {
                   </p>
                 </div>
 
-                <div className="space-y-4 min-h-[200px]">
+                <div className="space-y-4 min-h-[200px] max-h-[400px] overflow-y-auto">
                   {messages.map((msg, i) => (
                     <motion.div
                       key={i}
@@ -382,6 +384,23 @@ export default function Home() {
                       <ArrowRight className="h-4 w-4" />
                     </Button>
                   </motion.form>
+                )}
+
+                {/* CTA after conversation completes */}
+                {readyToCreate && !isTyping && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                    className="mt-4"
+                  >
+                    <Button
+                      onClick={() => router.push("/create")}
+                      className="w-full rounded-full bg-amber-600 hover:bg-amber-700 h-11 text-base"
+                    >
+                      Create {petName.trim()}&apos;s Tribute
+                    </Button>
+                  </motion.div>
                 )}
               </div>
 

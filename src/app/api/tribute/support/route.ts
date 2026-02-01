@@ -7,16 +7,14 @@ const MAX_PET_NAME = 100;
 const MAX_CONCERN_LENGTH = 2000;
 
 export async function POST(request: Request) {
+  // Auth is optional during creation (required only at save time)
   const supabase = await createServerSupabase();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  if (!rateLimit(`tribute-support:${user.id}`, 3)) {
+  const rateLimitKey = user ? `tribute-support:${user.id}` : `tribute-support:${request.headers.get("x-forwarded-for") || "anon"}`;
+  if (!rateLimit(rateLimitKey, 3)) {
     return NextResponse.json(
       { error: "Too many requests. Please wait a moment." },
       { status: 429 }
@@ -68,7 +66,7 @@ export async function POST(request: Request) {
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
   const message = await anthropic.messages.create({
-    model: "claude-haiku-4-20250514",
+    model: "claude-haiku-4-5-20251001",
     max_tokens: 300,
     system: `You are sitting with a pet owner who is struggling with guilt or regret about their ${safeSpecies}, ${safePetName}. They came to you before they were ready to celebrate — they need to work through something first.
 

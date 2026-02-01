@@ -8,16 +8,14 @@ const MAX_MESSAGES = 20;
 const MAX_MESSAGE_LENGTH = 2000;
 
 export async function POST(request: Request) {
+  // Auth is optional during creation (required only at save time)
   const supabase = await createServerSupabase();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  if (!rateLimit(`tribute-chat:${user.id}`, 10)) {
+  const rateLimitKey = user ? `tribute-chat:${user.id}` : `tribute-chat:${request.headers.get("x-forwarded-for") || "anon"}`;
+  if (!rateLimit(rateLimitKey, 10)) {
     return NextResponse.json(
       { error: "Too many requests. Please wait a moment." },
       { status: 429 }
@@ -65,8 +63,9 @@ export async function POST(request: Request) {
 
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
+  try {
   const message = await anthropic.messages.create({
-    model: "claude-haiku-4-20250514",
+    model: "claude-haiku-4-5-20251001",
     max_tokens: 200,
     system: `You are sitting with a pet owner who just lost their ${safeSpecies}, ${safePetName}. They chose to celebrate ${safePetName}'s life by sharing memories with you. You genuinely want to hear about this pet — you're not interviewing them or extracting information. You're a friend at the kitchen table, listening.
 
@@ -87,9 +86,11 @@ Handling grief that surfaces:
 - If they say "(skipped)", just move to a new topic naturally without drawing attention to the skip.
 
 Conversation arc:
-- Across the conversation, you want to gather stories about: what they loved doing, funny quirks or habits, a specific memory, what made them one-of-a-kind, small everyday moments. But follow the conversation — don't force all of these. 3-4 rich stories are better than 5 shallow ones.
-- If they give short answers, follow up to draw out more detail before moving on.
-- If they give rich, detailed answers, you can move to a new topic sooner.
+- Your goal is to collect DIVERSE stories across DIFFERENT topics: what they loved doing, funny quirks or habits, a specific memory, what made them one-of-a-kind, small everyday moments. 3-4 rich stories on DIFFERENT topics are better than 5 stories about the same thing.
+- IMPORTANT: After one follow-up on a topic, MOVE ON to a completely different topic. Do not ask a third question about the same subject. If the owner already told you about walks, do NOT ask another walk question. Pivot: "What about inside the house, any funny habits?"
+- If they give short answers, ask ONE follow-up to draw out more, then move to a new topic.
+- If they give rich, detailed answers, move to a new topic immediately.
+- Track what topics have been covered. Never circle back to a topic already discussed.
 
 Ending the conversation:
 - After you have enough material (at least 4 substantive responses with real stories and details), close warmly. Your final message should feel like a natural ending, not an abrupt stop — something like "I can really picture ${safePetName} doing all of this. I think I have a good sense of who ${safePetName} was — ready for me to write this up?" Then add this marker on its own line: [READY_FOR_TRIBUTE]
@@ -105,4 +106,11 @@ Ending the conversation:
   const cleanReply = reply.replace(/\n?\[READY_FOR_TRIBUTE\]\n?/g, "").trim();
 
   return NextResponse.json({ reply: cleanReply, readyForTribute });
+  } catch (err) {
+    console.error("Tribute chat error:", err);
+    return NextResponse.json(
+      { error: "Failed to generate response" },
+      { status: 500 }
+    );
+  }
 }
