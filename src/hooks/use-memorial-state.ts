@@ -24,6 +24,7 @@ export interface PetDetails {
   birthDate: string;
   deathDate: string;
   heroPhoto: string;
+  heroPhotoCropY: number; // 0-100, vertical focal point percentage
 }
 
 export interface WizardPhoto {
@@ -86,6 +87,7 @@ const initialState: MemorialState = {
     birthDate: "",
     deathDate: "",
     heroPhoto: "",
+    heroPhotoCropY: 50,
   },
   ownerLastName: "",
   photos: [],

@@ -187,6 +187,8 @@ function PreviewContent() {
         onReorderPhotos={ctx.reorderPhotos}
         onSave={handleSave}
         onBack={() => router.push("/create")}
+        heroPhotoCropY={ctx.petDetails.heroPhotoCropY ?? 50}
+        onUpdateCropY={(y) => ctx.updatePetDetails({ heroPhotoCropY: y })}
       />
     </div>
   );

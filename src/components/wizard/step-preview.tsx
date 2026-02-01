@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import type { PetDetails, WizardPhoto } from "@/hooks/use-memorial-state";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Pencil, Check, GripVertical, PawPrint } from "lucide-react";
+import { Pencil, Check, GripVertical, PawPrint, Move } from "lucide-react";
 import {
   DndContext,
   closestCenter,
@@ -71,6 +71,8 @@ interface StepPreviewProps {
   onReorderPhotos: (photos: WizardPhoto[]) => void;
   onSave: () => Promise<void>;
   onBack?: () => void;
+  heroPhotoCropY?: number;
+  onUpdateCropY?: (y: number) => void;
 }
 
 export function StepPreview({
@@ -82,11 +84,44 @@ export function StepPreview({
   onReorderPhotos,
   onSave,
   onBack,
+  heroPhotoCropY = 50,
+  onUpdateCropY,
 }: StepPreviewProps) {
   const [editingTribute, setEditingTribute] = useState(false);
   const [editedTribute, setEditedTribute] = useState(tribute);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [repositioning, setRepositioning] = useState(false);
+  const [cropY, setCropY] = useState(heroPhotoCropY);
+  const dragRef = useRef<{ startY: number; startCropY: number } | null>(null);
+  const heroContainerRef = useRef<HTMLDivElement>(null);
+
+  const handlePointerDown = useCallback(
+    (e: React.PointerEvent) => {
+      if (!repositioning) return;
+      e.preventDefault();
+      dragRef.current = { startY: e.clientY, startCropY: cropY };
+      (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    },
+    [repositioning, cropY]
+  );
+
+  const handlePointerMove = useCallback(
+    (e: React.PointerEvent) => {
+      if (!dragRef.current || !heroContainerRef.current) return;
+      const containerHeight = heroContainerRef.current.clientHeight;
+      const deltaPixels = e.clientY - dragRef.current.startY;
+      // Moving pointer down means we want to see higher in the image (lower cropY)
+      const deltaPct = (deltaPixels / containerHeight) * 100;
+      const newY = Math.min(100, Math.max(0, dragRef.current.startCropY - deltaPct));
+      setCropY(newY);
+    },
+    []
+  );
+
+  const handlePointerUp = useCallback(() => {
+    dragRef.current = null;
+  }, []);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -153,14 +188,55 @@ export function StepPreview({
       {/* Hero Section */}
       <section className="relative">
         {heroPhoto ? (
-          <div className="relative h-[50vh] min-h-[320px] max-h-[500px] w-full sm:h-[60vh]">
+          <div
+            ref={heroContainerRef}
+            className={`relative h-[60vh] min-h-[400px] max-h-[650px] w-full sm:h-[70vh] ${repositioning ? "cursor-grab active:cursor-grabbing" : ""}`}
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+          >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={heroPhoto}
               alt={petDetails.petName}
-              className="absolute inset-0 h-full w-full object-cover"
+              className="absolute inset-0 h-full w-full object-cover select-none"
+              style={{ objectPosition: `center ${cropY}%` }}
+              draggable={false}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+            {/* Reposition button */}
+            {onUpdateCropY && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (repositioning) {
+                    onUpdateCropY(cropY);
+                    setRepositioning(false);
+                  } else {
+                    setRepositioning(true);
+                  }
+                }}
+                className="absolute top-4 right-4 z-10 flex items-center gap-1.5 rounded-full bg-black/50 px-3 py-1.5 text-sm text-white backdrop-blur-sm hover:bg-black/70 transition-colors"
+              >
+                {repositioning ? (
+                  <>
+                    <Check className="h-3.5 w-3.5" /> Done
+                  </>
+                ) : (
+                  <>
+                    <Move className="h-3.5 w-3.5" /> Reposition
+                  </>
+                )}
+              </button>
+            )}
+            {repositioning && (
+              <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 text-center pointer-events-none">
+                <p className="inline-block rounded-full bg-black/50 px-4 py-2 text-sm text-white backdrop-blur-sm">
+                  Drag up or down to reposition
+                </p>
+              </div>
+            )}
             <div className="absolute inset-x-0 bottom-0 p-6 text-white sm:p-10">
               <h2 className="font-serif text-4xl font-medium tracking-tight sm:text-5xl">
                 {petDetails.petName}

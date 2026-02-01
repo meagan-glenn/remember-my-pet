@@ -16,9 +16,10 @@ import { Label } from "@/components/ui/label";
 interface AuthModalProps {
   open: boolean;
   onAuthenticated: () => void;
+  onClose?: () => void;
 }
 
-export function AuthModal({ open, onAuthenticated }: AuthModalProps) {
+export function AuthModal({ open, onAuthenticated, onClose }: AuthModalProps) {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
@@ -63,8 +64,8 @@ export function AuthModal({ open, onAuthenticated }: AuthModalProps) {
   }, [onAuthenticated]);
 
   return (
-    <Dialog open={open}>
-      <DialogContent className="sm:max-w-md" onInteractOutside={(e) => e.preventDefault()}>
+    <Dialog open={open} onOpenChange={(o) => { if (!o && onClose) onClose(); }}>
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-center">
             {sent ? "Check your email" : "Save your progress"}
