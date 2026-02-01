@@ -130,6 +130,7 @@ function saveState(state: MemorialState) {
 export function useMemorialState() {
   const [state, setState] = useState<MemorialState>(initialState);
   const [hydrated, setHydrated] = useState(false);
+  const [cameFromSeed, setCameFromSeed] = useState(false);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const stateRef = useRef(state);
   useEffect(() => {
@@ -157,6 +158,8 @@ export function useMemorialState() {
               petName: seed.petName,
               species: normalizedSpecies || loaded.petDetails.species,
             };
+            loaded.introComplete = true;
+            setCameFromSeed(true);
           }
           // Store homepage conversation for tribute integration
           if (seed.conversation && Array.isArray(seed.conversation)) {
@@ -538,6 +541,7 @@ export function useMemorialState() {
       ownerLastName: state.ownerLastName,
       compilationUrl: state.compilationUrl,
       introComplete: state.introComplete,
+      cameFromSeed,
       hydrated,
       heroPhotoFileRef,
       photoFilesRef,

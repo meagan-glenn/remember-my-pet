@@ -104,7 +104,7 @@ function IntroForm() {
               <Label htmlFor="ownerLastName">Your last name</Label>
               <Input
                 id="ownerLastName"
-                placeholder="Used for the memorial URL"
+                placeholder="So we can personalize the page"
                 value={ownerLastName}
                 onChange={(e) => setOwnerLastName(e.target.value)}
                 className="h-12 text-base"
@@ -259,6 +259,7 @@ function Dashboard() {
     setOwnerLastName,
     updatePetDetails,
     setHeroPhotoFile,
+    cameFromSeed,
     hydrated,
   } = useMemorialContext();
   const [editingDetails, setEditingDetails] = useState(false);
@@ -300,7 +301,9 @@ function Dashboard() {
             </div>
           )}
           <h1 className="text-2xl font-semibold text-gray-900">
-            You&apos;ve started {petDetails.petName}&apos;s memorial
+            {cameFromSeed
+              ? <>Let&apos;s build {petDetails.petName}&apos;s memorial</>
+              : <>You&apos;ve started {petDetails.petName}&apos;s memorial</>}
           </h1>
           <p className="text-gray-500">
             What would you like to do next?
@@ -415,7 +418,7 @@ function PetDetailsEditor({
         <Label htmlFor="edit-ownerLastName">Your last name</Label>
         <Input
           id="edit-ownerLastName"
-          placeholder="Used for the memorial URL"
+          placeholder="So we can personalize the page"
           value={ownerLastName}
           onChange={(e) => onOwnerLastNameChange(e.target.value)}
           className="h-12 text-base"
