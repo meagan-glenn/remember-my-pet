@@ -87,7 +87,7 @@ const PRICING_TIERS = [
     features: [
       "AI-written tribute",
       "Photo gallery with captions",
-      "Permanent memorial page",
+      "Your memorial page, always online",
       "Shareable link",
       "Memory wall for friends & family",
     ],
@@ -491,7 +491,7 @@ export default function Home() {
                 Everything you need to honor their memory
               </h2>
               <p className="mt-4 text-center text-gray-500">
-                A permanent, beautiful space to celebrate the life you shared.
+                A beautiful space to celebrate the life you shared.
               </p>
 
               <div className="mt-12 grid gap-6 sm:grid-cols-2">
@@ -541,7 +541,7 @@ export default function Home() {
                 Simple, one-time pricing
               </h2>
               <p className="mt-4 text-center text-gray-500">
-                No subscriptions. Your memorial is permanent.
+                No subscriptions. One payment, always online.
               </p>
 
               <div className="mt-12 grid gap-6 sm:grid-cols-2">
@@ -616,7 +616,7 @@ export default function Home() {
                   <Camera className="h-4 w-4" /> Your photos stay private
                 </span>
                 <span>No pressure, no timers</span>
-                <span>Hosted permanently</span>
+                <span>Hosted forever</span>
               </div>
             </div>
       </section>
