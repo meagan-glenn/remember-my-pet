@@ -6,6 +6,7 @@ import { PawPrint, Gift } from "lucide-react";
 import { ShareButton } from "./share-button";
 import { MasonryWall } from "@/components/memorial-wall/masonry-wall";
 import { MemoryForm } from "@/components/memory-wall/memory-form";
+import { LightCandle } from "@/components/memorial/light-candle";
 
 interface MemorialPageProps {
   params: Promise<{ slug: string }>;
@@ -225,6 +226,7 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
             Edit memorial
           </a>
         )}
+        <LightCandle memorialId={memorial.id} />
         <ShareButton url={memorialUrl} petName={memorial.pet_name} />
       </div>
 
