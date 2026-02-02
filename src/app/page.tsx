@@ -136,6 +136,7 @@ export default function Home() {
     e.preventDefault();
     if (!petName.trim()) return;
     setStarted(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     setIsTyping(true);
     setTimeout(() => {
       setIsTyping(false);
@@ -464,6 +465,12 @@ export default function Home() {
                     </Button>
                   </motion.div>
                 )}
+                <Link
+                  href="/demo"
+                  className="mt-4 block text-center text-sm text-amber-600 hover:text-amber-700 transition-colors"
+                >
+                  Want to see what a memorial looks like first? View an example →
+                </Link>
               </div>
 
               <button
@@ -477,16 +484,8 @@ export default function Home() {
         </AnimatePresence>
       </section>
 
-      {/* Below-fold content — hidden when conversation is active */}
-      {!started && (
-        <>
-          {/* Features Section */}
-          <motion.section
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.8, duration: 0.6 }}
-            className="px-4 py-10 sm:py-12"
-          >
+      {/* Below-fold content */}
+      <section className="px-4 py-10 sm:py-12">
             <div className="mx-auto max-w-4xl">
               <h2 className="text-center font-serif text-3xl font-medium text-gray-900 md:text-4xl">
                 Everything you need to honor their memory
@@ -514,9 +513,9 @@ export default function Home() {
                 ))}
               </div>
             </div>
-          </motion.section>
+      </section>
 
-          {/* Example Memorial */}
+      {/* Example Memorial */}
           <section className="px-4 py-10 sm:py-12 bg-amber-50/40">
             <div className="mx-auto max-w-3xl text-center">
               <h2 className="font-serif text-3xl font-medium text-gray-900 md:text-4xl">
@@ -620,9 +619,7 @@ export default function Home() {
                 <span>Hosted permanently</span>
               </div>
             </div>
-          </section>
-        </>
-      )}
+      </section>
     </div>
   );
 }
