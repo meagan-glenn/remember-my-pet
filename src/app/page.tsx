@@ -120,6 +120,9 @@ export default function Home() {
   const [species, setSpecies] = useState("");
   const [readyToCreate, setReadyToCreate] = useState(false);
   const [openingQuestion] = useState(() => pickOpeningQuestion());
+  const [aiLoading, setAiLoading] = useState(false);
+  const [userExchangeCount, setUserExchangeCount] = useState(0);
+  const [chatError, setChatError] = useState("");
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -127,7 +130,7 @@ export default function Home() {
     if (el?.parentElement) {
       el.parentElement.scrollTop = el.parentElement.scrollHeight;
     }
-  }, [messages, isTyping]);
+  }, [messages, isTyping, aiLoading]);
 
   const handleNameSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -165,46 +168,63 @@ export default function Home() {
     }, 1500);
   };
 
-  const handleMemorySubmit = (e: React.FormEvent) => {
+  const handleMemorySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!userInput.trim()) return;
-    const memory = userInput.trim();
+    if (!userInput.trim() || aiLoading) return;
+    const text = userInput.trim();
     setUserInput("");
-    setMessages((prev) => [...prev, { role: "user", content: memory }]);
-    setIsTyping(true);
-    setTimeout(() => {
-      setIsTyping(false);
+    setChatError("");
+    setMessages((prev) => [...prev, { role: "user", content: text }]);
+    setAiLoading(true);
+
+    try {
+      // Build chat history: skip the first 2 messages (species question + species answer)
+      const allMessages = [...messages, { role: "user" as const, content: text }];
+      const conversationMessages = allMessages.slice(2); // skip species exchange
+
+      const res = await fetch("/api/homepage/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          petName: petName.trim(),
+          species: species === "Other" ? "" : species,
+          chatHistory: conversationMessages,
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to get response");
+      }
+
+      const { reply } = await res.json();
       setMessages((prev) => [
         ...prev,
-        {
-          role: "assistant",
-          content: `That's beautiful. I'd love to help you create a tribute for ${petName.trim()}. Let's make sure ${petName.trim()} is remembered the way they deserve.`,
-        },
+        { role: "assistant", content: reply },
       ]);
-      const wizardSeed = {
-        petName: petName.trim(),
-        species: species === "Other" ? "" : species,
-        memory,
-      };
-      localStorage.setItem(
-        "petmemorial-wizard-seed",
-        JSON.stringify(wizardSeed)
-      );
-      setReadyToCreate(true);
-    }, 1200);
+      setUserExchangeCount((prev) => prev + 1);
+    } catch {
+      setChatError("Something went wrong.");
+    } finally {
+      setAiLoading(false);
+    }
   };
 
-  const handleSkipToCreate = () => {
+  const saveWizardSeed = () => {
+    const conversation = messages.slice(2); // skip species exchange
+    const wizardSeed = {
+      petName: petName.trim(),
+      species: species === "Other" ? "" : species,
+      conversation: conversation.length > 0 ? conversation : [],
+    };
+    localStorage.setItem(
+      "petmemorial-wizard-seed",
+      JSON.stringify(wizardSeed)
+    );
+  };
+
+  const handleCreateClick = () => {
     if (petName.trim()) {
-      const wizardSeed = {
-        petName: petName.trim(),
-        species: species === "Other" ? "" : species,
-        memory: "",
-      };
-      localStorage.setItem(
-        "petmemorial-wizard-seed",
-        JSON.stringify(wizardSeed)
-      );
+      saveWizardSeed();
     }
     router.push("/create");
   };
@@ -308,7 +328,7 @@ export default function Home() {
                     </motion.div>
                   ))}
 
-                  {isTyping && (
+                  {(isTyping || aiLoading) && (
                     <motion.div
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
@@ -345,49 +365,91 @@ export default function Home() {
                     </motion.div>
                   )}
 
-                {/* Memory text input */}
-                {!isTyping && conversationStep === 1 && messages.length === 3 && (
+                {/* Memory/conversation text input */}
+                {!isTyping && !aiLoading && conversationStep === 1 && !readyToCreate && userExchangeCount < 3 && (
                   <motion.form
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 }}
                     onSubmit={handleMemorySubmit}
-                    className="mt-4 flex gap-2"
+                    className="mt-4 space-y-2"
                   >
-                    <textarea
-                      value={userInput}
-                      onChange={(e) => {
-                        setUserInput(e.target.value);
-                        e.target.style.height = "auto";
-                        e.target.style.height = e.target.scrollHeight + "px";
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" && !e.shiftKey) {
-                          e.preventDefault();
-                          if (userInput.trim())
-                            handleMemorySubmit(
-                              e as unknown as React.FormEvent
-                            );
-                        }
-                      }}
-                      placeholder="Share a memory..."
-                      className="flex-1 rounded-2xl border border-amber-200 bg-white px-4 py-2 text-sm resize-none overflow-hidden leading-snug focus:outline-none focus:ring-2 focus:ring-amber-300 focus:border-amber-300"
-                      rows={1}
-                      autoFocus
-                    />
-                    <Button
-                      type="submit"
-                      disabled={!userInput.trim()}
-                      size="sm"
-                      className="rounded-full bg-amber-600 hover:bg-amber-700"
-                    >
-                      <ArrowRight className="h-4 w-4" />
-                    </Button>
+                    <div className="flex gap-2">
+                      <textarea
+                        value={userInput}
+                        onChange={(e) => {
+                          setUserInput(e.target.value);
+                          e.target.style.height = "auto";
+                          e.target.style.height = e.target.scrollHeight + "px";
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" && !e.shiftKey) {
+                            e.preventDefault();
+                            if (userInput.trim())
+                              handleMemorySubmit(
+                                e as unknown as React.FormEvent
+                              );
+                          }
+                        }}
+                        placeholder={userExchangeCount === 0 ? "Share a memory..." : "Tell me more..."}
+                        className="flex-1 rounded-2xl border border-amber-200 bg-white px-4 py-2 text-sm resize-none overflow-hidden leading-snug focus:outline-none focus:ring-2 focus:ring-amber-300 focus:border-amber-300"
+                        rows={1}
+                        autoFocus
+                        disabled={aiLoading}
+                      />
+                      <Button
+                        type="submit"
+                        disabled={!userInput.trim() || aiLoading}
+                        size="sm"
+                        className="rounded-full bg-amber-600 hover:bg-amber-700"
+                      >
+                        <ArrowRight className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    {userExchangeCount >= 1 && (
+                      <Button
+                        type="button"
+                        onClick={handleCreateClick}
+                        variant="outline"
+                        className="w-full rounded-full border-amber-300 text-amber-700 hover:bg-amber-50"
+                      >
+                        Create {petName.trim()}&apos;s Tribute
+                      </Button>
+                    )}
+                    {chatError && (
+                      <div className="space-y-1 text-center">
+                        <p className="text-xs text-red-500">{chatError}</p>
+                        <button
+                          type="button"
+                          onClick={handleCreateClick}
+                          className="text-xs text-gray-400 hover:text-gray-600 underline"
+                        >
+                          Skip to creator
+                        </button>
+                      </div>
+                    )}
                   </motion.form>
                 )}
 
-                {/* CTA after conversation completes */}
-                {readyToCreate && !isTyping && (
+                {/* CTA only — after 3 exchanges */}
+                {!isTyping && !aiLoading && conversationStep === 1 && !readyToCreate && userExchangeCount >= 3 && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                    className="mt-4"
+                  >
+                    <Button
+                      onClick={handleCreateClick}
+                      className="w-full rounded-full bg-amber-600 hover:bg-amber-700 h-11 text-base"
+                    >
+                      Create {petName.trim()}&apos;s Tribute
+                    </Button>
+                  </motion.div>
+                )}
+
+                {/* CTA after user clicks create */}
+                {readyToCreate && !isTyping && !aiLoading && (
                   <motion.div
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -405,7 +467,7 @@ export default function Home() {
               </div>
 
               <button
-                onClick={handleSkipToCreate}
+                onClick={handleCreateClick}
                 className="mt-4 block w-full text-center text-sm text-gray-400 hover:text-gray-600 transition-colors"
               >
                 Skip to full creator

@@ -66,9 +66,7 @@ export interface MemorialState {
   chatMessages: { role: "assistant" | "user"; content: string }[];
   generatedTribute: string;
   memorialId: string;
-  homepageMemory: string;
-  tributeMode: "celebrate" | "support" | "";
-  hasPassedTransition: boolean;
+  homepageConversation: { role: "assistant" | "user"; content: string }[];
   supportContext: SupportContextEntry[];
   videos: WizardVideo[];
   videoClips: VideoClip[];
@@ -94,9 +92,7 @@ const initialState: MemorialState = {
   chatMessages: [],
   generatedTribute: "",
   memorialId: "",
-  homepageMemory: "",
-  tributeMode: "",
-  hasPassedTransition: false,
+  homepageConversation: [],
   supportContext: [],
   videos: [],
   videoClips: [],
@@ -110,8 +106,8 @@ function loadState(): MemorialState {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (!stored) return initialState;
     // Destructure out currentStep from old wizard state for backward compat
-    const { currentStep: _currentStep, ...rest } = JSON.parse(stored);
-    void _currentStep;
+    const { currentStep: _currentStep, tributeMode: _tributeMode, hasPassedTransition: _hasPassedTransition, ...rest } = JSON.parse(stored);
+    void _currentStep; void _tributeMode; void _hasPassedTransition;
     return { ...initialState, ...rest };
   } catch {
     return initialState;
@@ -130,6 +126,8 @@ function saveState(state: MemorialState) {
 export function useMemorialState() {
   const [state, setState] = useState<MemorialState>(initialState);
   const [hydrated, setHydrated] = useState(false);
+  const [cameFromSeed, setCameFromSeed] = useState(false);
+  const [lastSaved, setLastSaved] = useState<number | null>(null);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const stateRef = useRef(state);
   useEffect(() => {
@@ -157,10 +155,18 @@ export function useMemorialState() {
               petName: seed.petName,
               species: normalizedSpecies || loaded.petDetails.species,
             };
+            loaded.introComplete = true;
+            setCameFromSeed(true);
           }
-          // Store homepage memory for tribute integration
-          if (seed.memory && !loaded.homepageMemory) {
-            loaded.homepageMemory = seed.memory;
+          // Store homepage conversation for tribute integration
+          if (seed.conversation && Array.isArray(seed.conversation)) {
+            loaded.homepageConversation = seed.conversation;
+          } else if (seed.memory && typeof seed.memory === "string" && !loaded.homepageConversation.length) {
+            // Backward compat: convert old single-memory format
+            loaded.homepageConversation = [
+              { role: "assistant" as const, content: `What's your favorite memory with ${seed.petName}?` },
+              { role: "user" as const, content: seed.memory },
+            ];
           }
         }
       } catch {
@@ -222,7 +228,14 @@ export function useMemorialState() {
   useEffect(() => {
     if (!hydrated) return;
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
-    saveTimerRef.current = setTimeout(() => saveState(state), SAVE_DEBOUNCE_MS);
+    saveTimerRef.current = setTimeout(() => {
+      try {
+        saveState(state);
+        setLastSaved(Date.now());
+      } catch {
+        // localStorage full or unavailable — don't update lastSaved
+      }
+    }, SAVE_DEBOUNCE_MS);
     return () => {
       if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     };
@@ -350,28 +363,9 @@ export function useMemorialState() {
     []
   );
 
-  const setHomepageMemory = useCallback(
-    (memory: string) =>
-      setState((prev) => ({ ...prev, homepageMemory: memory })),
-    []
-  );
-
-  const setTributeMode = useCallback(
-    (mode: "celebrate" | "support" | "") =>
-      setState((prev) => ({
-        ...prev,
-        tributeMode: mode,
-        chatMessages: [],
-        generatedTribute: "",
-        hasPassedTransition: false,
-        supportContext: [],
-      })),
-    []
-  );
-
-  const setHasPassedTransition = useCallback(
-    (passed: boolean) =>
-      setState((prev) => ({ ...prev, hasPassedTransition: passed })),
+  const setHomepageConversation = useCallback(
+    (conversation: { role: "assistant" | "user"; content: string }[]) =>
+      setState((prev) => ({ ...prev, homepageConversation: conversation })),
     []
   );
 
@@ -497,9 +491,7 @@ export function useMemorialState() {
       addChatMessage,
       setTribute,
       setHeroPhotoFile,
-      setHomepageMemory,
-      setTributeMode,
-      setHasPassedTransition,
+      setHomepageConversation,
       setSupportContext,
       addVideo,
       removeVideo,
@@ -513,7 +505,7 @@ export function useMemorialState() {
       setIntroComplete,
       reset,
     }),
-    [updatePetDetails, addPhoto, removePhoto, setPhotoCaption, setPhotoTags, reorderPhotos, addChatMessage, setTribute, setHeroPhotoFile, setHomepageMemory, setTributeMode, setHasPassedTransition, setSupportContext, addVideo, removeVideo, reorderVideos, addClip, updateClip, removeClip, reorderClips, setOwnerLastName, setCompilationUrl, setIntroComplete, reset]
+    [updatePetDetails, addPhoto, removePhoto, setPhotoCaption, setPhotoTags, reorderPhotos, addChatMessage, setTribute, setHeroPhotoFile, setHomepageConversation, setSupportContext, addVideo, removeVideo, reorderVideos, addClip, updateClip, removeClip, reorderClips, setOwnerLastName, setCompilationUrl, setIntroComplete, reset]
   );
 
   return useMemo(
@@ -523,22 +515,22 @@ export function useMemorialState() {
       chatMessages: state.chatMessages,
       generatedTribute: state.generatedTribute,
       memorialId: state.memorialId,
-      homepageMemory: state.homepageMemory,
-      tributeMode: state.tributeMode,
-      hasPassedTransition: state.hasPassedTransition,
+      homepageConversation: state.homepageConversation,
       supportContext: state.supportContext,
       videos: state.videos,
       videoClips: state.videoClips,
       ownerLastName: state.ownerLastName,
       compilationUrl: state.compilationUrl,
       introComplete: state.introComplete,
+      cameFromSeed,
+      lastSaved,
       hydrated,
       heroPhotoFileRef,
       photoFilesRef,
       videoFilesRef,
       ...actions,
     }),
-    [state, hydrated, actions]
+    [state, hydrated, lastSaved, actions]
   );
 }
 

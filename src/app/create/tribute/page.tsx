@@ -13,14 +13,10 @@ export default function TributePage() {
     petDetails,
     chatMessages,
     generatedTribute,
-    homepageMemory,
-    tributeMode,
-    hasPassedTransition,
+    homepageConversation,
     supportContext,
     addChatMessage,
     setTribute,
-    setTributeMode,
-    setHasPassedTransition,
     setSupportContext,
     hydrated,
   } = useMemorialContext();
@@ -60,14 +56,10 @@ export default function TributePage() {
           petDetails={petDetails}
           chatMessages={chatMessages}
           generatedTribute={generatedTribute}
-          homepageMemory={homepageMemory}
-          tributeMode={tributeMode}
-          hasPassedTransition={hasPassedTransition}
+          homepageConversation={homepageConversation}
           supportContext={supportContext}
           onAddMessage={addChatMessage}
           onSetTribute={setTribute}
-          onSetTributeMode={setTributeMode}
-          onSetHasPassedTransition={setHasPassedTransition}
           onSetSupportContext={setSupportContext}
           onNext={() => router.push("/create/preview")}
           onBack={() => router.push("/create")}

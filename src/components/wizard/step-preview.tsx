@@ -351,6 +351,13 @@ export function StepPreview({
         </section>
       )}
 
+      {/* Persistence reassurance */}
+      <div className="mx-auto max-w-2xl px-4 sm:px-6">
+        <div className="rounded-xl border border-amber-100 bg-amber-50/60 px-4 py-3 text-sm text-gray-600">
+          Everything you&apos;ve created is saved on this device. Sign in to publish — we&apos;ll bring you right back.
+        </div>
+      </div>
+
       {/* Actions */}
       <div className="mx-auto max-w-2xl px-4 pb-12 sm:px-6 space-y-4">
         <p className="text-center text-sm text-gray-400">

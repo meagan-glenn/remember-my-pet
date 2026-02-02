@@ -17,6 +17,7 @@ function PreviewContent() {
   const autoSaveTriggered = useRef(false);
   const [saving, setSaving] = useState(false);
   const [autoSaveFailed, setAutoSaveFailed] = useState(false);
+  const [showWelcomeBack, setShowWelcomeBack] = useState(false);
   const [savedMemorial, setSavedMemorial] = useState<{
     id: string;
     slug: string;
@@ -64,7 +65,6 @@ function PreviewContent() {
       photos.push(...galleryResults);
     } catch (err) {
       if (err instanceof Error && err.message === "__AUTH_REQUIRED__") {
-        toast.info("Sign in to save your memorial — your progress is safe.");
         router.push("/sign-in?redirect=" + encodeURIComponent("/create/preview?autoSave=1") + "&context=save");
         return;
       }
@@ -103,6 +103,7 @@ function PreviewContent() {
   useEffect(() => {
     if (!autoSave || !ctx.hydrated || autoSaveTriggered.current) return;
     autoSaveTriggered.current = true;
+    setShowWelcomeBack(true);
     // Strip autoSave param from URL
     router.replace("/create/preview", { scroll: false });
     setSaving(true);
@@ -110,6 +111,7 @@ function PreviewContent() {
       .catch((err) => {
         toast.error(err instanceof Error ? err.message : "Failed to save memorial. Please try again.");
         setAutoSaveFailed(true);
+        setShowWelcomeBack(false);
       })
       .finally(() => setSaving(false));
   }, [autoSave, ctx.hydrated, handleSave, router]);
@@ -117,7 +119,12 @@ function PreviewContent() {
   if (!ctx.hydrated || saving) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="text-center space-y-3">
+        <div className="text-center space-y-3 px-4">
+          {showWelcomeBack && (
+            <p className="text-base text-gray-700 mb-4">
+              Welcome back. Picking up right where you left off.
+            </p>
+          )}
           <div className="h-8 w-8 mx-auto animate-spin rounded-full border-2 border-amber-500 border-t-transparent" />
           {saving && (
             <p className="text-sm text-gray-500">Saving your memorial...</p>
