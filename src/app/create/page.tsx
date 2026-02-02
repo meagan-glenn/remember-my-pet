@@ -304,7 +304,7 @@ function Dashboard() {
       : "in-progress" as const;
 
   return (
-    <div className="py-8 px-4 pb-28">
+    <div className={`py-8 px-4 ${photoCount > 0 || !tributeNotStarted || videos.length > 0 || compilationUrl ? "pb-28" : "pb-8"}`}>
       <div className="mx-auto max-w-lg space-y-8">
         {/* Pet details header */}
         <div className="text-center space-y-1">
@@ -416,17 +416,28 @@ function Dashboard() {
         </div>
       </div>
 
-      {/* Sticky save bar */}
-      <div className="fixed bottom-0 left-0 right-0 border-t border-gray-200 bg-white/95 backdrop-blur-sm px-4 py-4">
-        <div className="mx-auto max-w-lg">
-          <Link href="/create/preview">
-            <Button className="w-full h-12 text-base bg-amber-600 hover:bg-amber-700 gap-2">
-              <Eye className="h-5 w-5" />
-              Preview & Save
-            </Button>
+      {/* Sticky save bar — only show after user has started at least one section */}
+      {(photoCount > 0 || !tributeNotStarted || videos.length > 0 || compilationUrl) ? (
+        <div className="fixed bottom-0 left-0 right-0 border-t border-gray-200 bg-white/95 backdrop-blur-sm px-4 py-4">
+          <div className="mx-auto max-w-lg">
+            <Link href="/create/preview">
+              <Button className="w-full h-12 text-base bg-amber-600 hover:bg-amber-700 gap-2">
+                <Eye className="h-5 w-5" />
+                Preview & Save
+              </Button>
+            </Link>
+          </div>
+        </div>
+      ) : (
+        <div className="mt-8 text-center space-y-3">
+          <p className="text-sm text-gray-400">
+            Most people start with photos — it&apos;s the gentlest way to begin.
+          </p>
+          <Link href="/demo" className="text-sm text-amber-600 hover:text-amber-700 underline underline-offset-2">
+            Want to see what a finished memorial looks like? View example →
           </Link>
         </div>
-      </div>
+      )}
     </div>
   );
 }
@@ -498,6 +509,26 @@ function PetDetailsEditor({
             className="h-12 text-base mt-2"
           />
         )}
+      </div>
+
+      <div className="space-y-2">
+        <Label>Gender (optional)</Label>
+        <div className="flex gap-2">
+          {([["male", "Boy"], ["female", "Girl"], ["neutral", "Other"]] as const).map(([value, label]) => (
+            <button
+              key={value}
+              type="button"
+              onClick={() => onUpdate({ gender: petDetails.gender === value ? undefined : value })}
+              className={`flex-1 rounded-lg border px-4 py-3 text-sm font-medium transition-colors ${
+                petDetails.gender === value
+                  ? "border-amber-500 bg-amber-50 text-amber-700"
+                  : "border-gray-200 text-gray-600 hover:border-gray-300"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
