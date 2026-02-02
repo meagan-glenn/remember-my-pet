@@ -36,7 +36,7 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json();
-  const { petName, species, customSpecies, gender, birthDate, deathDate, tribute, ownerLastName } = body;
+  const { petName, species, customSpecies, gender, birthDate, deathDate, tribute, ownerLastName, memorialId } = body;
   // Support both new { url, caption, aiDetectedTags } format and legacy string[] format
   const photoItems: { url: string; caption?: string; aiDetectedTags?: string[] }[] = body.photos
     ? body.photos.map((p: { url: string; caption?: string; aiDetectedTags?: string[] }) => p)
@@ -86,68 +86,117 @@ export async function POST(request: Request) {
     .from("users")
     .upsert({ id: user.id, email: user.email }, { onConflict: "id" });
 
-  // Generate unique slug (capped attempts)
-  const baseSlug = generateSlug(petName, ownerLastName || "", deathDate);
-  let slug = baseSlug;
-  let found = false;
+  const memorialFields = {
+    pet_name: petName.slice(0, MAX_PET_NAME),
+    species: typeof species === "string" ? species.slice(0, 50) : null,
+    custom_species: typeof customSpecies === "string" ? customSpecies.slice(0, 100) : null,
+    gender: typeof gender === "string" && ["male", "female", "neutral"].includes(gender) ? gender : null,
+    birth_date: birthDate || null,
+    death_date: deathDate || null,
+    tribute: tribute.slice(0, MAX_TRIBUTE),
+  };
 
-  for (let i = 2; i <= MAX_SLUG_ATTEMPTS + 1; i++) {
-    const { data } = await supabase
+  let memorial: { id: string; slug: string };
+
+  if (memorialId) {
+    // ── Update existing memorial ──────────────────────────────────────────
+    // Verify ownership
+    const { data: existing } = await supabase
       .from("memorials")
-      .select("id")
-      .eq("slug", slug)
-      .maybeSingle();
+      .select("id, slug, user_id")
+      .eq("id", memorialId)
+      .single();
 
-    if (!data) {
-      found = true;
-      break;
+    if (!existing || existing.user_id !== user.id) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
-    slug = `${baseSlug}-${i}`;
-  }
 
-  if (!found) {
-    slug = `${baseSlug}-${crypto.randomUUID().slice(0, 6)}`;
-  }
+    const { error: updateError } = await supabase
+      .from("memorials")
+      .update(memorialFields)
+      .eq("id", memorialId);
 
-  // Insert memorial
-  const { data: memorial, error: memError } = await supabase
-    .from("memorials")
-    .insert({
-      user_id: user.id,
-      pet_name: petName.slice(0, MAX_PET_NAME),
-      slug,
-      species: typeof species === "string" ? species.slice(0, 50) : null,
-      custom_species: typeof customSpecies === "string" ? customSpecies.slice(0, 100) : null,
-      gender: typeof gender === "string" && ["male", "female", "neutral"].includes(gender) ? gender : null,
-      birth_date: birthDate || null,
-      death_date: deathDate || null,
-      tribute: tribute.slice(0, MAX_TRIBUTE),
-      is_paid: false,
-      is_published: false,
-    })
-    .select()
-    .single();
+    if (updateError) {
+      console.error("Memorial update error:", updateError.message);
+      return NextResponse.json(
+        { error: "Failed to update memorial" },
+        { status: 500 }
+      );
+    }
 
-  if (memError) {
-    console.error("Memorial creation error:", memError.message);
-    return NextResponse.json(
-      { error: "Failed to create memorial" },
-      { status: 500 }
-    );
-  }
+    // Replace photos: delete old, insert new
+    await supabase.from("photos").delete().eq("memorial_id", memorialId);
 
-  // Insert photos
-  if (photoItems.length > 0) {
-    const photosData = photoItems.slice(0, MAX_PHOTOS).map((item, index) => ({
-      memorial_id: memorial.id,
-      url: item.url,
-      caption: item.caption?.slice(0, 200) || null,
-      ai_detected_tags: item.aiDetectedTags || [],
-      sort_order: index,
-      uploaded_by: user.id,
-    }));
+    if (photoItems.length > 0) {
+      const photosData = photoItems.slice(0, MAX_PHOTOS).map((item, index) => ({
+        memorial_id: memorialId,
+        url: item.url,
+        caption: item.caption?.slice(0, 200) || null,
+        ai_detected_tags: item.aiDetectedTags || [],
+        sort_order: index,
+        uploaded_by: user.id,
+      }));
+      await supabase.from("photos").insert(photosData);
+    }
 
-    await supabase.from("photos").insert(photosData);
+    memorial = { id: existing.id, slug: existing.slug };
+  } else {
+    // ── Create new memorial ───────────────────────────────────────────────
+    const baseSlug = generateSlug(petName, ownerLastName || "", deathDate);
+    let slug = baseSlug;
+    let found = false;
+
+    for (let i = 2; i <= MAX_SLUG_ATTEMPTS + 1; i++) {
+      const { data } = await supabase
+        .from("memorials")
+        .select("id")
+        .eq("slug", slug)
+        .maybeSingle();
+
+      if (!data) {
+        found = true;
+        break;
+      }
+      slug = `${baseSlug}-${i}`;
+    }
+
+    if (!found) {
+      slug = `${baseSlug}-${crypto.randomUUID().slice(0, 6)}`;
+    }
+
+    const { data: newMemorial, error: memError } = await supabase
+      .from("memorials")
+      .insert({
+        user_id: user.id,
+        ...memorialFields,
+        slug,
+        is_paid: false,
+        is_published: false,
+      })
+      .select()
+      .single();
+
+    if (memError) {
+      console.error("Memorial creation error:", memError.message);
+      return NextResponse.json(
+        { error: "Failed to create memorial" },
+        { status: 500 }
+      );
+    }
+
+    if (photoItems.length > 0) {
+      const photosData = photoItems.slice(0, MAX_PHOTOS).map((item, index) => ({
+        memorial_id: newMemorial.id,
+        url: item.url,
+        caption: item.caption?.slice(0, 200) || null,
+        ai_detected_tags: item.aiDetectedTags || [],
+        sort_order: index,
+        uploaded_by: user.id,
+      }));
+      await supabase.from("photos").insert(photosData);
+    }
+
+    memorial = { id: newMemorial.id, slug: newMemorial.slug };
   }
 
   return NextResponse.json({

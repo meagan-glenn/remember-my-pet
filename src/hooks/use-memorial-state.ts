@@ -473,6 +473,52 @@ export function useMemorialState() {
     []
   );
 
+  const loadFromMemorial = useCallback(
+    (memorial: {
+      id: string;
+      pet_name: string;
+      species?: string | null;
+      custom_species?: string | null;
+      gender?: string | null;
+      birth_date?: string | null;
+      death_date?: string | null;
+      tribute?: string | null;
+      photos?: { id: string; url: string; caption?: string | null; ai_detected_tags?: string[]; sort_order: number }[];
+    }) => {
+      // Find the first photo to use as hero (or none)
+      const sortedPhotos = (memorial.photos || []).sort(
+        (a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0)
+      );
+      const heroUrl = sortedPhotos[0]?.url || "";
+      const galleryPhotos = sortedPhotos.slice(1);
+
+      setState((prev) => ({
+        ...prev,
+        memorialId: memorial.id,
+        petDetails: {
+          petName: memorial.pet_name || "",
+          species: memorial.species || "dog",
+          customSpecies: memorial.custom_species || "",
+          birthDate: memorial.birth_date || "",
+          deathDate: memorial.death_date || "",
+          heroPhoto: heroUrl,
+          heroPhotoCropY: prev.petDetails.heroPhotoCropY,
+          gender: (memorial.gender as "male" | "female" | "neutral") || undefined,
+        },
+        generatedTribute: memorial.tribute || "",
+        photos: galleryPhotos.map((p, i) => ({
+          id: p.id,
+          url: p.url,
+          sortOrder: i,
+          caption: p.caption || undefined,
+          aiDetectedTags: p.ai_detected_tags,
+        })),
+        introComplete: true,
+      }));
+    },
+    []
+  );
+
   const reset = useCallback(() => {
     setState(initialState);
     if (typeof window !== "undefined") {
@@ -505,9 +551,10 @@ export function useMemorialState() {
       setOwnerLastName,
       setCompilationUrl,
       setIntroComplete,
+      loadFromMemorial,
       reset,
     }),
-    [updatePetDetails, addPhoto, removePhoto, setPhotoCaption, setPhotoTags, reorderPhotos, addChatMessage, setTribute, setHeroPhotoFile, setHomepageConversation, setSupportContext, addVideo, removeVideo, reorderVideos, addClip, updateClip, removeClip, reorderClips, setOwnerLastName, setCompilationUrl, setIntroComplete, reset]
+    [updatePetDetails, addPhoto, removePhoto, setPhotoCaption, setPhotoTags, reorderPhotos, addChatMessage, setTribute, setHeroPhotoFile, setHomepageConversation, setSupportContext, addVideo, removeVideo, reorderVideos, addClip, updateClip, removeClip, reorderClips, setOwnerLastName, setCompilationUrl, setIntroComplete, loadFromMemorial, reset]
   );
 
   return useMemo(

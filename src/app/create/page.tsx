@@ -7,7 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ImagePlus, X, Camera, PenLine, Film, Eye, Check } from "lucide-react";
 import Link from "next/link";
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import type { PetDetails } from "@/hooks/use-memorial-state";
 import { ImageCropModal } from "@/components/image-crop-modal";
 
@@ -289,7 +290,7 @@ function Dashboard() {
   const photoStatus = photoCount === 0
     ? "Not started"
     : `${photoCount} photo${photoCount !== 1 ? "s" : ""} uploaded`;
-  const photoStatusType = photoCount === 0 ? "not-started" as const : "in-progress" as const;
+  const photoStatusType = photoCount === 0 ? "not-started" as const : "complete" as const;
 
   const tributeNotStarted = chatMessages.length === 0 && !generatedTribute;
   const tributeStatus = tributeNotStarted
@@ -616,6 +617,53 @@ function PetDetailsEditor({
   );
 }
 
+// ── Edit loader wrapper ────────────────────────────────────────────────────────
+
+function EditLoader() {
+  const searchParams = useSearchParams();
+  const editId = searchParams.get("edit");
+  const { memorialId, loadFromMemorial, hydrated } = useMemorialContext();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const attempted = useRef(false);
+
+  useEffect(() => {
+    if (!editId || !hydrated || attempted.current) return;
+    // Already loaded this memorial
+    if (memorialId === editId) return;
+    attempted.current = true;
+    setLoading(true);
+    fetch(`/api/memorial/${editId}`)
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to load memorial");
+        return res.json();
+      })
+      .then(({ memorial }) => {
+        loadFromMemorial(memorial);
+      })
+      .catch(() => {
+        setError("Couldn't load memorial. You may need to sign in.");
+      })
+      .finally(() => setLoading(false));
+  }, [editId, hydrated, memorialId, loadFromMemorial]);
+
+  if (loading) return <LoadingSkeleton />;
+  if (error) {
+    return (
+      <div className="flex min-h-screen items-center justify-center px-4">
+        <div className="text-center space-y-3">
+          <p className="text-gray-600">{error}</p>
+          <a href="/dashboard" className="text-sm text-amber-600 hover:underline">
+            Back to dashboard
+          </a>
+        </div>
+      </div>
+    );
+  }
+
+  return null;
+}
+
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
 export default function CreateMemorial() {
@@ -623,10 +671,12 @@ export default function CreateMemorial() {
 
   if (!hydrated) return <LoadingSkeleton />;
 
-  // Show intro form until user explicitly submits it
-  if (!introComplete) {
-    return <IntroForm />;
-  }
-
-  return <Dashboard />;
+  return (
+    <>
+      <Suspense>
+        <EditLoader />
+      </Suspense>
+      {introComplete ? <Dashboard /> : <IntroForm />}
+    </>
+  );
 }
