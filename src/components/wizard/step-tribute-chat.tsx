@@ -96,6 +96,7 @@ export function StepTributeChat({
               ? petDetails.customSpecies
               : petDetails.species,
           chatHistory: history,
+          homepageConversation,
         }),
       });
 
