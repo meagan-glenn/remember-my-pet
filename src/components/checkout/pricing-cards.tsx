@@ -42,9 +42,10 @@ const TIERS = [
 interface PricingCardsProps {
   memorialId: string;
   slug: string;
+  onLeave?: () => void;
 }
 
-export function PricingCards({ memorialId, slug }: PricingCardsProps) {
+export function PricingCards({ memorialId, slug, onLeave }: PricingCardsProps) {
   const [loading, setLoading] = useState<string | null>(null);
   const [error, setError] = useState("");
 
@@ -66,6 +67,7 @@ export function PricingCards({ memorialId, slug }: PricingCardsProps) {
 
       const { url } = await res.json();
       if (url) {
+        onLeave?.();
         window.location.href = url;
       }
     } catch (err) {
@@ -148,7 +150,7 @@ export function PricingCards({ memorialId, slug }: PricingCardsProps) {
 
       <p className="text-center text-sm text-gray-500">
         Not ready yet? Your memorial is saved to your{" "}
-        <a href="/dashboard" className="underline hover:text-gray-700">
+        <a href="/dashboard" className="underline hover:text-gray-700" onClick={() => onLeave?.()}>
           dashboard
         </a>
         . You can publish anytime.

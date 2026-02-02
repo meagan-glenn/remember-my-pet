@@ -76,6 +76,7 @@ function PreviewContent() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
+        memorialId: ctx.memorialId || undefined,
         petName: ctx.petDetails.petName,
         ownerLastName: ctx.ownerLastName,
         species:
@@ -97,7 +98,6 @@ function PreviewContent() {
     }
 
     const { memorialId, slug } = await res.json();
-    ctx.reset();
     setSavedMemorial({ id: memorialId, slug });
   }, [ctx, uploadFile, router]);
 
@@ -168,6 +168,7 @@ function PreviewContent() {
         <PricingCards
           memorialId={savedMemorial.id}
           slug={savedMemorial.slug}
+          onLeave={() => ctx.reset()}
         />
       </div>
     );
