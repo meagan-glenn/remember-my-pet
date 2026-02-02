@@ -87,10 +87,10 @@ export default function TermsPage() {
               processed securely via Stripe. If you are unsatisfied with your
               purchase, contact us within 30 days at{" "}
               <a
-                href="mailto:hello@remembermypet.ai"
+                href="mailto:teamremembermypet@gmail.com"
                 className="text-amber-600 hover:underline"
               >
-                hello@remembermypet.ai
+                teamremembermypet@gmail.com
               </a>{" "}
               for a full refund.
             </p>
@@ -153,10 +153,10 @@ export default function TermsPage() {
             <p className="mt-3">
               Questions about these terms? Email us at{" "}
               <a
-                href="mailto:hello@remembermypet.ai"
+                href="mailto:teamremembermypet@gmail.com"
                 className="text-amber-600 hover:underline"
               >
-                hello@remembermypet.ai
+                teamremembermypet@gmail.com
               </a>
               .
             </p>

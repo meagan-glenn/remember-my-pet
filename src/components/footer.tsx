@@ -49,7 +49,7 @@ export function Footer() {
             <ul className="mt-3 space-y-2 text-sm text-gray-500">
               <li>
                 <a
-                  href="mailto:hello@remembermypet.ai"
+                  href="mailto:teamremembermypet@gmail.com"
                   className="hover:text-amber-600 transition-colors"
                 >
                   Contact
