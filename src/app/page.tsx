@@ -118,6 +118,7 @@ export default function Home() {
   const [userInput, setUserInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [species, setSpecies] = useState("");
+  const [gender, setGender] = useState<"male" | "female" | "neutral" | "">("");
   const [readyToCreate, setReadyToCreate] = useState(false);
   const [openingQuestion] = useState(() => pickOpeningQuestion());
   const [aiLoading, setAiLoading] = useState(false);
@@ -158,6 +159,27 @@ export default function Home() {
     setIsTyping(true);
     setTimeout(() => {
       setIsTyping(false);
+      setConversationStep(0.5); // gender step
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: `Was ${petName.trim()} a boy or a girl?`,
+        },
+      ]);
+    }, 1500);
+  };
+
+  const handleGenderSelect = (selected: "male" | "female" | "neutral") => {
+    setGender(selected);
+    const label = selected === "male" ? "Boy" : selected === "female" ? "Girl" : "Prefer not to say";
+    setMessages((prev) => [
+      ...prev,
+      { role: "user", content: label },
+    ]);
+    setIsTyping(true);
+    setTimeout(() => {
+      setIsTyping(false);
       setConversationStep(1);
       setMessages((prev) => [
         ...prev,
@@ -179,9 +201,9 @@ export default function Home() {
     setAiLoading(true);
 
     try {
-      // Build chat history: skip the first 2 messages (species question + species answer)
+      // Build chat history: skip the first 4 messages (species Q/A + gender Q/A)
       const allMessages = [...messages, { role: "user" as const, content: text }];
-      const conversationMessages = allMessages.slice(2); // skip species exchange
+      const conversationMessages = allMessages.slice(4); // skip species + gender exchanges
 
       const res = await fetch("/api/homepage/chat", {
         method: "POST",
@@ -189,6 +211,7 @@ export default function Home() {
         body: JSON.stringify({
           petName: petName.trim(),
           species: species === "Other" ? "" : species,
+          gender: gender || undefined,
           chatHistory: conversationMessages,
         }),
       });
@@ -211,10 +234,11 @@ export default function Home() {
   };
 
   const saveWizardSeed = () => {
-    const conversation = messages.slice(2); // skip species exchange
+    const conversation = messages.slice(4); // skip species + gender exchanges
     const wizardSeed = {
       petName: petName.trim(),
       species: species === "Other" ? "" : species,
+      gender: gender || undefined,
       conversation: conversation.length > 0 ? conversation : [],
     };
     localStorage.setItem(
@@ -361,6 +385,29 @@ export default function Home() {
                           className="flex-1 rounded-full border-amber-200 hover:bg-amber-50 hover:border-amber-300"
                         >
                           {opt}
+                        </Button>
+                      ))}
+                    </motion.div>
+                  )}
+
+                {/* Gender selection buttons */}
+                {!isTyping &&
+                  conversationStep === 0.5 &&
+                  !gender && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2 }}
+                      className="mt-4 flex gap-2"
+                    >
+                      {([["male", "Boy"], ["female", "Girl"], ["neutral", "Prefer not to say"]] as const).map(([value, label]) => (
+                        <Button
+                          key={value}
+                          variant="outline"
+                          onClick={() => handleGenderSelect(value)}
+                          className="flex-1 rounded-full border-amber-200 hover:bg-amber-50 hover:border-amber-300"
+                        >
+                          {label}
                         </Button>
                       ))}
                     </motion.div>

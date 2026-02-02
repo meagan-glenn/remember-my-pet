@@ -16,7 +16,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { imageBase64, mimeType, petName } = await request.json();
+    const { imageBase64, mimeType, petName, gender } = await request.json();
 
     if (!imageBase64 || !mimeType || !petName) {
       return NextResponse.json(
@@ -25,7 +25,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { caption, tags } = await generatePhotoMetadata(imageBase64, mimeType, petName);
+    const { caption, tags } = await generatePhotoMetadata(imageBase64, mimeType, petName, gender);
     return NextResponse.json({ caption, tags });
   } catch (error) {
     console.error("Caption generation failed:", error);

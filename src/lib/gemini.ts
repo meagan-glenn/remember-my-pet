@@ -1,4 +1,5 @@
 import { GoogleGenAI, createUserContent, createPartFromBase64 } from "@google/genai";
+import { getPronouns, type Gender } from "@/lib/pronouns";
 
 const MODEL = "gemini-2.5-flash-lite";
 
@@ -22,12 +23,15 @@ export interface PhotoMetadata {
 export async function generatePhotoMetadata(
   imageBase64: string,
   mimeType: string,
-  petName: string
+  petName: string,
+  gender?: string
 ): Promise<PhotoMetadata> {
+  const safeGender: Gender = typeof gender === "string" && ["male", "female", "neutral"].includes(gender) ? gender as Gender : undefined;
+  const { subject, possessive } = getPronouns(safeGender);
   const contents = createUserContent([
-    `Analyze this photo of a pet named ${petName} and return a JSON object with two fields:
+    `Analyze this photo of a pet named ${petName} and return a JSON object with two fields. Use ${subject}/${possessive} pronouns when referring to ${petName}.
 
-1. "caption": A short, warm sentence suitable for a memorial photo caption. Focus on what the pet is doing or the setting. Keep it under 150 characters. Do not use quotes or clichés like "rainbow bridge," "forever in our hearts," or "best friend."
+1. "caption": A short, warm sentence suitable for a memorial photo caption. Focus on what ${subject}'s doing or the setting. Use ${subject}/${possessive} pronouns naturally. Keep it under 150 characters. Do not use quotes or clichés like "rainbow bridge," "forever in our hearts," or "best friend."
 
 2. "tags": An array of relevant tags from these categories:
    - Life stage: "puppy", "kitten", "young", "adult", "senior"

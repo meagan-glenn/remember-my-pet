@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { rateLimit } from "@/lib/rate-limit";
 import Anthropic from "@anthropic-ai/sdk";
+import { getPronouns, type Gender } from "@/lib/pronouns";
 
 const MAX_PET_NAME = 100;
 const MAX_MESSAGES = 10;
@@ -15,7 +16,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const { petName, species, chatHistory } = await request.json();
+  const { petName, species, gender, chatHistory } = await request.json();
 
   if (
     !petName ||
@@ -32,6 +33,8 @@ export async function POST(request: Request) {
   const safePetName = petName.slice(0, MAX_PET_NAME);
   const safeSpecies =
     typeof species === "string" && species ? species.slice(0, 50) : "pet";
+  const safeGender: Gender = typeof gender === "string" && ["male", "female", "neutral"].includes(gender) ? gender as Gender : undefined;
+  const { subject, object, possessive } = getPronouns(safeGender);
 
   const sanitizedHistory = chatHistory
     .slice(0, MAX_MESSAGES)
@@ -61,6 +64,8 @@ export async function POST(request: Request) {
       model: "claude-haiku-4-5-20251001",
       max_tokens: 150,
       system: `You're meeting someone who just lost their ${safeSpecies}, ${safePetName}. They're on a homepage, considering creating a memorial. You want them to feel heard and welcomed. This is a brief teaser conversation (2-3 exchanges), not a full tribute chat.
+
+IMPORTANT: Use ${subject}/${object}/${possessive} pronouns when referring to ${safePetName}. For example: "${subject} really had your number" or "what made ${object} special."
 
 How to respond:
 - ALWAYS react to what they just shared. Reference the SPECIFIC detail — the stare, the couch spot, the sock stealing. Never react generically.

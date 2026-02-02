@@ -36,6 +36,9 @@ interface Memorial {
   user_id: string;
   pet_name: string;
   slug: string;
+  species?: string | null;
+  custom_species?: string | null;
+  gender?: string | null;
   birth_date: string | null;
   death_date: string | null;
   tribute: string | null;

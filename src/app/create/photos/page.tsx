@@ -41,6 +41,7 @@ export default function PhotosPage() {
           onNext={() => router.push("/create")}
           onBack={() => router.push("/create")}
           petName={petDetails.petName}
+          gender={petDetails.gender}
         />
       </div>
     </div>

@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback } from "react";
 import type { PetDetails } from "@/hooks/use-memorial-state";
+import { getPronouns } from "@/lib/pronouns";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -66,7 +67,7 @@ export function StepPetDetails({ data, onUpdate, onSetHeroFile, onNext }: StepPe
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="text-center space-y-2">
         <h1 className="text-2xl font-semibold text-gray-900">
-          Let&apos;s remember them
+          Let&apos;s remember {data.petName ? data.petName : getPronouns(data.gender).object}
         </h1>
         <p className="text-gray-500">
           Tell us a little about your pet to get started.
@@ -115,6 +116,26 @@ export function StepPetDetails({ data, onUpdate, onSetHeroFile, onNext }: StepPe
               className="h-12 text-base mt-2"
             />
           )}
+        </div>
+
+        <div className="space-y-2">
+          <Label>Gender (optional)</Label>
+          <div className="flex gap-2">
+            {([["male", "Boy"], ["female", "Girl"], ["neutral", "Other"]] as const).map(([value, label]) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => onUpdate({ gender: data.gender === value ? undefined : value })}
+                className={`flex-1 rounded-lg border px-4 py-3 text-sm font-medium transition-colors ${
+                  data.gender === value
+                    ? "border-amber-500 bg-amber-50 text-amber-700"
+                    : "border-gray-200 text-gray-600 hover:border-gray-300"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
