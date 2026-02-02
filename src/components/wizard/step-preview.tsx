@@ -191,7 +191,7 @@ export function StepPreview({
         {heroPhoto ? (
           <div
             ref={heroContainerRef}
-            className={`relative h-[60vh] min-h-[400px] max-h-[650px] w-full sm:h-[70vh] ${repositioning ? "cursor-grab active:cursor-grabbing" : ""}`}
+            className={`relative h-[45vh] min-h-[320px] max-h-[650px] w-full sm:h-[55vh] ${repositioning ? "cursor-grab active:cursor-grabbing" : ""}`}
             onPointerDown={handlePointerDown}
             onPointerMove={handlePointerMove}
             onPointerUp={handlePointerUp}
@@ -274,96 +274,108 @@ export function StepPreview({
         )}
       </section>
 
-      {/* Tribute */}
-      <section className="mx-auto max-w-2xl px-4 py-8 sm:px-6">
-        <div className="rounded-2xl border border-amber-100 bg-white/80 p-6 shadow-sm backdrop-blur-sm sm:p-8">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="font-serif text-2xl font-medium text-gray-900">
-              A Tribute
-            </h2>
-            <button
-              type="button"
-              onClick={() => {
-                if (editingTribute) {
-                  handleSaveTribute();
-                } else {
-                  setEditingTribute(true);
-                }
-              }}
-              className="flex items-center gap-1 text-sm text-amber-600 hover:text-amber-700"
-            >
-              {editingTribute ? (
-                <>
-                  <Check className="h-3.5 w-3.5" /> Done
-                </>
-              ) : (
-                <>
-                  <Pencil className="h-3.5 w-3.5" /> Edit
-                </>
-              )}
-            </button>
-          </div>
+      {/* Wall intro */}
+      <section className="mx-auto max-w-6xl px-4 pt-8 sm:px-6">
+        <p className="mb-6 text-center text-sm text-gray-400 italic">
+          {petDetails.petName}&apos;s life, through the eyes of those who loved them
+        </p>
+      </section>
 
-          {editingTribute ? (
-            <Textarea
-              value={editedTribute}
-              onChange={(e) => setEditedTribute(e.target.value)}
-              rows={10}
-              className="text-base leading-relaxed"
-            />
-          ) : tribute ? (
-            <div className="whitespace-pre-line text-base leading-relaxed text-gray-700">
-              {tribute}
+      {/* Tribute + Side Photos */}
+      <section className="mx-auto max-w-6xl px-4 pb-3 sm:px-6">
+        <div className="flex flex-col gap-3 md:flex-row md:items-stretch md:gap-4">
+          <div className="flex-1 rounded-2xl border-l-4 border-l-amber-700 border border-amber-100 bg-amber-50/50 p-6 shadow-sm backdrop-blur-sm sm:p-8">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-serif text-2xl font-medium text-gray-900">
+                A Tribute
+              </h2>
+              <button
+                type="button"
+                onClick={() => {
+                  if (editingTribute) {
+                    handleSaveTribute();
+                  } else {
+                    setEditingTribute(true);
+                  }
+                }}
+                className="flex items-center gap-1 text-sm text-amber-600 hover:text-amber-700"
+              >
+                {editingTribute ? (
+                  <>
+                    <Check className="h-3.5 w-3.5" /> Done
+                  </>
+                ) : (
+                  <>
+                    <Pencil className="h-3.5 w-3.5" /> Edit
+                  </>
+                )}
+              </button>
             </div>
-          ) : (
-            <p className="text-gray-400 italic">
-              No tribute yet. Click Edit to add one.
-            </p>
+
+            {editingTribute ? (
+              <Textarea
+                value={editedTribute}
+                onChange={(e) => setEditedTribute(e.target.value)}
+                rows={10}
+                className="text-base leading-relaxed"
+              />
+            ) : tribute ? (
+              <div className="whitespace-pre-line text-base leading-relaxed text-gray-700">
+                {tribute}
+              </div>
+            ) : (
+              <p className="text-gray-400 italic">
+                No tribute yet. Click Edit to add one.
+              </p>
+            )}
+          </div>
+          {photos.length > 0 && (
+            <div className="flex gap-3 md:w-80 md:shrink-0 md:flex-col">
+              {photos.slice(0, 2).map((photo) => (
+                <div key={photo.id} className="overflow-hidden rounded-2xl border border-amber-100 bg-white/80 shadow-sm">
+                  <div className="relative aspect-square">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={photo.url}
+                      alt={photo.caption || petDetails.petName}
+                      className="absolute inset-0 h-full w-full object-cover"
+                    />
+                  </div>
+                  {photo.caption && (
+                    <p className="px-3 py-2 text-xs italic text-gray-500">{photo.caption}</p>
+                  )}
+                </div>
+              ))}
+            </div>
           )}
         </div>
       </section>
 
-      {/* Photo Gallery */}
-      {photos.length > 0 && (
-        <section className="mx-auto max-w-3xl px-4 pb-16 sm:px-6">
-          <div className="flex items-baseline gap-3 mb-6">
-            <h2 className="font-serif text-2xl font-medium text-gray-900">
-              Photos
-            </h2>
-            <span className="text-sm text-gray-400">drag to reorder</span>
-          </div>
+      {/* Photo Gallery (remaining photos after side photos) */}
+      {photos.length > 2 && (
+        <section className="mx-auto max-w-6xl px-4 pb-8 sm:px-6">
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
             onDragEnd={handleDragEnd}
           >
             <SortableContext
-              items={photos.map((p) => p.id)}
+              items={photos.slice(2).map((p) => p.id)}
               strategy={rectSortingStrategy}
             >
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
-                {photos.map((photo) => (
+              <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+                {photos.slice(2).map((photo) => (
                   <SortablePhoto key={photo.id} photo={photo} />
                 ))}
               </div>
             </SortableContext>
           </DndContext>
+          <p className="mt-2 text-center text-xs text-gray-400">drag to reorder</p>
         </section>
       )}
 
-      {/* Persistence reassurance */}
-      <div className="mx-auto max-w-2xl px-4 sm:px-6">
-        <div className="rounded-xl border border-amber-100 bg-amber-50/60 px-4 py-3 text-sm text-gray-600">
-          Everything you&apos;ve created is saved on this device. Sign in to publish — we&apos;ll bring you right back.
-        </div>
-      </div>
-
       {/* Actions */}
-      <div className="mx-auto max-w-2xl px-4 pb-12 sm:px-6 space-y-4">
-        <p className="text-center text-sm text-gray-400">
-          Your memorial will be private until you choose to share it.
-        </p>
-
+      <div className="mx-auto max-w-md px-4 pt-8 pb-12 sm:px-6 space-y-4">
         {error && <p className="text-sm text-red-500 text-center">{error}</p>}
 
         <div className="flex gap-3">
@@ -393,6 +405,10 @@ export function StepPreview({
             )}
           </Button>
         </div>
+
+        <p className="text-center text-xs text-gray-400">
+          Saved on this device. Sign in to publish. Your memorial will be private until you choose to share it.
+        </p>
       </div>
     </div>
   );

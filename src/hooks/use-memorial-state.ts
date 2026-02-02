@@ -483,6 +483,7 @@ export function useMemorialState() {
       birth_date?: string | null;
       death_date?: string | null;
       tribute?: string | null;
+      hero_photo_crop_y?: number | null;
       photos?: { id: string; url: string; caption?: string | null; ai_detected_tags?: string[]; sort_order: number }[];
     }) => {
       // Find the first photo to use as hero (or none)
@@ -502,7 +503,7 @@ export function useMemorialState() {
           birthDate: memorial.birth_date || "",
           deathDate: memorial.death_date || "",
           heroPhoto: heroUrl,
-          heroPhotoCropY: prev.petDetails.heroPhotoCropY,
+          heroPhotoCropY: memorial.hero_photo_crop_y ?? prev.petDetails.heroPhotoCropY,
           gender: (memorial.gender as "male" | "female" | "neutral") || undefined,
         },
         generatedTribute: memorial.tribute || "",

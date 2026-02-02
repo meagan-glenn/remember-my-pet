@@ -11,6 +11,7 @@ import { useState, useRef, useCallback, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import type { PetDetails } from "@/hooks/use-memorial-state";
 import { ImageCropModal } from "@/components/image-crop-modal";
+import { createBrowserSupabase } from "@/lib/supabase";
 
 function LoadingSkeleton() {
   return (
@@ -271,9 +272,12 @@ function Dashboard() {
 
   useEffect(() => {
     if (!hydrated) return;
-    if (!localStorage.getItem(AUTOSAVE_DISMISSED_KEY)) {
-      setShowAutoSaveMsg(true);
-    }
+    if (localStorage.getItem(AUTOSAVE_DISMISSED_KEY)) return;
+    // Don't show "create an account" banner if already signed in
+    const supabase = createBrowserSupabase();
+    supabase.auth.getUser().then(({ data }) => {
+      if (!data.user) setShowAutoSaveMsg(true);
+    });
   }, [hydrated]);
 
   useEffect(() => {

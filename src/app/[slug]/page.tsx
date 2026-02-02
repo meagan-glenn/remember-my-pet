@@ -45,6 +45,7 @@ interface Memorial {
   tribute: string | null;
   is_published: boolean;
   photos: Photo[];
+  hero_photo_crop_y?: number | null;
   compilation_url?: string | null;
   memories: MemoryRow[];
 }
@@ -158,6 +159,7 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
   const { memorial, isOwner } = result;
   const heroPhoto = memorial.photos?.[0];
   const galleryPhotos = memorial.photos?.slice(1) ?? [];
+  const heroCropY = memorial.hero_photo_crop_y ?? 50;
   const birthFormatted = formatDate(memorial.birth_date);
   const deathFormatted = formatDate(memorial.death_date);
 
@@ -178,6 +180,7 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
               priority
               sizes="100vw"
               className="object-cover"
+              style={{ objectPosition: `center ${heroCropY}%` }}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
             <div className="absolute inset-x-0 bottom-0 p-6 text-white sm:p-10">

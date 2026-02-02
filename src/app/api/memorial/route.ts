@@ -36,7 +36,7 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json();
-  const { petName, species, customSpecies, gender, birthDate, deathDate, tribute, ownerLastName, memorialId } = body;
+  const { petName, species, customSpecies, gender, birthDate, deathDate, tribute, ownerLastName, memorialId, heroPhotoCropY } = body;
   // Support both new { url, caption, aiDetectedTags } format and legacy string[] format
   const photoItems: { url: string; caption?: string; aiDetectedTags?: string[] }[] = body.photos
     ? body.photos.map((p: { url: string; caption?: string; aiDetectedTags?: string[] }) => p)
@@ -94,6 +94,7 @@ export async function POST(request: Request) {
     birth_date: birthDate || null,
     death_date: deathDate || null,
     tribute: tribute.slice(0, MAX_TRIBUTE),
+    hero_photo_crop_y: typeof heroPhotoCropY === "number" ? Math.min(100, Math.max(0, heroPhotoCropY)) : 50,
   };
 
   let memorial: { id: string; slug: string };

@@ -88,6 +88,7 @@ function PreviewContent() {
         birthDate: ctx.petDetails.birthDate || null,
         deathDate: ctx.petDetails.deathDate || null,
         tribute: ctx.generatedTribute,
+        heroPhotoCropY: ctx.petDetails.heroPhotoCropY ?? 50,
         photos,
       }),
     });
