@@ -5,9 +5,12 @@ import { Button } from "@/components/ui/button";
 import { detectCrisisKeywords } from "@/lib/crisis-detection";
 import { EarlyAuthBanner } from "@/components/wizard/early-auth-banner";
 import type { SupportContextEntry } from "@/hooks/use-memorial-state";
+import { getPronouns } from "@/lib/pronouns";
 
-const OPENING_QUESTION = (name: string) =>
-  `I'd love to hear about ${name}. What comes to mind first when you think of them?`;
+const OPENING_QUESTION = (name: string, gender?: "male" | "female" | "neutral") => {
+  const { object } = getPronouns(gender);
+  return `I'd love to hear about ${name}. What comes to mind first when you think of ${object}?`;
+};
 
 interface StepTributeChatProps {
   petName: string;
@@ -17,6 +20,7 @@ interface StepTributeChatProps {
     customSpecies: string;
     birthDate: string;
     deathDate: string;
+    gender?: "male" | "female" | "neutral";
   };
   chatMessages: { role: "assistant" | "user"; content: string }[];
   generatedTribute: string;
@@ -50,6 +54,7 @@ export function StepTributeChat({
   const [crisisBanner, setCrisisBanner] = useState(false);
   const [readyForTribute, setReadyForTribute] = useState(false);
   const [chatLoading, setChatLoading] = useState(false);
+  const [showSkipNote, setShowSkipNote] = useState(false);
   const [showRefinementInput, setShowRefinementInput] = useState(false);
   const [refinementFeedback, setRefinementFeedback] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -64,7 +69,7 @@ export function StepTributeChat({
     if (authChecked && chatMessages.length === 0) {
       onAddMessage({
         role: "assistant",
-        content: OPENING_QUESTION(petName || "your pet"),
+        content: OPENING_QUESTION(petName || "your pet", petDetails.gender),
       });
     }
   }, [authChecked, chatMessages.length, petName, onAddMessage]);
@@ -95,7 +100,9 @@ export function StepTributeChat({
             petDetails.species === "other"
               ? petDetails.customSpecies
               : petDetails.species,
+          gender: petDetails.gender,
           chatHistory: history,
+          homepageConversation,
         }),
       });
 
@@ -138,6 +145,7 @@ export function StepTributeChat({
   };
 
   const handleSkip = () => {
+    if (!showSkipNote) setShowSkipNote(true);
     onAddMessage({ role: "user", content: "(skipped)" });
     handleChat("(skipped)");
   };
@@ -156,6 +164,7 @@ export function StepTributeChat({
             petDetails.species === "other"
               ? petDetails.customSpecies
               : petDetails.species,
+          gender: petDetails.gender,
           birthDate: petDetails.birthDate,
           deathDate: petDetails.deathDate,
           supportContext: supportContext.length > 0 ? supportContext : undefined,
@@ -340,6 +349,11 @@ export function StepTributeChat({
               >
                 Skip this question
               </button>
+              {showSkipNote && (
+                <p className="text-xs text-gray-400 text-center mt-1">
+                  The more you share, the more personal your tribute will be — but skip anything that&apos;s too much right now.
+                </p>
+              )}
             </div>
           )}
 

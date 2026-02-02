@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase-server";
 import { rateLimit } from "@/lib/rate-limit";
 import Anthropic from "@anthropic-ai/sdk";
+import { getPronouns, type Gender } from "@/lib/pronouns";
 
 const MAX_PET_NAME = 100;
 const MAX_CONCERN_LENGTH = 2000;
@@ -21,7 +22,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const { petName, species, concern, priorContext } = await request.json();
+  const { petName, species, gender, concern, priorContext } = await request.json();
 
   if (
     !petName ||
@@ -38,6 +39,8 @@ export async function POST(request: Request) {
   const safePetName = petName.slice(0, MAX_PET_NAME);
   const safeSpecies =
     typeof species === "string" ? species.slice(0, 50) : "pet";
+  const safeGender: Gender = typeof gender === "string" && ["male", "female", "neutral"].includes(gender) ? gender as Gender : undefined;
+  const { object } = getPronouns(safeGender);
   const safeConcern = concern.slice(0, MAX_CONCERN_LENGTH);
 
   // Build conversation history from prior support exchanges
@@ -72,7 +75,7 @@ export async function POST(request: Request) {
 
 Rules:
 - Name the specific thing they described. "You're carrying guilt about not being there at the end" is real. "I hear you" is empty.
-- Then gently reframe without dismissing their pain. Help them see what their feeling actually reveals — usually that they loved deeply, cared intensely, or made the best decision they could with what they knew.
+- Then gently reframe without dismissing their pain. Help them see what their feeling actually reveals — usually that they loved ${object} deeply, cared intensely, or made the best decision they could with what they knew.
 - If this is their second concern, connect it to what they shared before if relevant. They're building trust with you — show you were listening.
 - NEVER open with "Thank you for sharing," "I hear you," "It's okay," or "Everything happens for a reason."
 - NEVER be preachy, use platitudes, or lecture. No "healing journey" language.

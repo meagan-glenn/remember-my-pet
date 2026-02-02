@@ -101,11 +101,12 @@ export default function TermsPage() {
               7. Memorial Hosting
             </h2>
             <p className="mt-3">
-              Paid memorials are hosted permanently at no additional cost. We
-              will make reasonable efforts to maintain uptime and data
-              integrity. In the unlikely event of service discontinuation, we
-              will provide at least 90 days notice and the ability to export
-              your data.
+              All memorials are preserved in your account. Paid memorials
+              become publicly accessible and are hosted indefinitely at no
+              additional cost. We will make reasonable efforts to maintain
+              uptime and data integrity. In the unlikely event of service
+              discontinuation, we will provide at least 90 days notice and
+              the ability to export your data.
             </p>
           </section>
 

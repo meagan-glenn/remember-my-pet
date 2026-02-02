@@ -28,6 +28,7 @@ interface StepPhotoUploadProps {
   onNext?: () => void;
   onBack?: () => void;
   petName: string;
+  gender?: "male" | "female" | "neutral";
 }
 
 const MAX_PHOTOS = 20;
@@ -50,6 +51,7 @@ export function StepPhotoUpload({
   onNext,
   onBack,
   petName,
+  gender,
 }: StepPhotoUploadProps) {
   const totalPhotos = photos.length + (heroPhoto ? 1 : 0);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -84,6 +86,7 @@ export function StepPhotoUpload({
                 imageBase64: base64,
                 mimeType: file.type,
                 petName,
+                gender,
               }),
             })
           )

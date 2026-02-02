@@ -82,6 +82,8 @@ function PreviewContent() {
           ctx.petDetails.species === "other"
             ? ctx.petDetails.customSpecies
             : ctx.petDetails.species,
+        customSpecies: ctx.petDetails.species === "other" ? ctx.petDetails.customSpecies : undefined,
+        gender: ctx.petDetails.gender || undefined,
         birthDate: ctx.petDetails.birthDate || null,
         deathDate: ctx.petDetails.deathDate || null,
         tribute: ctx.generatedTribute,

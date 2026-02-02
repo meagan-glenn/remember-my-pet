@@ -142,7 +142,7 @@ export default function DemoPage() {
             Create a memorial for your pet
           </h2>
           <p className="mt-2 text-gray-500">
-            Honor their memory with a beautiful, permanent tribute.
+            Honor their memory with a beautiful tribute.
           </p>
           <Link
             href="/create"

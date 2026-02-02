@@ -36,7 +36,7 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json();
-  const { petName, species, birthDate, deathDate, tribute, ownerLastName } = body;
+  const { petName, species, customSpecies, gender, birthDate, deathDate, tribute, ownerLastName } = body;
   // Support both new { url, caption, aiDetectedTags } format and legacy string[] format
   const photoItems: { url: string; caption?: string; aiDetectedTags?: string[] }[] = body.photos
     ? body.photos.map((p: { url: string; caption?: string; aiDetectedTags?: string[] }) => p)
@@ -116,6 +116,9 @@ export async function POST(request: Request) {
       user_id: user.id,
       pet_name: petName.slice(0, MAX_PET_NAME),
       slug,
+      species: typeof species === "string" ? species.slice(0, 50) : null,
+      custom_species: typeof customSpecies === "string" ? customSpecies.slice(0, 100) : null,
+      gender: typeof gender === "string" && ["male", "female", "neutral"].includes(gender) ? gender : null,
       birth_date: birthDate || null,
       death_date: deathDate || null,
       tribute: tribute.slice(0, MAX_TRIBUTE),

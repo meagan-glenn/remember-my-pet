@@ -18,7 +18,7 @@ const TIERS = [
     price: "$49",
     description: "Everything you need to honor their memory",
     features: [
-      "Permanent memorial page",
+      "Your memorial page, always online",
       "Photo gallery with captions",
       "AI-written tribute",
       "Video reel",
@@ -81,8 +81,8 @@ export function PricingCards({ memorialId, slug }: PricingCardsProps) {
           Publish your memorial
         </h2>
         <p className="text-gray-500">
-          Your memorial has been saved. Choose a plan to make it permanent and
-          shareable.
+          Your memorial is saved. When you&apos;re ready, choose a plan to
+          publish and share it.
         </p>
       </div>
 
@@ -143,8 +143,15 @@ export function PricingCards({ memorialId, slug }: PricingCardsProps) {
       {error && <p className="text-sm text-red-500 text-center">{error}</p>}
 
       <p className="text-center text-xs text-gray-400">
-        Secure payment via Stripe. Your memorial stays private until you
-        publish.
+        Secure payment via Stripe.
+      </p>
+
+      <p className="text-center text-sm text-gray-500">
+        Not ready yet? Your memorial is saved to your{" "}
+        <a href="/dashboard" className="underline hover:text-gray-700">
+          dashboard
+        </a>
+        . You can publish anytime.
       </p>
     </div>
   );

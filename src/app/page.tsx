@@ -87,7 +87,7 @@ const PRICING_TIERS = [
     features: [
       "AI-written tribute",
       "Photo gallery with captions",
-      "Permanent memorial page",
+      "Your memorial page, always online",
       "Shareable link",
       "Memory wall for friends & family",
     ],
@@ -118,6 +118,7 @@ export default function Home() {
   const [userInput, setUserInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [species, setSpecies] = useState("");
+  const [gender, setGender] = useState<"male" | "female" | "neutral" | "">("");
   const [readyToCreate, setReadyToCreate] = useState(false);
   const [openingQuestion] = useState(() => pickOpeningQuestion());
   const [aiLoading, setAiLoading] = useState(false);
@@ -136,6 +137,7 @@ export default function Home() {
     e.preventDefault();
     if (!petName.trim()) return;
     setStarted(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     setIsTyping(true);
     setTimeout(() => {
       setIsTyping(false);
@@ -153,6 +155,27 @@ export default function Home() {
     setMessages((prev) => [
       ...prev,
       { role: "user", content: selected },
+    ]);
+    setIsTyping(true);
+    setTimeout(() => {
+      setIsTyping(false);
+      setConversationStep(0.5); // gender step
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: `Was ${petName.trim()} a boy or a girl?`,
+        },
+      ]);
+    }, 1500);
+  };
+
+  const handleGenderSelect = (selected: "male" | "female" | "neutral") => {
+    setGender(selected);
+    const label = selected === "male" ? "Boy" : selected === "female" ? "Girl" : "Prefer not to say";
+    setMessages((prev) => [
+      ...prev,
+      { role: "user", content: label },
     ]);
     setIsTyping(true);
     setTimeout(() => {
@@ -178,9 +201,9 @@ export default function Home() {
     setAiLoading(true);
 
     try {
-      // Build chat history: skip the first 2 messages (species question + species answer)
+      // Build chat history: skip the first 4 messages (species Q/A + gender Q/A)
       const allMessages = [...messages, { role: "user" as const, content: text }];
-      const conversationMessages = allMessages.slice(2); // skip species exchange
+      const conversationMessages = allMessages.slice(4); // skip species + gender exchanges
 
       const res = await fetch("/api/homepage/chat", {
         method: "POST",
@@ -188,6 +211,7 @@ export default function Home() {
         body: JSON.stringify({
           petName: petName.trim(),
           species: species === "Other" ? "" : species,
+          gender: gender || undefined,
           chatHistory: conversationMessages,
         }),
       });
@@ -210,10 +234,11 @@ export default function Home() {
   };
 
   const saveWizardSeed = () => {
-    const conversation = messages.slice(2); // skip species exchange
+    const conversation = messages.slice(4); // skip species + gender exchanges
     const wizardSeed = {
       petName: petName.trim(),
       species: species === "Other" ? "" : species,
+      gender: gender || undefined,
       conversation: conversation.length > 0 ? conversation : [],
     };
     localStorage.setItem(
@@ -365,6 +390,29 @@ export default function Home() {
                     </motion.div>
                   )}
 
+                {/* Gender selection buttons */}
+                {!isTyping &&
+                  conversationStep === 0.5 &&
+                  !gender && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2 }}
+                      className="mt-4 flex gap-2"
+                    >
+                      {([["male", "Boy"], ["female", "Girl"], ["neutral", "Prefer not to say"]] as const).map(([value, label]) => (
+                        <Button
+                          key={value}
+                          variant="outline"
+                          onClick={() => handleGenderSelect(value)}
+                          className="flex-1 rounded-full border-amber-200 hover:bg-amber-50 hover:border-amber-300"
+                        >
+                          {label}
+                        </Button>
+                      ))}
+                    </motion.div>
+                  )}
+
                 {/* Memory/conversation text input */}
                 {!isTyping && !aiLoading && conversationStep === 1 && !readyToCreate && userExchangeCount < 3 && (
                   <motion.form
@@ -464,6 +512,12 @@ export default function Home() {
                     </Button>
                   </motion.div>
                 )}
+                <Link
+                  href="/demo"
+                  className="mt-4 block text-center text-sm text-amber-600 hover:text-amber-700 transition-colors"
+                >
+                  Want to see what a memorial looks like first? View an example →
+                </Link>
               </div>
 
               <button
@@ -477,22 +531,14 @@ export default function Home() {
         </AnimatePresence>
       </section>
 
-      {/* Below-fold content — hidden when conversation is active */}
-      {!started && (
-        <>
-          {/* Features Section */}
-          <motion.section
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.8, duration: 0.6 }}
-            className="px-4 py-10 sm:py-12"
-          >
+      {/* Below-fold content */}
+      <section className="px-4 py-10 sm:py-12">
             <div className="mx-auto max-w-4xl">
               <h2 className="text-center font-serif text-3xl font-medium text-gray-900 md:text-4xl">
                 Everything you need to honor their memory
               </h2>
               <p className="mt-4 text-center text-gray-500">
-                A permanent, beautiful space to celebrate the life you shared.
+                A beautiful space to celebrate the life you shared.
               </p>
 
               <div className="mt-12 grid gap-6 sm:grid-cols-2">
@@ -514,9 +560,9 @@ export default function Home() {
                 ))}
               </div>
             </div>
-          </motion.section>
+      </section>
 
-          {/* Example Memorial */}
+      {/* Example Memorial */}
           <section className="px-4 py-10 sm:py-12 bg-amber-50/40">
             <div className="mx-auto max-w-3xl text-center">
               <h2 className="font-serif text-3xl font-medium text-gray-900 md:text-4xl">
@@ -542,7 +588,7 @@ export default function Home() {
                 Simple, one-time pricing
               </h2>
               <p className="mt-4 text-center text-gray-500">
-                No subscriptions. Your memorial is permanent.
+                No subscriptions. One payment, always online.
               </p>
 
               <div className="mt-12 grid gap-6 sm:grid-cols-2">
@@ -617,12 +663,10 @@ export default function Home() {
                   <Camera className="h-4 w-4" /> Your photos stay private
                 </span>
                 <span>No pressure, no timers</span>
-                <span>Hosted permanently</span>
+                <span>Hosted forever</span>
               </div>
             </div>
-          </section>
-        </>
-      )}
+      </section>
     </div>
   );
 }

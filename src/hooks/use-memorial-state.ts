@@ -25,6 +25,7 @@ export interface PetDetails {
   deathDate: string;
   heroPhoto: string;
   heroPhotoCropY: number; // 0-100, vertical focal point percentage
+  gender?: "male" | "female" | "neutral";
 }
 
 export interface WizardPhoto {
@@ -154,6 +155,7 @@ export function useMemorialState() {
               ...loaded.petDetails,
               petName: seed.petName,
               species: normalizedSpecies || loaded.petDetails.species,
+              gender: seed.gender || undefined,
             };
             loaded.introComplete = true;
             setCameFromSeed(true);
