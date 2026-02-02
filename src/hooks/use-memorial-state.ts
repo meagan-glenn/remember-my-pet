@@ -67,8 +67,6 @@ export interface MemorialState {
   generatedTribute: string;
   memorialId: string;
   homepageConversation: { role: "assistant" | "user"; content: string }[];
-  tributeMode: "celebrate" | "support" | "";
-  hasPassedTransition: boolean;
   supportContext: SupportContextEntry[];
   videos: WizardVideo[];
   videoClips: VideoClip[];
@@ -95,8 +93,6 @@ const initialState: MemorialState = {
   generatedTribute: "",
   memorialId: "",
   homepageConversation: [],
-  tributeMode: "",
-  hasPassedTransition: false,
   supportContext: [],
   videos: [],
   videoClips: [],
@@ -110,8 +106,8 @@ function loadState(): MemorialState {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (!stored) return initialState;
     // Destructure out currentStep from old wizard state for backward compat
-    const { currentStep: _currentStep, ...rest } = JSON.parse(stored);
-    void _currentStep;
+    const { currentStep: _currentStep, tributeMode: _tributeMode, hasPassedTransition: _hasPassedTransition, ...rest } = JSON.parse(stored);
+    void _currentStep; void _tributeMode; void _hasPassedTransition;
     return { ...initialState, ...rest };
   } catch {
     return initialState;
@@ -373,25 +369,6 @@ export function useMemorialState() {
     []
   );
 
-  const setTributeMode = useCallback(
-    (mode: "celebrate" | "support" | "") =>
-      setState((prev) => ({
-        ...prev,
-        tributeMode: mode,
-        chatMessages: [],
-        generatedTribute: "",
-        hasPassedTransition: false,
-        supportContext: [],
-      })),
-    []
-  );
-
-  const setHasPassedTransition = useCallback(
-    (passed: boolean) =>
-      setState((prev) => ({ ...prev, hasPassedTransition: passed })),
-    []
-  );
-
   const setSupportContext = useCallback(
     (ctx: SupportContextEntry[]) =>
       setState((prev) => ({ ...prev, supportContext: ctx })),
@@ -515,8 +492,6 @@ export function useMemorialState() {
       setTribute,
       setHeroPhotoFile,
       setHomepageConversation,
-      setTributeMode,
-      setHasPassedTransition,
       setSupportContext,
       addVideo,
       removeVideo,
@@ -530,7 +505,7 @@ export function useMemorialState() {
       setIntroComplete,
       reset,
     }),
-    [updatePetDetails, addPhoto, removePhoto, setPhotoCaption, setPhotoTags, reorderPhotos, addChatMessage, setTribute, setHeroPhotoFile, setHomepageConversation, setTributeMode, setHasPassedTransition, setSupportContext, addVideo, removeVideo, reorderVideos, addClip, updateClip, removeClip, reorderClips, setOwnerLastName, setCompilationUrl, setIntroComplete, reset]
+    [updatePetDetails, addPhoto, removePhoto, setPhotoCaption, setPhotoTags, reorderPhotos, addChatMessage, setTribute, setHeroPhotoFile, setHomepageConversation, setSupportContext, addVideo, removeVideo, reorderVideos, addClip, updateClip, removeClip, reorderClips, setOwnerLastName, setCompilationUrl, setIntroComplete, reset]
   );
 
   return useMemo(
@@ -541,8 +516,6 @@ export function useMemorialState() {
       generatedTribute: state.generatedTribute,
       memorialId: state.memorialId,
       homepageConversation: state.homepageConversation,
-      tributeMode: state.tributeMode,
-      hasPassedTransition: state.hasPassedTransition,
       supportContext: state.supportContext,
       videos: state.videos,
       videoClips: state.videoClips,

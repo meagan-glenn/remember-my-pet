@@ -254,7 +254,6 @@ function Dashboard() {
     photos,
     chatMessages,
     generatedTribute,
-    tributeMode,
     videos,
     compilationUrl,
     ownerLastName,
@@ -292,7 +291,7 @@ function Dashboard() {
     : `${photoCount} photo${photoCount !== 1 ? "s" : ""} uploaded`;
   const photoStatusType = photoCount === 0 ? "not-started" as const : "in-progress" as const;
 
-  const tributeNotStarted = !tributeMode && chatMessages.length === 0 && !generatedTribute;
+  const tributeNotStarted = chatMessages.length === 0 && !generatedTribute;
   const tributeStatus = tributeNotStarted
     ? "Not started"
     : generatedTribute

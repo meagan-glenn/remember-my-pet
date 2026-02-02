@@ -64,9 +64,9 @@ export async function POST(request: Request) {
 
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
-  // Build support context summary if in support mode
+  // Build support context summary if guilt/regret was expressed
   let supportSummary = "";
-  if (mode === "support" && Array.isArray(supportContext)) {
+  if (Array.isArray(supportContext) && supportContext.length > 0) {
     supportSummary = supportContext
       .filter(
         (s: unknown): s is { userConcern: string; aiReframing: string } =>
@@ -136,7 +136,7 @@ Rules:
   const message = await anthropic.messages.create({
     model: "claude-haiku-4-5-20251001",
     max_tokens: 600,
-    system: mode === "support" ? supportSystemPrompt : celebrateSystemPrompt,
+    system: supportSummary ? supportSystemPrompt : celebrateSystemPrompt,
     messages: [
       {
         role: "user",

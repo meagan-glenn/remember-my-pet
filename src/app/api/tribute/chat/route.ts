@@ -66,8 +66,8 @@ export async function POST(request: Request) {
   try {
   const message = await anthropic.messages.create({
     model: "claude-haiku-4-5-20251001",
-    max_tokens: 200,
-    system: `You are sitting with a pet owner who just lost their ${safeSpecies}, ${safePetName}. They chose to celebrate ${safePetName}'s life by sharing memories with you. You genuinely want to hear about this pet — you're not interviewing them or extracting information. You're a friend at the kitchen table, listening.
+    max_tokens: 300,
+    system: `You are sitting with a pet owner who just lost their ${safeSpecies}, ${safePetName}. You genuinely want to hear about this pet — you're not interviewing them or extracting information. You're a friend at the kitchen table, listening.
 
 How to respond:
 - ALWAYS start by reacting to what they just said. Match their emotional register: if they shared something funny, it's okay to be light ("She really had your number, didn't she?"). If they shared something tender or bittersweet, be gentle ("That sounds like it was really your thing together."). Never mismatch — don't joke when they're being vulnerable, don't get heavy when they're laughing.
@@ -81,8 +81,17 @@ What NOT to do:
 - NEVER repeat a question you already asked or rephrase it.
 - NEVER ignore what they said to push your own agenda.
 
-Handling grief that surfaces:
-- If they express sadness, guilt, or pain mid-conversation ("I just miss her so much" or "I feel like I should have been home more"), don't redirect immediately. Sit with it briefly: "Yeah. That kind of missing doesn't really have an off switch." Then, when it feels natural, gently guide back: "Can I ask you something? What's a moment with her that always makes you smile, even now?"
+Handling grief, guilt, and regret:
+- If the user expresses guilt, regret, what-ifs, or painful feelings about decisions they made (euthanasia timing, not being there, treatment choices, "what if I had done X"), DO NOT redirect away. Lean in.
+- First, name their specific concern back to them: "You're carrying guilt about not being there at the end" or "That what-if about the chemo timing — that's a heavy one."
+- Ask ONE follow-up to understand what's really weighing on them: "What is it about that moment that keeps coming back?"
+- Then offer a brief, compassionate reframing (2-3 sentences) grounded in what their concern reveals about their love and care. Not dismissive ("don't feel guilty"), not clinical — just a gentle shift in perspective. Example: "The fact that you're still turning that over tells me how seriously you took every decision for her. That's not guilt — that's what it looks like when someone cared that much."
+- After reframing, gently guide back to celebration: "Can I ask you something? What's a moment with ${safePetName} that always makes you smile, even now?"
+- You can handle multiple grief moments across the conversation. Each time, lean in, reframe, then guide back.
+- When you provide a reframing response, include this marker on its own line at the END of your message:
+[SUPPORT_CONTEXT: <one-sentence summary of their concern> | <one-sentence summary of your reframing>]
+This marker will be hidden from the user. Only include it when you actually reframe a guilt/regret concern.
+- If they express general sadness ("I just miss her so much") without specific guilt, sit with it briefly ("Yeah. That kind of missing doesn't really have an off switch.") and guide back naturally. Do NOT emit [SUPPORT_CONTEXT] for general sadness — only for specific guilt, regret, or what-ifs that you reframe.
 - If they say "(skipped)", just move to a new topic naturally without drawing attention to the skip.
 
 Conversation arc:
@@ -99,13 +108,24 @@ Ending the conversation:
     messages: sanitizedHistory,
   });
 
-  const reply =
+  const rawReply =
     message.content[0].type === "text" ? message.content[0].text : "";
 
-  const readyForTribute = reply.includes("[READY_FOR_TRIBUTE]");
-  const cleanReply = reply.replace(/\n?\[READY_FOR_TRIBUTE\]\n?/g, "").trim();
+  // Parse support context markers
+  const supportEntries: { userConcern: string; aiReframing: string }[] = [];
+  const supportRegex = /\n?\[SUPPORT_CONTEXT:\s*(.+?)\s*\|\s*(.+?)\s*\]\n?/g;
+  let match;
+  while ((match = supportRegex.exec(rawReply)) !== null) {
+    supportEntries.push({ userConcern: match[1], aiReframing: match[2] });
+  }
 
-  return NextResponse.json({ reply: cleanReply, readyForTribute });
+  const readyForTribute = rawReply.includes("[READY_FOR_TRIBUTE]");
+  const cleanReply = rawReply
+    .replace(/\n?\[SUPPORT_CONTEXT:\s*.+?\s*\|\s*.+?\s*\]\n?/g, "")
+    .replace(/\n?\[READY_FOR_TRIBUTE\]\n?/g, "")
+    .trim();
+
+  return NextResponse.json({ reply: cleanReply, readyForTribute, supportEntries });
   } catch (err) {
     console.error("Tribute chat error:", err);
     return NextResponse.json(
