@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { PawPrint, Gift } from "lucide-react";
 import { ShareButton } from "./share-button";
-import { MemoryList } from "@/components/memory-wall/memory-list";
+import { MasonryWall } from "@/components/memorial-wall/masonry-wall";
 import { MemoryForm } from "@/components/memory-wall/memory-form";
 
 interface MemorialPageProps {
@@ -169,7 +169,7 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
       {/* Hero Section */}
       <section className="relative">
         {heroPhoto ? (
-          <div className="relative h-[50vh] min-h-[320px] max-h-[500px] w-full sm:h-[60vh]">
+          <div className="relative h-[35vh] min-h-[280px] max-h-[500px] w-full sm:h-[50vh]">
             <Image
               src={heroPhoto.url}
               alt={memorial.pet_name}
@@ -195,7 +195,7 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
             </div>
           </div>
         ) : (
-          <div className="flex h-[40vh] min-h-[280px] w-full flex-col items-center justify-center bg-gradient-to-b from-amber-100 to-amber-50">
+          <div className="flex h-[35vh] min-h-[280px] w-full flex-col items-center justify-center bg-gradient-to-b from-amber-100 to-amber-50">
             <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-amber-200/60">
               <PawPrint className="h-10 w-10 text-amber-600" />
             </div>
@@ -216,7 +216,7 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
       </section>
 
       {/* Actions bar */}
-      <div className="mx-auto flex max-w-2xl items-center justify-end gap-3 px-4 pt-6 print:hidden sm:px-6">
+      <div className="mx-auto flex max-w-6xl items-center justify-end gap-3 px-4 pt-6 print:hidden sm:px-6">
         {isOwner && (
           <a
             href={`/create?edit=${memorial.id}`}
@@ -228,20 +228,49 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
         <ShareButton url={memorialUrl} petName={memorial.pet_name} />
       </div>
 
-      {/* Tribute */}
+      {/* Wall intro */}
+      <section className="mx-auto max-w-6xl px-4 pt-8 sm:px-6">
+        <p className="mb-6 text-center text-sm text-gray-400 italic">
+          {memorial.pet_name}&apos;s life, through the eyes of those who loved them
+        </p>
+      </section>
+
+      {/* Tribute + Side Photos */}
       {memorial.tribute ? (
-        <section className="mx-auto max-w-2xl px-4 py-8 sm:px-6">
-          <div className="rounded-2xl border border-amber-100 bg-white/80 p-6 shadow-sm backdrop-blur-sm sm:p-8">
-            <h2 className="mb-4 font-serif text-2xl font-medium text-gray-900">
-              A Tribute
-            </h2>
-            <div className="whitespace-pre-line text-base leading-relaxed text-gray-700">
-              {memorial.tribute}
+        <section className="mx-auto max-w-6xl px-4 pb-3 sm:px-6">
+          <div className="flex flex-col gap-3 md:flex-row md:items-stretch md:gap-4">
+            <div className="flex-1 rounded-2xl border-l-4 border-l-amber-700 border border-amber-100 bg-amber-50/50 p-6 shadow-sm backdrop-blur-sm sm:p-8">
+              <h2 className="mb-4 font-serif text-2xl font-medium text-gray-900">
+                A Tribute
+              </h2>
+              <div className="whitespace-pre-line text-base leading-relaxed text-gray-700">
+                {memorial.tribute}
+              </div>
             </div>
+            {galleryPhotos.length > 0 && (
+              <div className="flex gap-3 md:w-80 md:shrink-0 md:flex-col">
+                {galleryPhotos.slice(0, 2).map((photo) => (
+                  <div key={photo.id} className="overflow-hidden rounded-2xl border border-amber-100 bg-white/80 shadow-sm">
+                    <div className="relative aspect-square">
+                      <Image
+                        src={photo.url}
+                        alt={photo.caption || memorial.pet_name}
+                        fill
+                        sizes="(max-width: 768px) 50vw, 224px"
+                        className="object-cover"
+                      />
+                    </div>
+                    {photo.caption && (
+                      <p className="px-3 py-2 text-xs italic text-gray-500">{photo.caption}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </section>
       ) : isOwner ? (
-        <section className="mx-auto max-w-2xl px-4 py-8 sm:px-6">
+        <section className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
           <div className="rounded-2xl border border-dashed border-amber-200 bg-amber-50/50 p-6 text-center">
             <p className="text-gray-500">No tribute yet.</p>
             <a
@@ -254,57 +283,24 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
         </section>
       ) : null}
 
-      {/* Video Compilation */}
-      {memorial.compilation_url && (
-        <section className="mx-auto max-w-2xl px-4 pb-8 sm:px-6">
-          <h2 className="mb-4 font-serif text-2xl font-medium text-gray-900">
-            Video Memories
-          </h2>
-          <div className="rounded-2xl overflow-hidden bg-black">
-            {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
-            <video
-              src={memorial.compilation_url}
-              controls
-              playsInline
-              poster={heroPhoto?.url}
-              className="w-full"
+      {/* Wall intro + Masonry Wall */}
+      {(galleryPhotos.length > 2 || memorial.memories.length > 0 || memorial.compilation_url) && (
+        <>
+          <section className="mx-auto max-w-6xl px-4 pb-8 sm:px-6">
+            <MasonryWall
+              photos={galleryPhotos.slice(2)}
+              memories={memorial.memories}
+              videoUrl={memorial.compilation_url ?? undefined}
+              videoPosterUrl={heroPhoto?.url}
+              petName={memorial.pet_name}
             />
-          </div>
-        </section>
-      )}
-
-      {/* Photo Gallery */}
-      {galleryPhotos.length > 0 && (
-        <section className="mx-auto max-w-3xl px-4 pb-16 sm:px-6">
-          <h2 className="mb-6 font-serif text-2xl font-medium text-gray-900">
-            Photos
-          </h2>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
-            {galleryPhotos.map((photo) => (
-              <div key={photo.id} className="space-y-2">
-                <div className="relative aspect-square overflow-hidden rounded-xl">
-                  <Image
-                    src={photo.url}
-                    alt={photo.caption || memorial.pet_name}
-                    fill
-                    sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
-                    className="object-cover"
-                  />
-                </div>
-                {photo.caption && (
-                  <p className="text-sm text-gray-500 italic px-1">
-                    {photo.caption}
-                  </p>
-                )}
-              </div>
-            ))}
-          </div>
-        </section>
+          </section>
+        </>
       )}
 
       {/* Keepsake CTA (owner only) */}
       {isOwner && (
-        <section className="mx-auto max-w-2xl px-4 pb-8 sm:px-6 print:hidden">
+        <section className="mx-auto max-w-6xl px-4 pb-8 sm:px-6 print:hidden">
           <a
             href={`/${memorial.slug}/shop`}
             className="flex items-center gap-4 rounded-2xl border border-amber-100 bg-white/80 p-6 shadow-sm backdrop-blur-sm hover:border-amber-200 transition-colors"
@@ -324,16 +320,10 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
         </section>
       )}
 
-      {/* Memory Wall */}
+      {/* Memory Form (for published memorials) */}
       {memorial.is_published && (
-        <section className="mx-auto max-w-2xl px-4 pb-16 sm:px-6">
-          <h2 className="mb-6 font-serif text-2xl font-medium text-gray-900">
-            Memories &amp; Stories
-          </h2>
-          <div className="space-y-6">
-            <MemoryList memories={memorial.memories} petName={memorial.pet_name} />
-            <MemoryForm memorialId={memorial.id} petName={memorial.pet_name} />
-          </div>
+        <section className="mx-auto max-w-6xl px-4 pb-16 sm:px-6">
+          <MemoryForm memorialId={memorial.id} petName={memorial.pet_name} />
         </section>
       )}
 

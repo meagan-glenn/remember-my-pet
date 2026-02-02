@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { MasonryWall } from "@/components/memorial-wall/masonry-wall";
 
 export const metadata: Metadata = {
   title: "Example Memorial — RememberMyPet.ai",
@@ -13,9 +14,11 @@ const DEMO_TRIBUTE = `Buddy wasn't just a dog — he was the first face you'd se
 
 He loved swimming in the lake more than anything. The moment he heard the car doors unlock on a Saturday morning, he knew it was adventure time. He'd press his nose against the window the entire drive, tail going like a metronome set to allegro.
 
-In his later years, the lake trips got shorter, but his enthusiasm never dimmed. He'd wade in up to his belly and stand there, perfectly content, watching the ducks like he was supervising them.
+He had a signature move at the dog park — a full-speed lap around the perimeter, ears back, pure joy, before he'd even acknowledge the other dogs. Everyone knew Buddy's victory lap. The regulars would cheer him on and he'd finish with this proud little prance back to you, like he'd just won an Olympic medal.
 
-Buddy taught everyone around him what unconditional loyalty looks like. Not the dramatic kind — the quiet, steady, always-there kind. The kind where you come home after the worst day and someone is genuinely, completely thrilled to see you.
+In his later years, the lake trips got shorter, but his enthusiasm never dimmed. He'd wade in up to his belly and stand there, perfectly content, watching the ducks like he was supervising them. On cold mornings he'd curl up on the couch and let out this deep sigh — not sad, just settled. Like he'd found exactly where he was supposed to be.
+
+Buddy taught everyone around him what unconditional loyalty looks like. Not the dramatic kind — the quiet, steady, always-there kind. The kind where you come home after the worst day and someone is genuinely, completely thrilled to see you. He never held a grudge, never kept score, never loved you less on your bad days.
 
 Fourteen years wasn't enough. It never would have been. But every single one of those years was better because he was in it.`;
 
@@ -38,10 +41,12 @@ const DEMO_MEMORIES = [
 ];
 
 const DEMO_PHOTOS = [
-  { src: "/demo/lake.jpg", caption: "Lake day — his happy place" },
+  { src: "/demo/lake.jpg", caption: "That smile that could fix any bad day" },
   { src: "/demo/snow.jpg", caption: "First snow, age 2" },
-  { src: "/demo/ball.jpg", caption: "The tennis ball collection" },
-  { src: "/demo/nap.jpg", caption: "Nap time with his favorite human" },
+  { src: "/demo/ball.jpg", caption: "The ball was always his favorite" },
+  { src: "/demo/nap.jpg", caption: "Sprinkler days in the backyard" },
+  { src: "/demo/hero.jpg", caption: "Our adventure buddy" },
+  { src: "/demo/lake.jpg", caption: "Lake days were his happy place" },
 ];
 
 export default function DemoPage() {
@@ -57,12 +62,12 @@ export default function DemoPage() {
 
       {/* Hero */}
       <section className="relative">
-        <div className="relative h-[50vh] min-h-[320px] max-h-[500px] w-full sm:h-[60vh]">
+        <div className="relative h-[35vh] min-h-[280px] max-h-[500px] w-full sm:h-[50vh]">
           <Image
             src="/demo/hero.jpg"
             alt="Buddy the golden retriever"
             fill
-            className="object-cover"
+            className="object-cover object-[center_25%]"
             priority
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
@@ -77,62 +82,54 @@ export default function DemoPage() {
         </div>
       </section>
 
-      {/* Tribute */}
-      <section className="mx-auto max-w-2xl px-4 py-8 sm:px-6">
-        <div className="rounded-2xl border border-amber-100 bg-white/80 p-6 shadow-sm backdrop-blur-sm sm:p-8">
-          <h2 className="mb-4 font-serif text-2xl font-medium text-gray-900">
-            A Tribute
-          </h2>
-          <div className="whitespace-pre-line text-base leading-relaxed text-gray-700">
-            {DEMO_TRIBUTE}
+      {/* Wall intro */}
+      <section className="mx-auto max-w-6xl px-4 pt-8 sm:px-6">
+        <p className="mb-6 text-center text-sm text-gray-400 italic">
+          Buddy&apos;s life, through the eyes of those who loved him
+        </p>
+      </section>
+
+      {/* Tribute + Side Photos */}
+      <section className="mx-auto max-w-6xl px-4 pb-3 sm:px-6">
+        <div className="flex flex-col gap-3 md:flex-row md:items-stretch md:gap-4">
+          {/* Tribute */}
+          <div className="flex-1 rounded-2xl border-l-4 border-l-amber-700 border border-amber-100 bg-amber-50/50 p-6 shadow-sm backdrop-blur-sm sm:p-8">
+            <h2 className="mb-4 font-serif text-2xl font-medium text-gray-900">
+              A Tribute
+            </h2>
+            <div className="whitespace-pre-line text-base leading-relaxed text-gray-700">
+              {DEMO_TRIBUTE}
+            </div>
+          </div>
+          {/* Side photos */}
+          <div className="flex gap-3 md:w-80 md:shrink-0 md:flex-col">
+            {DEMO_PHOTOS.slice(0, 2).map((photo, i) => (
+              <div key={i} className="overflow-hidden rounded-2xl border border-amber-100 bg-white/80 shadow-sm">
+                <div className="relative aspect-square">
+                  <Image
+                    src={photo.src}
+                    alt={photo.caption}
+                    fill
+                    sizes="(max-width: 768px) 50vw, 320px"
+                    className="object-cover"
+                  />
+                </div>
+                {photo.caption && (
+                  <p className="px-3 py-2 text-xs italic text-gray-500">{photo.caption}</p>
+                )}
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Photo Gallery (placeholders) */}
-      <section className="mx-auto max-w-3xl px-4 pb-16 sm:px-6">
-        <h2 className="mb-6 font-serif text-2xl font-medium text-gray-900">
-          Photos
-        </h2>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          {DEMO_PHOTOS.map((photo, i) => (
-            <div key={i} className="space-y-2">
-              <div className="relative aspect-square overflow-hidden rounded-xl">
-                <Image
-                  src={photo.src}
-                  alt={photo.caption}
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <p className="text-sm text-gray-500 italic px-1">
-                {photo.caption}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Memory Wall */}
-      <section className="mx-auto max-w-2xl px-4 pb-16 sm:px-6">
-        <h2 className="mb-6 font-serif text-2xl font-medium text-gray-900">
-          Memories &amp; Stories
-        </h2>
-        <div className="space-y-4">
-          {DEMO_MEMORIES.map((memory, i) => (
-            <div
-              key={i}
-              className="rounded-2xl border border-amber-100 bg-white/80 p-5 shadow-sm"
-            >
-              <p className="text-base leading-relaxed text-gray-700">
-                {memory.content}
-              </p>
-              <p className="mt-3 text-sm font-medium text-gray-500">
-                — {memory.name}
-              </p>
-            </div>
-          ))}
-        </div>
+      {/* Masonry Wall (remaining photos + memories) */}
+      <section className="mx-auto max-w-6xl px-4 pb-12 sm:px-6">
+        <MasonryWall
+          photos={DEMO_PHOTOS.slice(2)}
+          memories={DEMO_MEMORIES}
+          petName="Buddy"
+        />
       </section>
 
       {/* CTA */}
