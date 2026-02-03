@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { ERROR_MESSAGES } from "@/lib/error-messages";
 import {
   Card,
   CardContent,
@@ -71,7 +72,7 @@ export function PricingCards({ memorialId, slug, onLeave }: PricingCardsProps) {
         window.location.href = url;
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
+      setError(err instanceof Error ? err.message : ERROR_MESSAGES.CHECKOUT_FAILED.message);
       setLoading(null);
     }
   };

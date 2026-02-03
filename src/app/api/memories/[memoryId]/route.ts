@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase-server";
 import { rateLimit } from "@/lib/rate-limit";
 import { validateMemoryContent } from "@/lib/validation";
+import { apiError } from "@/lib/error-messages";
 
 interface RouteParams {
   params: Promise<{ memoryId: string }>;
@@ -14,14 +15,11 @@ export async function PATCH(request: Request, { params }: RouteParams) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return apiError("AUTH_REQUIRED", 401);
   }
 
   if (!rateLimit(`moderate:${user.id}`, 20)) {
-    return NextResponse.json(
-      { error: "Too many requests. Please wait a moment." },
-      { status: 429 }
-    );
+    return apiError("RATE_LIMITED", 429);
   }
 
   const { memoryId } = await params;
@@ -35,12 +33,12 @@ export async function PATCH(request: Request, { params }: RouteParams) {
     .single();
 
   if (!memory) {
-    return NextResponse.json({ error: "Memory not found" }, { status: 404 });
+    return apiError("MEMORIAL_NOT_FOUND", 404);
   }
 
   const memorial = memory.memorials as unknown as { user_id: string };
   if (memorial.user_id !== user.id) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return apiError("AUTH_REQUIRED", 403, "You don't have permission.");
   }
 
   if (action === "approve") {
@@ -54,7 +52,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
       .eq("id", memoryId);
 
     if (error) {
-      return NextResponse.json({ error: "Failed to approve" }, { status: 500 });
+      return apiError("MODERATION_FAILED", 500);
     }
     return NextResponse.json({ success: true });
   }
@@ -66,7 +64,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
       .eq("id", memoryId);
 
     if (error) {
-      return NextResponse.json({ error: "Failed to reject" }, { status: 500 });
+      return apiError("MODERATION_FAILED", 500);
     }
     return NextResponse.json({ success: true });
   }
@@ -74,7 +72,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
   if (action === "edit") {
     const validation = validateMemoryContent(content);
     if (!validation.valid) {
-      return NextResponse.json({ error: validation.error }, { status: 400 });
+      return apiError("INVALID_INPUT", 400, validation.error);
     }
 
     const { error } = await supabase
@@ -83,12 +81,12 @@ export async function PATCH(request: Request, { params }: RouteParams) {
       .eq("id", memoryId);
 
     if (error) {
-      return NextResponse.json({ error: "Failed to update" }, { status: 500 });
+      return apiError("MODERATION_FAILED", 500);
     }
     return NextResponse.json({ success: true });
   }
 
-  return NextResponse.json({ error: "Invalid action" }, { status: 400 });
+  return apiError("INVALID_INPUT", 400, "Invalid action.");
 }
 
 export async function DELETE(request: Request, { params }: RouteParams) {
@@ -98,7 +96,7 @@ export async function DELETE(request: Request, { params }: RouteParams) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return apiError("AUTH_REQUIRED", 401);
   }
 
   const { memoryId } = await params;
@@ -110,18 +108,18 @@ export async function DELETE(request: Request, { params }: RouteParams) {
     .single();
 
   if (!memory) {
-    return NextResponse.json({ error: "Memory not found" }, { status: 404 });
+    return apiError("MEMORIAL_NOT_FOUND", 404);
   }
 
   const memorial = memory.memorials as unknown as { user_id: string };
   if (memorial.user_id !== user.id) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return apiError("AUTH_REQUIRED", 403, "You don't have permission.");
   }
 
   const { error } = await supabase.from("memories").delete().eq("id", memoryId);
 
   if (error) {
-    return NextResponse.json({ error: "Failed to delete" }, { status: 500 });
+    return apiError("MODERATION_FAILED", 500);
   }
 
   return NextResponse.json({ success: true });

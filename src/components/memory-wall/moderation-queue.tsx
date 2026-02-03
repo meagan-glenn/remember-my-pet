@@ -15,6 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { Check, Pencil, Trash2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { createBrowserClient } from "@supabase/ssr";
+import { ERROR_MESSAGES } from "@/lib/error-messages";
 import Image from "next/image";
 
 interface Memory {
@@ -104,7 +105,9 @@ export function ModerationQueue() {
         setDeletingId(null);
       }
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Something went wrong");
+      toast.error(err instanceof Error ? err.message : ERROR_MESSAGES.MODERATION_FAILED.message, {
+        duration: Infinity,
+      });
     } finally {
       setActionLoading(null);
     }

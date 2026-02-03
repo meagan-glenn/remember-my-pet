@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase-server";
 import { rateLimit } from "@/lib/rate-limit";
+import { apiError } from "@/lib/error-messages";
 import { PRODUCT_UIDS, type ProductType } from "@/lib/gelato";
 
 export async function POST(request: Request) {
@@ -10,23 +11,17 @@ export async function POST(request: Request) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return apiError("AUTH_REQUIRED", 401);
   }
 
   if (!rateLimit(`product-preview:${user.id}`, 5)) {
-    return NextResponse.json(
-      { error: "Too many requests. Please wait a moment." },
-      { status: 429 }
-    );
+    return apiError("RATE_LIMITED", 429);
   }
 
   const { memorialId, productType } = await request.json();
 
   if (!memorialId || !productType || !(productType in PRODUCT_UIDS)) {
-    return NextResponse.json(
-      { error: "Invalid memorial ID or product type" },
-      { status: 400 }
-    );
+    return apiError("INVALID_INPUT", 400, "Invalid memorial ID or product type.");
   }
 
   // Verify user owns this memorial
@@ -38,7 +33,7 @@ export async function POST(request: Request) {
     .single();
 
   if (!memorial) {
-    return NextResponse.json({ error: "Memorial not found" }, { status: 404 });
+    return apiError("MEMORIAL_NOT_FOUND", 404);
   }
 
   const photos = (memorial.photos || []).sort(
@@ -47,10 +42,7 @@ export async function POST(request: Request) {
   );
 
   if (photos.length === 0) {
-    return NextResponse.json(
-      { error: "Memorial must have at least one photo" },
-      { status: 400 }
-    );
+    return apiError("INVALID_INPUT", 400, "Memorial must have at least one photo.");
   }
 
   // Fetch approved memories for the book
@@ -79,10 +71,7 @@ export async function POST(request: Request) {
 
   if (orderError) {
     console.error("Order creation error:", orderError.message);
-    return NextResponse.json(
-      { error: "Failed to create order" },
-      { status: 500 }
-    );
+    return apiError("SHOP_ORDER_FAILED", 500);
   }
 
   return NextResponse.json({

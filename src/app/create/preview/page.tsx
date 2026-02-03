@@ -8,6 +8,7 @@ import { PricingCards } from "@/components/checkout/pricing-cards";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { ERROR_MESSAGES } from "@/lib/error-messages";
 
 function PreviewContent() {
   const ctx = useMemorialContext();
@@ -112,7 +113,7 @@ function PreviewContent() {
     setSaving(true);
     handleSave()
       .catch((err) => {
-        toast.error(err instanceof Error ? err.message : "Failed to save memorial. Please try again.");
+        toast.error(err instanceof Error ? err.message : ERROR_MESSAGES.MEMORIAL_SAVE_FAILED.message, { duration: Infinity });
         setAutoSaveFailed(true);
         setShowWelcomeBack(false);
       })
@@ -141,7 +142,7 @@ function PreviewContent() {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center space-y-4 px-4">
-          <p className="text-gray-700">Something went wrong saving your memorial.</p>
+          <p className="text-gray-700">{ERROR_MESSAGES.MEMORIAL_SAVE_FAILED.message}</p>
           <p className="text-sm text-gray-500">Your progress is safe — you can try again.</p>
           <Button
             onClick={() => {
@@ -149,7 +150,7 @@ function PreviewContent() {
               setSaving(true);
               handleSave()
                 .catch((err) => {
-                  toast.error(err instanceof Error ? err.message : "Failed to save memorial. Please try again.");
+                  toast.error(err instanceof Error ? err.message : ERROR_MESSAGES.MEMORIAL_SAVE_FAILED.message, { duration: Infinity });
                   setAutoSaveFailed(true);
                 })
                 .finally(() => setSaving(false));

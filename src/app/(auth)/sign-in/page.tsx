@@ -3,6 +3,7 @@
 import { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { createBrowserSupabase } from "@/lib/supabase";
+import { ERROR_MESSAGES } from "@/lib/error-messages";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -43,7 +44,7 @@ function SignInForm() {
 
       if (authError) throw authError;
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
+      setError(err instanceof Error ? err.message : ERROR_MESSAGES.AUTH_FAILED.message);
       setGoogleLoading(false);
     }
   };
@@ -67,7 +68,7 @@ function SignInForm() {
       if (authError) throw authError;
       setSent(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
+      setError(err instanceof Error ? err.message : ERROR_MESSAGES.AUTH_FAILED.message);
     } finally {
       setLoading(false);
     }

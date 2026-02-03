@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase-server";
 import { rateLimit } from "@/lib/rate-limit";
+import { apiError } from "@/lib/error-messages";
 import ffmpeg from "fluent-ffmpeg";
 import ffmpegPath from "ffmpeg-static";
 import { writeFile, unlink, mkdtemp } from "fs/promises";
@@ -188,21 +189,18 @@ export async function POST(request: Request) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return apiError("AUTH_REQUIRED", 401);
   }
 
   if (!rateLimit(`compile:${user.id}`, 3)) {
-    return NextResponse.json(
-      { error: "Too many compilations. Please wait a moment." },
-      { status: 429 }
-    );
+    return apiError("RATE_LIMITED", 429);
   }
 
   const body: CompileRequest = await request.json();
   const { memorialId, clips, transition } = body;
 
   if (!memorialId || !clips?.length) {
-    return NextResponse.json({ error: "Missing memorialId or clips" }, { status: 400 });
+    return apiError("INVALID_INPUT", 400, "Missing memorialId or clips.");
   }
 
   // Validate clip inputs
@@ -210,23 +208,20 @@ export async function POST(request: Request) {
   for (const clip of clips) {
     // Prevent SSRF: only allow Supabase-hosted video URLs
     if (!supabaseUrl || typeof clip.videoUrl !== "string" || !clip.videoUrl.startsWith(supabaseUrl)) {
-      return NextResponse.json({ error: "Invalid video URL" }, { status: 400 });
+      return apiError("INVALID_INPUT", 400, "Invalid video URL.");
     }
     // Prevent command injection: enforce numeric types at runtime
     if (typeof clip.startTime !== "number" || !isFinite(clip.startTime) ||
         typeof clip.endTime !== "number" || !isFinite(clip.endTime) ||
         clip.startTime < 0 || clip.endTime <= clip.startTime) {
-      return NextResponse.json({ error: "Invalid clip times" }, { status: 400 });
+      return apiError("INVALID_INPUT", 400, "Invalid clip times.");
     }
   }
 
   // Validate total duration
   const totalDuration = clips.reduce((sum, c) => sum + (c.endTime - c.startTime), 0);
   if (totalDuration > MAX_OUTPUT_DURATION) {
-    return NextResponse.json(
-      { error: `Total clip duration exceeds ${MAX_OUTPUT_DURATION} seconds. Please shorten your clips.` },
-      { status: 400 }
-    );
+    return apiError("INVALID_INPUT", 400, `Total clip duration exceeds ${MAX_OUTPUT_DURATION} seconds. Please shorten your clips.`);
   }
 
   // Create compilation record
@@ -242,7 +237,7 @@ export async function POST(request: Request) {
 
   if (insertError || !compilation) {
     console.error("Failed to create compilation record:", insertError);
-    return NextResponse.json({ error: "Failed to start compilation" }, { status: 500 });
+    return apiError("VIDEO_COMPILATION_FAILED", 500);
   }
 
   const compilationId = compilation.id;
@@ -327,7 +322,7 @@ export async function POST(request: Request) {
       .eq("id", compilationId);
 
     return NextResponse.json(
-      { error: "Compilation failed. Please try again.", compilationId },
+      { error: { code: "VIDEO_COMPILATION_FAILED", message: "The video couldn't be compiled. Your clips are saved.", recoverable: true }, compilationId },
       { status: 500 }
     );
   } finally {

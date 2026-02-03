@@ -35,7 +35,7 @@ function AuthErrorContent() {
         "We couldn't verify your sign-in link. It may have expired. Please request a new one.",
     },
     unexpected: {
-      title: "Something went wrong",
+      title: "Couldn't sign you in",
       description:
         "We had trouble signing you in. Please try again.",
     },

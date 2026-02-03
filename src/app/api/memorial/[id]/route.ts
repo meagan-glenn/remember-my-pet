@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase-server";
+import { apiError } from "@/lib/error-messages";
 
 export async function GET(
   _request: Request,
@@ -12,7 +13,7 @@ export async function GET(
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return apiError("AUTH_REQUIRED", 401);
   }
 
   const { data: memorial, error } = await supabase
@@ -22,11 +23,11 @@ export async function GET(
     .single();
 
   if (error || !memorial) {
-    return NextResponse.json({ error: "Memorial not found" }, { status: 404 });
+    return apiError("MEMORIAL_NOT_FOUND", 404);
   }
 
   if (memorial.user_id !== user.id) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    return apiError("AUTH_REQUIRED", 403, "You don't have permission.");
   }
 
   // Sort photos by sort_order

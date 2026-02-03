@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { createBrowserSupabase } from "@/lib/supabase";
+import { ERROR_MESSAGES } from "@/lib/error-messages";
 import {
   Dialog,
   DialogContent,
@@ -44,7 +45,7 @@ export function AuthModal({ open, onAuthenticated, onClose }: AuthModalProps) {
       if (authError) throw authError;
       setSent(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
+      setError(err instanceof Error ? err.message : ERROR_MESSAGES.AUTH_FAILED.message);
     } finally {
       setLoading(false);
     }

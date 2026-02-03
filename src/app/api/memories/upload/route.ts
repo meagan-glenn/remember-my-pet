@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { rateLimit } from "@/lib/rate-limit";
+import { apiError } from "@/lib/error-messages";
 
 const MAX_SIZE = 10 * 1024 * 1024; // 10MB
 const ALLOWED_TYPES: Record<string, string> = {
@@ -21,10 +22,7 @@ export async function POST(request: Request) {
   const ip = getClientIp(request);
 
   if (!rateLimit(`memory-upload:${ip}`, 10)) {
-    return NextResponse.json(
-      { error: "Too many uploads. Please wait a moment." },
-      { status: 429 }
-    );
+    return apiError("RATE_LIMITED", 429);
   }
 
   const formData = await request.formData();
@@ -32,20 +30,20 @@ export async function POST(request: Request) {
   const memorialId = formData.get("memorialId") as string | null;
 
   if (!file) {
-    return NextResponse.json({ error: "No file provided" }, { status: 400 });
+    return apiError("INVALID_INPUT", 400, "No file provided.");
   }
 
   if (!memorialId) {
-    return NextResponse.json({ error: "Memorial ID is required" }, { status: 400 });
+    return apiError("INVALID_INPUT", 400, "Memorial ID is required.");
   }
 
   if (file.size > MAX_SIZE) {
-    return NextResponse.json({ error: "File too large (max 10MB)" }, { status: 400 });
+    return apiError("FILE_TOO_LARGE", 400);
   }
 
   const ext = ALLOWED_TYPES[file.type];
   if (!ext) {
-    return NextResponse.json({ error: "Unsupported file type" }, { status: 400 });
+    return apiError("INVALID_FILE_TYPE", 400);
   }
 
   const supabase = createClient(
@@ -61,7 +59,7 @@ export async function POST(request: Request) {
     .single();
 
   if (!memorial?.is_published) {
-    return NextResponse.json({ error: "Memorial not found" }, { status: 404 });
+    return apiError("MEMORIAL_NOT_FOUND", 404);
   }
 
   const path = `memories/${memorialId}/${Date.now()}.${ext}`;
@@ -73,7 +71,7 @@ export async function POST(request: Request) {
 
   if (error) {
     console.error("Memory photo upload error:", error.message);
-    return NextResponse.json({ error: "Failed to upload file" }, { status: 500 });
+    return apiError("UPLOAD_FAILED", 500);
   }
 
   const {

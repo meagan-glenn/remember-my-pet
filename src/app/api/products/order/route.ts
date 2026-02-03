@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase-server";
 import { rateLimit } from "@/lib/rate-limit";
+import { apiError } from "@/lib/error-messages";
 import {
   createOrder,
   PRODUCT_UIDS,
@@ -15,33 +16,24 @@ export async function POST(request: Request) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return apiError("AUTH_REQUIRED", 401);
   }
 
   if (!rateLimit(`product-order:${user.id}`, 3)) {
-    return NextResponse.json(
-      { error: "Too many requests. Please wait a moment." },
-      { status: 429 }
-    );
+    return apiError("RATE_LIMITED", 429);
   }
 
   const { orderId, shippingAddress } = await request.json();
 
   if (!orderId || !shippingAddress) {
-    return NextResponse.json(
-      { error: "Missing order ID or shipping address" },
-      { status: 400 }
-    );
+    return apiError("INVALID_INPUT", 400, "Missing order ID or shipping address.");
   }
 
   // Validate shipping address
   const required = ["firstName", "lastName", "addressLine1", "city", "postCode", "country", "email"];
   for (const field of required) {
     if (!shippingAddress[field]) {
-      return NextResponse.json(
-        { error: `Missing shipping field: ${field}` },
-        { status: 400 }
-      );
+      return apiError("INVALID_INPUT", 400, `Missing shipping field: ${field}.`);
     }
   }
 
@@ -54,14 +46,11 @@ export async function POST(request: Request) {
     .single();
 
   if (!order) {
-    return NextResponse.json({ error: "Order not found" }, { status: 404 });
+    return apiError("MEMORIAL_NOT_FOUND", 404, "Order not found.");
   }
 
   if (order.status !== "preview") {
-    return NextResponse.json(
-      { error: "Order has already been submitted" },
-      { status: 400 }
-    );
+    return apiError("INVALID_INPUT", 400, "Order has already been submitted.");
   }
 
   // Fetch memorial photos
@@ -72,10 +61,7 @@ export async function POST(request: Request) {
     .single();
 
   if (!memorial) {
-    return NextResponse.json(
-      { error: "Memorial not found" },
-      { status: 404 }
-    );
+    return apiError("MEMORIAL_NOT_FOUND", 404);
   }
 
   const photos = (memorial.photos || []).sort(
@@ -131,9 +117,6 @@ export async function POST(request: Request) {
     });
   } catch (err) {
     console.error("Gelato order error:", err);
-    return NextResponse.json(
-      { error: "Failed to submit order to Gelato" },
-      { status: 500 }
-    );
+    return apiError("SHOP_ORDER_FAILED", 500);
   }
 }

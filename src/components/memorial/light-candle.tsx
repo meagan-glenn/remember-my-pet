@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Flame } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { createBrowserSupabase } from "@/lib/supabase";
+import { toast } from "sonner";
 
 interface LightCandleProps {
   memorialId: string;
@@ -78,11 +79,13 @@ export function LightCandle({ memorialId }: LightCandleProps) {
         // Revert on error
         setUserLit(wasLit);
         setCount((c) => (wasLit ? c + 1 : c - 1));
+        toast.error("Couldn't save your candle right now. Try refreshing the page.", { duration: 4000 });
       }
     } catch {
       // Revert on error
       setUserLit(wasLit);
       setCount((c) => (wasLit ? c + 1 : c - 1));
+      toast.error("Couldn't save your candle right now. Try refreshing the page.", { duration: 4000 });
     } finally {
       setToggling(false);
     }

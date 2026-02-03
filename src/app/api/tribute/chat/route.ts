@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase-server";
 import { rateLimit } from "@/lib/rate-limit";
+import { apiError } from "@/lib/error-messages";
 import Anthropic from "@anthropic-ai/sdk";
 import { getPronouns, type Gender } from "@/lib/pronouns";
 
@@ -17,10 +18,7 @@ export async function POST(request: Request) {
 
   const rateLimitKey = user ? `tribute-chat:${user.id}` : `tribute-chat:${request.headers.get("x-forwarded-for") || "anon"}`;
   if (!rateLimit(rateLimitKey, 10)) {
-    return NextResponse.json(
-      { error: "Too many requests. Please wait a moment." },
-      { status: 429 }
-    );
+    return apiError("RATE_LIMITED", 429);
   }
 
   const { petName, species, gender, chatHistory, homepageConversation } = await request.json();
@@ -31,10 +29,7 @@ export async function POST(request: Request) {
     !Array.isArray(chatHistory) ||
     !chatHistory.length
   ) {
-    return NextResponse.json(
-      { error: "Missing required fields" },
-      { status: 400 }
-    );
+    return apiError("INVALID_INPUT", 400, "Missing required fields.");
   }
 
   const safePetName = petName.slice(0, MAX_PET_NAME);
@@ -59,10 +54,7 @@ export async function POST(request: Request) {
     }));
 
   if (!sanitizedHistory.length) {
-    return NextResponse.json(
-      { error: "Missing required fields" },
-      { status: 400 }
-    );
+    return apiError("INVALID_INPUT", 400, "Missing required fields.");
   }
 
   // Build homepage context snippet if available
@@ -152,9 +144,6 @@ Ending the conversation:
   return NextResponse.json({ reply: cleanReply, readyForTribute, supportEntries });
   } catch (err) {
     console.error("Tribute chat error:", err);
-    return NextResponse.json(
-      { error: "Failed to generate response" },
-      { status: 500 }
-    );
+    return apiError("TRIBUTE_GENERATION_FAILED", 500);
   }
 }

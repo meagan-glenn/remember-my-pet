@@ -95,7 +95,9 @@ export function StepPhotoUpload({
             if (caption) onSetCaption(id, caption);
             if (tags?.length && onSetTags) onSetTags(id, tags);
           })
-          .catch(() => {})
+          .catch((err) => {
+            console.warn("Caption generation failed:", err);
+          })
           .finally(() =>
             setCaptioning((prev) => {
               const next = new Set(prev);

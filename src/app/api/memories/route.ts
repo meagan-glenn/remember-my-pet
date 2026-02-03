@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { rateLimit } from "@/lib/rate-limit";
+import { apiError } from "@/lib/error-messages";
 import { validateMemoryContent, validateEmail } from "@/lib/validation";
 import { sendMemoryNotification } from "@/lib/email";
 
@@ -17,10 +18,7 @@ export async function POST(request: Request) {
   const ip = getClientIp(request);
 
   if (!rateLimit(`memory:${ip}`, 5)) {
-    return NextResponse.json(
-      { error: "Too many submissions. Please wait a moment." },
-      { status: 429 }
-    );
+    return apiError("RATE_LIMITED", 429);
   }
 
   const supabase = createClient(
@@ -33,35 +31,35 @@ export async function POST(request: Request) {
 
   // Validate required fields
   if (!memorialId || typeof memorialId !== "string") {
-    return NextResponse.json({ error: "Memorial ID is required" }, { status: 400 });
+    return apiError("INVALID_INPUT", 400, "Memorial ID is required.");
   }
 
   if (!contributorName || typeof contributorName !== "string" || contributorName.trim().length === 0) {
-    return NextResponse.json({ error: "Your name is required" }, { status: 400 });
+    return apiError("INVALID_INPUT", 400, "Your name is required.");
   }
 
   if (contributorName.length > MAX_NAME) {
-    return NextResponse.json({ error: `Name must be under ${MAX_NAME} characters` }, { status: 400 });
+    return apiError("INVALID_INPUT", 400, `Name must be under ${MAX_NAME} characters.`);
   }
 
   const contentValidation = validateMemoryContent(content);
   if (!contentValidation.valid) {
-    return NextResponse.json({ error: contentValidation.error }, { status: 400 });
+    return apiError("INVALID_INPUT", 400, contentValidation.error);
   }
 
   if (contributorEmail && !validateEmail(contributorEmail)) {
-    return NextResponse.json({ error: "Invalid email address" }, { status: 400 });
+    return apiError("INVALID_INPUT", 400, "Invalid email address.");
   }
 
   // Validate photo URLs
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   if (photoUrls && Array.isArray(photoUrls)) {
     if (photoUrls.length > MAX_PHOTOS) {
-      return NextResponse.json({ error: `Maximum ${MAX_PHOTOS} photos allowed` }, { status: 400 });
+      return apiError("INVALID_INPUT", 400, `Maximum ${MAX_PHOTOS} photos allowed.`);
     }
     for (const url of photoUrls) {
       if (typeof url !== "string" || !supabaseUrl || !url.startsWith(supabaseUrl)) {
-        return NextResponse.json({ error: "Invalid photo URL" }, { status: 400 });
+        return apiError("INVALID_INPUT", 400, "Invalid photo URL.");
       }
     }
   }
@@ -74,7 +72,7 @@ export async function POST(request: Request) {
     .single();
 
   if (memError || !memorial || !memorial.is_published) {
-    return NextResponse.json({ error: "Memorial not found" }, { status: 404 });
+    return apiError("MEMORIAL_NOT_FOUND", 404);
   }
 
   // Insert memory
@@ -90,7 +88,7 @@ export async function POST(request: Request) {
 
   if (insertError) {
     console.error("Memory insert error:", insertError.message);
-    return NextResponse.json({ error: "Failed to submit memory" }, { status: 500 });
+    return apiError("MEMORY_SUBMIT_FAILED", 500);
   }
 
   // Upsert contributor record

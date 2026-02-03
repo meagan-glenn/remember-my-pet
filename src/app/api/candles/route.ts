@@ -1,16 +1,14 @@
 import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase-server";
 import { createClient } from "@supabase/supabase-js";
+import { apiError } from "@/lib/error-messages";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const memorialId = searchParams.get("memorial_id");
 
   if (!memorialId) {
-    return NextResponse.json(
-      { error: "memorial_id is required" },
-      { status: 400 }
-    );
+    return apiError("INVALID_INPUT", 400, "memorial_id is required.");
   }
 
   const serviceClient = createClient(
@@ -25,10 +23,7 @@ export async function GET(request: Request) {
     .eq("memorial_id", memorialId);
 
   if (error) {
-    return NextResponse.json(
-      { error: "Failed to fetch candle count" },
-      { status: 500 }
-    );
+    return apiError("CANDLE_FAILED", 500);
   }
 
   // Check if current user has lit a candle
@@ -63,17 +58,14 @@ export async function POST(request: Request) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+    return apiError("AUTH_REQUIRED", 401);
   }
 
   const body = await request.json();
   const { memorial_id } = body;
 
   if (!memorial_id || typeof memorial_id !== "string") {
-    return NextResponse.json(
-      { error: "memorial_id is required" },
-      { status: 400 }
-    );
+    return apiError("INVALID_INPUT", 400, "memorial_id is required.");
   }
 
   const serviceClient = createClient(
@@ -100,10 +92,7 @@ export async function POST(request: Request) {
     });
 
     if (error) {
-      return NextResponse.json(
-        { error: "Failed to light candle" },
-        { status: 500 }
-      );
+      return apiError("CANDLE_FAILED", 500);
     }
   }
 

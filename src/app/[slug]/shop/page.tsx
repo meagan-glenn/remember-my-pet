@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { createBrowserSupabase } from "@/lib/supabase";
+import { ERROR_MESSAGES } from "@/lib/error-messages";
 import { KeepsakeCard } from "@/components/keepsake-card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -82,7 +83,7 @@ export default function ShopPage() {
         setPreview(data);
         setStep("shipping");
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Something went wrong");
+        setError(err instanceof Error ? err.message : ERROR_MESSAGES.SHOP_ORDER_FAILED.message);
       } finally {
         setLoading(false);
       }
@@ -112,7 +113,7 @@ export default function ShopPage() {
 
       setStep("done");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
+      setError(err instanceof Error ? err.message : ERROR_MESSAGES.SHOP_ORDER_FAILED.message);
     } finally {
       setLoading(false);
     }

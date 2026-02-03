@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase-server";
 import { rateLimit } from "@/lib/rate-limit";
+import { apiError } from "@/lib/error-messages";
 import Anthropic from "@anthropic-ai/sdk";
 import { getPronouns, type Gender } from "@/lib/pronouns";
 
@@ -16,10 +17,7 @@ export async function POST(request: Request) {
 
   const rateLimitKey = user ? `tribute-support:${user.id}` : `tribute-support:${request.headers.get("x-forwarded-for") || "anon"}`;
   if (!rateLimit(rateLimitKey, 3)) {
-    return NextResponse.json(
-      { error: "Too many requests. Please wait a moment." },
-      { status: 429 }
-    );
+    return apiError("RATE_LIMITED", 429);
   }
 
   const { petName, species, gender, concern, priorContext } = await request.json();
@@ -30,10 +28,7 @@ export async function POST(request: Request) {
     !concern ||
     typeof concern !== "string"
   ) {
-    return NextResponse.json(
-      { error: "Missing required fields" },
-      { status: 400 }
-    );
+    return apiError("INVALID_INPUT", 400, "Missing required fields.");
   }
 
   const safePetName = petName.slice(0, MAX_PET_NAME);

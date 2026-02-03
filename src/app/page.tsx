@@ -227,7 +227,7 @@ export default function Home() {
       ]);
       setUserExchangeCount((prev) => prev + 1);
     } catch {
-      setChatError("Something went wrong.");
+      setChatError("Couldn't connect right now. Your conversation is saved.");
     } finally {
       setAiLoading(false);
     }

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase-server";
 import { rateLimit } from "@/lib/rate-limit";
+import { apiError } from "@/lib/error-messages";
 import { stripe, PRICES, type Tier } from "@/lib/stripe";
 
 export async function POST(request: Request) {
@@ -10,14 +11,11 @@ export async function POST(request: Request) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return apiError("AUTH_REQUIRED", 401);
   }
 
   if (!rateLimit(`checkout:${user.id}`, 5)) {
-    return NextResponse.json(
-      { error: "Too many requests. Please wait a moment." },
-      { status: 429 }
-    );
+    return apiError("RATE_LIMITED", 429);
   }
 
   const body = await request.json();
@@ -27,18 +25,12 @@ export async function POST(request: Request) {
   };
 
   if (!memorial_id || !tier || !["basic", "premium"].includes(tier)) {
-    return NextResponse.json(
-      { error: "Missing or invalid memorial_id or tier" },
-      { status: 400 }
-    );
+    return apiError("INVALID_INPUT", 400, "Missing or invalid memorial_id or tier.");
   }
 
   const priceId = PRICES[tier as Tier];
   if (!priceId) {
-    return NextResponse.json(
-      { error: "Stripe price not configured for this tier" },
-      { status: 500 }
-    );
+    return apiError("CHECKOUT_FAILED", 500);
   }
 
   // Verify memorial belongs to user and is not already paid
@@ -50,17 +42,11 @@ export async function POST(request: Request) {
     .single();
 
   if (memError || !memorial) {
-    return NextResponse.json(
-      { error: "Memorial not found" },
-      { status: 404 }
-    );
+    return apiError("MEMORIAL_NOT_FOUND", 404);
   }
 
   if (memorial.is_paid) {
-    return NextResponse.json(
-      { error: "Memorial is already paid" },
-      { status: 400 }
-    );
+    return apiError("INVALID_INPUT", 400, "Memorial is already paid.");
   }
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";

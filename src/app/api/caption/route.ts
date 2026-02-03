@@ -1,17 +1,15 @@
 import { NextResponse } from "next/server";
 import { rateLimit } from "@/lib/rate-limit";
+import { apiError } from "@/lib/error-messages";
 import { generatePhotoMetadata } from "@/lib/gemini";
 
 export async function POST(request: Request) {
   const ip = request.headers.get("x-forwarded-for") || "unknown";
   if (!rateLimit(`caption:${ip}`, 20)) {
-    return NextResponse.json(
-      { error: "Too many requests", caption: "" },
-      { status: 429 }
-    );
+    return apiError("RATE_LIMITED", 429);
   }
 
-  if (!process.env.GOOGLE_AI_API_KEY) {
+  if (!process.env.ANTHROPIC_API_KEY) {
     return NextResponse.json({ caption: "", tags: [] });
   }
 

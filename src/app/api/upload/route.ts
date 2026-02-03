@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase-server";
 import { rateLimit } from "@/lib/rate-limit";
+import { apiError } from "@/lib/error-messages";
 
 const MAX_SIZE = 10 * 1024 * 1024; // 10MB
 const ALLOWED_TYPES: Record<string, string> = {
@@ -18,36 +19,27 @@ export async function POST(request: Request) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return apiError("AUTH_REQUIRED", 401);
   }
 
   if (!rateLimit(`upload:${user.id}`, 20)) {
-    return NextResponse.json(
-      { error: "Too many uploads. Please wait a moment." },
-      { status: 429 }
-    );
+    return apiError("RATE_LIMITED", 429);
   }
 
   const formData = await request.formData();
   const file = formData.get("file") as File | null;
 
   if (!file) {
-    return NextResponse.json({ error: "No file provided" }, { status: 400 });
+    return apiError("INVALID_INPUT", 400, "No file provided.");
   }
 
   if (file.size > MAX_SIZE) {
-    return NextResponse.json(
-      { error: "File too large (max 10MB)" },
-      { status: 400 }
-    );
+    return apiError("FILE_TOO_LARGE", 400);
   }
 
   const ext = ALLOWED_TYPES[file.type];
   if (!ext) {
-    return NextResponse.json(
-      { error: "Unsupported file type" },
-      { status: 400 }
-    );
+    return apiError("INVALID_FILE_TYPE", 400);
   }
 
   const folder = `uploads/${user.id}`;
@@ -63,10 +55,7 @@ export async function POST(request: Request) {
 
   if (error) {
     console.error("Upload error:", error.message);
-    return NextResponse.json(
-      { error: "Failed to upload file" },
-      { status: 500 }
-    );
+    return apiError("UPLOAD_FAILED", 500);
   }
 
   const {

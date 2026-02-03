@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { createBrowserSupabase } from "@/lib/supabase";
+import { ERROR_MESSAGES } from "@/lib/error-messages";
 import { Button } from "@/components/ui/button";
 
 const DISMISS_KEY = "petmemorial-early-auth-dismissed";
@@ -61,7 +62,7 @@ export function EarlyAuthBanner({ petName, onAuthenticated }: EarlyAuthBannerPro
 
       if (authError) throw authError;
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
+      setError(err instanceof Error ? err.message : ERROR_MESSAGES.AUTH_FAILED.message);
       setGoogleLoading(false);
     }
   };

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase-server";
 import { getOrder } from "@/lib/gelato";
+import { apiError } from "@/lib/error-messages";
 
 export async function GET(
   _request: NextRequest,
@@ -13,7 +14,7 @@ export async function GET(
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return apiError("AUTH_REQUIRED", 401);
   }
 
   const { data: order } = await supabase
@@ -24,7 +25,7 @@ export async function GET(
     .single();
 
   if (!order) {
-    return NextResponse.json({ error: "Order not found" }, { status: 404 });
+    return apiError("MEMORIAL_NOT_FOUND", 404, "Order not found.");
   }
 
   // If order has a Gelato ID, fetch latest status

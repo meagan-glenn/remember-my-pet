@@ -646,7 +646,7 @@ function EditLoader() {
         loadFromMemorial(memorial);
       })
       .catch(() => {
-        setError("Couldn't load memorial. You may need to sign in.");
+        setError("Couldn't load your memorial. Please refresh the page or sign in again.");
       })
       .finally(() => setLoading(false));
   }, [editId, hydrated, memorialId, loadFromMemorial]);

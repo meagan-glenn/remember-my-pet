@@ -85,7 +85,7 @@ export default function CompilePage() {
       }
     } catch (err) {
       setStatus("failed");
-      setErrorMessage(err instanceof Error ? err.message : "Compilation failed");
+      setErrorMessage(err instanceof Error ? err.message : "The video couldn't be compiled. Your clips are saved.");
       setStatusText("");
     }
   }, [sortedClips, videos, memorialId, transition, setCompilationUrl]);
@@ -111,14 +111,14 @@ export default function CompilePage() {
         // Still processing, continue polling
       } catch (err) {
         setStatus("failed");
-        setErrorMessage(err instanceof Error ? err.message : "Compilation failed");
+        setErrorMessage(err instanceof Error ? err.message : "Connection lost. Your compilation may still be processing.");
         setStatusText("");
         return;
       }
     }
     // Timeout
     setStatus("failed");
-    setErrorMessage("Compilation timed out. Please try again.");
+    setErrorMessage("Compilation is taking longer than expected. Your clips are saved — please try again.");
     setStatusText("");
   }, [setCompilationUrl]);
 

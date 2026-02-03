@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { detectCrisisKeywords } from "@/lib/crisis-detection";
+import { ERROR_MESSAGES } from "@/lib/error-messages";
 import { EarlyAuthBanner } from "@/components/wizard/early-auth-banner";
 import type { SupportContextEntry } from "@/hooks/use-memorial-state";
 import { getPronouns } from "@/lib/pronouns";
@@ -123,7 +124,7 @@ export function StepTributeChat({
       }
     } catch (err) {
       setIsTyping(false);
-      setError(err instanceof Error ? err.message : "Something went wrong");
+      setError(err instanceof Error ? err.message : ERROR_MESSAGES.TRIBUTE_GENERATION_FAILED.message);
     } finally {
       setChatLoading(false);
     }
@@ -189,7 +190,7 @@ export function StepTributeChat({
       setShowRefinementInput(false);
       setRefinementFeedback("");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
+      setError(err instanceof Error ? err.message : ERROR_MESSAGES.TRIBUTE_GENERATION_FAILED.message);
     } finally {
       setGenerating(false);
     }

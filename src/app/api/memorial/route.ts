@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase-server";
 import { rateLimit } from "@/lib/rate-limit";
+import { apiError } from "@/lib/error-messages";
 
 const MAX_PET_NAME = 100;
 const MAX_TRIBUTE = 5000;
@@ -25,14 +26,11 @@ export async function POST(request: Request) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return apiError("AUTH_REQUIRED", 401);
   }
 
   if (!rateLimit(`memorial:${user.id}`, 10)) {
-    return NextResponse.json(
-      { error: "Too many requests. Please wait a moment." },
-      { status: 429 }
-    );
+    return apiError("RATE_LIMITED", 429);
   }
 
   const body = await request.json();
@@ -44,40 +42,25 @@ export async function POST(request: Request) {
 
   // Input validation
   if (!petName || typeof petName !== "string" || !tribute || typeof tribute !== "string") {
-    return NextResponse.json(
-      { error: "Missing required fields" },
-      { status: 400 }
-    );
+    return apiError("INVALID_INPUT", 400, "Pet name and tribute are required.");
   }
 
   if (petName.length > MAX_PET_NAME) {
-    return NextResponse.json(
-      { error: `Pet name must be under ${MAX_PET_NAME} characters` },
-      { status: 400 }
-    );
+    return apiError("INVALID_INPUT", 400, `Pet name must be under ${MAX_PET_NAME} characters.`);
   }
 
   if (tribute.length > MAX_TRIBUTE) {
-    return NextResponse.json(
-      { error: `Tribute must be under ${MAX_TRIBUTE} characters` },
-      { status: 400 }
-    );
+    return apiError("INVALID_INPUT", 400, `Tribute must be under ${MAX_TRIBUTE} characters.`);
   }
 
   // Validate photo URLs
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   if (photoItems.length > MAX_PHOTOS) {
-    return NextResponse.json(
-      { error: `Maximum ${MAX_PHOTOS} photos allowed` },
-      { status: 400 }
-    );
+    return apiError("INVALID_INPUT", 400, `Maximum ${MAX_PHOTOS} photos allowed.`);
   }
   for (const item of photoItems) {
     if (typeof item.url !== "string" || !supabaseUrl || !item.url.startsWith(supabaseUrl)) {
-      return NextResponse.json(
-        { error: "Invalid photo URL" },
-        { status: 400 }
-      );
+      return apiError("INVALID_INPUT", 400, "Invalid photo URL.");
     }
   }
 
@@ -109,7 +92,7 @@ export async function POST(request: Request) {
       .single();
 
     if (!existing || existing.user_id !== user.id) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return apiError("AUTH_REQUIRED", 403, "You don't have permission to edit this memorial.");
     }
 
     const { error: updateError } = await supabase
@@ -119,10 +102,7 @@ export async function POST(request: Request) {
 
     if (updateError) {
       console.error("Memorial update error:", updateError.message);
-      return NextResponse.json(
-        { error: "Failed to update memorial" },
-        { status: 500 }
-      );
+      return apiError("MEMORIAL_SAVE_FAILED", 500);
     }
 
     // Replace photos: delete old, insert new
@@ -179,10 +159,7 @@ export async function POST(request: Request) {
 
     if (memError) {
       console.error("Memorial creation error:", memError.message);
-      return NextResponse.json(
-        { error: "Failed to create memorial" },
-        { status: 500 }
-      );
+      return apiError("MEMORIAL_SAVE_FAILED", 500);
     }
 
     if (photoItems.length > 0) {

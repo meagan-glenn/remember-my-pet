@@ -9,6 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Camera, X, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { wordCount } from "@/lib/validation";
+import { ERROR_MESSAGES } from "@/lib/error-messages";
 import Image from "next/image";
 
 interface MemoryFormProps {
@@ -115,7 +116,9 @@ export function MemoryForm({ memorialId, petName, onSubmitted }: MemoryFormProps
       setSubmitted(true);
       onSubmitted?.();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Something went wrong");
+      toast.error(err instanceof Error ? err.message : ERROR_MESSAGES.MEMORY_SUBMIT_FAILED.message, {
+        duration: Infinity,
+      });
     } finally {
       setSubmitting(false);
     }

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase-server";
+import { apiError } from "@/lib/error-messages";
 
 export async function GET(request: Request) {
   const supabase = await createServerSupabase();
@@ -8,14 +9,14 @@ export async function GET(request: Request) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return apiError("AUTH_REQUIRED", 401);
   }
 
   const { searchParams } = new URL(request.url);
   const compilationId = searchParams.get("compilationId");
 
   if (!compilationId) {
-    return NextResponse.json({ error: "Missing compilationId" }, { status: 400 });
+    return apiError("INVALID_INPUT", 400, "Missing compilationId.");
   }
 
   const { data, error } = await supabase
@@ -25,7 +26,7 @@ export async function GET(request: Request) {
     .single();
 
   if (error || !data) {
-    return NextResponse.json({ error: "Compilation not found" }, { status: 404 });
+    return apiError("MEMORIAL_NOT_FOUND", 404, "Compilation not found.");
   }
 
   return NextResponse.json({

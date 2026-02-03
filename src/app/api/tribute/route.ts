@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase-server";
 import { rateLimit } from "@/lib/rate-limit";
+import { apiError } from "@/lib/error-messages";
 import Anthropic from "@anthropic-ai/sdk";
 import { getPronouns, type Gender } from "@/lib/pronouns";
 
@@ -18,27 +19,18 @@ export async function POST(request: Request) {
 
   const rateLimitKey = user ? `tribute:${user.id}` : `tribute:${request.headers.get("x-forwarded-for") || "anon"}`;
   if (!rateLimit(rateLimitKey, 5)) {
-    return NextResponse.json(
-      { error: "Too many requests. Please wait a moment." },
-      { status: 429 }
-    );
+    return apiError("RATE_LIMITED", 429);
   }
 
   const { petName, species, gender, birthDate, deathDate, chatHistory, mode, supportContext, previousTribute, refinementFeedback } =
     await request.json();
 
   if (!petName || typeof petName !== "string" || !Array.isArray(chatHistory) || !chatHistory.length) {
-    return NextResponse.json(
-      { error: "Missing required fields" },
-      { status: 400 }
-    );
+    return apiError("INVALID_INPUT", 400, "Missing required fields.");
   }
 
   if (petName.length > MAX_PET_NAME) {
-    return NextResponse.json(
-      { error: "Pet name is too long" },
-      { status: 400 }
-    );
+    return apiError("INVALID_INPUT", 400, "Pet name is too long.");
   }
 
   // Validate and truncate chat history
@@ -57,10 +49,7 @@ export async function POST(request: Request) {
     }));
 
   if (!sanitizedHistory.length) {
-    return NextResponse.json(
-      { error: "Missing required fields" },
-      { status: 400 }
-    );
+    return apiError("INVALID_INPUT", 400, "Missing required fields.");
   }
 
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
