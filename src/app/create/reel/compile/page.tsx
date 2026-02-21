@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useMemorialContext } from "@/contexts/memorial-state-context";
+import { AuthModal } from "@/components/wizard/auth-modal";
+import { createBrowserSupabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Clapperboard, Check, AlertCircle, Loader2 } from "lucide-react";
 
@@ -21,6 +23,8 @@ export default function CompilePage() {
     videoClips,
     compilationUrl,
     setCompilationUrl,
+    reorderVideos,
+    videoFilesRef,
     memorialId,
     hydrated,
   } = useMemorialContext();
@@ -30,6 +34,8 @@ export default function CompilePage() {
   const [statusText, setStatusText] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [resultUrl, setResultUrl] = useState(compilationUrl);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
   const sortedClips = [...videoClips].sort((a, b) => a.sortOrder - b.sortOrder);
 
@@ -38,24 +44,77 @@ export default function CompilePage() {
     0
   );
 
+  // Check auth on mount
+  useEffect(() => {
+    const supabase = createBrowserSupabase();
+    supabase.auth.getUser().then(({ data }) => {
+      setIsAuthenticated(!!data.user);
+    });
+  }, []);
+
+  /** Upload any videos still using blob URLs to Supabase. Returns updated URL map. */
+  const uploadBlobVideos = useCallback(async (): Promise<Map<string, string>> => {
+    const urlUpdates = new Map<string, string>();
+    const updatedVideos = [...videos];
+
+    for (let i = 0; i < updatedVideos.length; i++) {
+      const video = updatedVideos[i];
+      if (!video.url.startsWith("blob:")) continue;
+
+      const file = videoFilesRef.current.get(video.id);
+      if (!file) continue;
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await fetch("/api/upload-video", { method: "POST", body: formData });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        const msg = typeof data.error === "object" ? data.error?.message : data.error;
+        throw new Error(msg || "Video upload failed");
+      }
+
+      const { url } = await res.json();
+      urlUpdates.set(video.id, url);
+      updatedVideos[i] = { ...video, url };
+    }
+
+    if (urlUpdates.size > 0) {
+      reorderVideos(updatedVideos);
+    }
+
+    return urlUpdates;
+  }, [videos, videoFilesRef, reorderVideos]);
+
   const handleCompile = useCallback(async () => {
     if (sortedClips.length === 0) return;
+
+    // Require auth before compiling
+    if (!isAuthenticated) {
+      setShowAuthModal(true);
+      return;
+    }
 
     setStatus("compiling");
     setStatusText("Starting compilation...");
     setErrorMessage("");
 
-    // Build clip inputs with video URLs
-    const clipInputs = sortedClips.map((clip) => {
-      const video = videos.find((v) => v.id === clip.videoId);
-      return {
-        videoUrl: video?.url ?? "",
-        startTime: clip.startTime,
-        endTime: clip.endTime,
-      };
-    });
-
     try {
+      // Upload any local blob videos first
+      setStatusText("Uploading videos...");
+      const urlUpdates = await uploadBlobVideos();
+
+      // Build clip inputs with Supabase URLs
+      const clipInputs = sortedClips.map((clip) => {
+        const video = videos.find((v) => v.id === clip.videoId);
+        const videoUrl = urlUpdates.get(clip.videoId) ?? video?.url ?? "";
+        return {
+          videoUrl,
+          startTime: clip.startTime,
+          endTime: clip.endTime,
+        };
+      });
+
       setStatusText("Rendering video...");
       const res = await fetch("/api/compile-video", {
         method: "POST",
@@ -70,7 +129,8 @@ export default function CompilePage() {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || "Compilation failed");
+        const errorMsg = typeof data.error === "object" ? data.error?.message : data.error;
+        throw new Error(errorMsg || "Compilation failed");
       }
 
       if (data.status === "complete" && data.url) {
@@ -88,7 +148,7 @@ export default function CompilePage() {
       setErrorMessage(err instanceof Error ? err.message : "The video couldn't be compiled. Your clips are saved.");
       setStatusText("");
     }
-  }, [sortedClips, videos, memorialId, transition, setCompilationUrl]);
+  }, [sortedClips, videos, memorialId, transition, setCompilationUrl, isAuthenticated, uploadBlobVideos]);
 
   const pollStatus = useCallback(async (compilationId: string) => {
     const maxAttempts = 150; // 5 minutes at 2s interval
@@ -250,6 +310,18 @@ export default function CompilePage() {
           </Button>
         )}
       </div>
+
+      <AuthModal
+        open={showAuthModal}
+        title="Sign in to compile"
+        description="Create a free account to compile your video and save your memorial."
+        onClose={() => setShowAuthModal(false)}
+        onAuthenticated={() => {
+          setIsAuthenticated(true);
+          setShowAuthModal(false);
+          handleCompile();
+        }}
+      />
     </div>
   );
 }

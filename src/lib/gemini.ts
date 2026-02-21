@@ -1,18 +1,18 @@
-import { GoogleGenAI, createUserContent, createPartFromBase64 } from "@google/genai";
+import Anthropic from "@anthropic-ai/sdk";
 import { getPronouns, type Gender } from "@/lib/pronouns";
 
-const MODEL = "gemini-2.5-flash-lite";
+const MODEL = "claude-haiku-3-5-20241022";
 
-let _ai: GoogleGenAI | null = null;
+let _client: Anthropic | null = null;
 
-function getClient(): GoogleGenAI {
-  if (!_ai) {
-    if (!process.env.GOOGLE_AI_API_KEY) {
-      throw new Error("GOOGLE_AI_API_KEY is not set");
+function getClient(): Anthropic {
+  if (!_client) {
+    if (!process.env.ANTHROPIC_API_KEY) {
+      throw new Error("ANTHROPIC_API_KEY is not set");
     }
-    _ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_AI_API_KEY });
+    _client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
   }
-  return _ai;
+  return _client;
 }
 
 export interface PhotoMetadata {
@@ -28,8 +28,8 @@ export async function generatePhotoMetadata(
 ): Promise<PhotoMetadata> {
   const safeGender: Gender = typeof gender === "string" && ["male", "female", "neutral"].includes(gender) ? gender as Gender : undefined;
   const { subject, possessive } = getPronouns(safeGender);
-  const contents = createUserContent([
-    `Analyze this photo of a pet named ${petName} and return a JSON object with two fields. Use ${subject}/${possessive} pronouns when referring to ${petName}.
+
+  const prompt = `Analyze this photo of a pet named ${petName} and return a JSON object with two fields. Use ${subject}/${possessive} pronouns when referring to ${petName}.
 
 1. "caption": A short, warm sentence suitable for a memorial photo caption. Focus on what ${subject}'s doing or the setting. Use ${subject}/${possessive} pronouns naturally. Keep it under 150 characters. Do not use quotes or clichés like "rainbow bridge," "forever in our hearts," or "best friend."
 
@@ -41,16 +41,30 @@ export async function generatePhotoMetadata(
    Only include tags that clearly apply. Use 1-5 tags.
 
 Return ONLY valid JSON, no markdown fences. Example:
-{"caption": "Stretching out in a warm patch of sunlight", "tags": ["sunny_spot", "indoor", "senior"]}`,
-    createPartFromBase64(imageBase64, mimeType),
-  ]);
+{"caption": "Stretching out in a warm patch of sunlight", "tags": ["sunny_spot", "indoor", "senior"]}`;
 
-  const response = await getClient().models.generateContent({
+  const response = await getClient().messages.create({
     model: MODEL,
-    contents,
+    max_tokens: 256,
+    messages: [
+      {
+        role: "user",
+        content: [
+          {
+            type: "image",
+            source: {
+              type: "base64",
+              media_type: mimeType as "image/jpeg" | "image/png" | "image/webp" | "image/gif",
+              data: imageBase64,
+            },
+          },
+          { type: "text", text: prompt },
+        ],
+      },
+    ],
   });
 
-  const text = response.text?.trim() || "";
+  const text = response.content[0].type === "text" ? response.content[0].text.trim() : "";
 
   try {
     const parsed = JSON.parse(text);

@@ -157,7 +157,6 @@ export function useMemorialState() {
               species: normalizedSpecies || loaded.petDetails.species,
               gender: seed.gender || undefined,
             };
-            loaded.introComplete = true;
             setCameFromSeed(true);
           }
           // Store homepage conversation for tribute integration

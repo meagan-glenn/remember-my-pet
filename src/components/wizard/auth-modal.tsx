@@ -18,9 +18,11 @@ interface AuthModalProps {
   open: boolean;
   onAuthenticated: () => void;
   onClose?: () => void;
+  title?: string;
+  description?: string;
 }
 
-export function AuthModal({ open, onAuthenticated, onClose }: AuthModalProps) {
+export function AuthModal({ open, onAuthenticated, onClose, title, description }: AuthModalProps) {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
@@ -69,12 +71,12 @@ export function AuthModal({ open, onAuthenticated, onClose }: AuthModalProps) {
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-center">
-            {sent ? "Check your email" : "Save your progress"}
+            {sent ? "Check your email" : (title ?? "Save your progress")}
           </DialogTitle>
           <DialogDescription className="text-center">
             {sent
-              ? `We sent a sign-in link to ${email}. Click it to continue creating your tribute.`
-              : "Enter your email to generate your tribute and save your memorial."}
+              ? `We sent a sign-in link to ${email}. Click it to continue.`
+              : (description ?? "Enter your email to generate your tribute and save your memorial.")}
           </DialogDescription>
         </DialogHeader>
 

@@ -14,6 +14,9 @@ import {
   PawPrint,
   Camera,
   Check,
+  ShieldCheck,
+  Ban,
+  Globe,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -257,7 +260,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50/60 via-orange-50/30 to-white">
       {/* Hero Section */}
-      <section className="flex flex-col items-center justify-center px-4 pt-10 pb-6 md:pt-14 md:pb-8">
+      <section className="flex flex-col items-center justify-center px-4 pt-10 pb-2 md:pt-14 md:pb-4">
         <AnimatePresence mode="wait">
           {!started ? (
             <motion.div
@@ -321,7 +324,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
-              className="mx-auto w-full max-w-md"
+              className="mx-auto w-full max-w-xl"
             >
               <div className="rounded-2xl border border-amber-100 bg-white/80 p-6 shadow-sm backdrop-blur-sm">
                 <div className="mb-4 text-center">
@@ -514,6 +517,8 @@ export default function Home() {
                 )}
                 <Link
                   href="/demo"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="mt-4 block text-center text-sm text-amber-600 hover:text-amber-700 transition-colors"
                 >
                   Want to see what a memorial looks like first? View an example →
@@ -532,7 +537,7 @@ export default function Home() {
       </section>
 
       {/* Below-fold content */}
-      <section className="px-4 py-10 sm:py-12">
+      <section className="px-4 py-6 sm:py-8">
             <div className="mx-auto max-w-4xl">
               <h2 className="text-center font-serif text-3xl font-medium text-gray-900 md:text-4xl">
                 Everything you need to honor their memory
@@ -563,7 +568,7 @@ export default function Home() {
       </section>
 
       {/* Example Memorial */}
-          <section className="px-4 py-10 sm:py-12 bg-amber-50/40">
+          <section className="px-4 py-6 sm:py-8 bg-amber-50/40">
             <div className="mx-auto max-w-3xl text-center">
               <h2 className="font-serif text-3xl font-medium text-gray-900 md:text-4xl">
                 See what a memorial looks like
@@ -582,7 +587,7 @@ export default function Home() {
           </section>
 
           {/* Pricing */}
-          <section id="pricing" className="px-4 py-10 sm:py-12">
+          <section id="pricing" className="px-4 py-6 sm:py-8">
             <div className="mx-auto max-w-3xl">
               <h2 className="text-center font-serif text-3xl font-medium text-gray-900 md:text-4xl">
                 Simple, one-time pricing
@@ -660,10 +665,14 @@ export default function Home() {
 
               <div className="mt-12 flex flex-wrap items-center justify-center gap-6 text-sm text-gray-400">
                 <span className="flex items-center gap-1.5">
-                  <Camera className="h-4 w-4" /> Your photos stay private
+                  <ShieldCheck className="h-4 w-4" /> Your photos stay private
                 </span>
-                <span>No pressure, no timers</span>
-                <span>Hosted forever</span>
+                <span className="flex items-center gap-1.5">
+                  <Ban className="h-4 w-4" /> No pressure, no timers
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <Globe className="h-4 w-4" /> Hosted forever
+                </span>
               </div>
             </div>
       </section>

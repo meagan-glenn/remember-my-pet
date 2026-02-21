@@ -67,7 +67,7 @@ export function MasonryWall({
     <div className="space-y-0">
       {/* Photos & Video */}
       {mediaCards.length > 0 && (
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
+        <div className="columns-2 gap-3 md:columns-4 md:gap-4 [&>*]:mb-3 [&>*]:break-inside-avoid md:[&>*]:mb-4">
           {mediaCards.map((card, i) => (
             <WallCardRenderer key={card.id} card={card} index={i} petName={petName} />
           ))}

@@ -45,16 +45,19 @@ npm run lint     # Run ESLint
 - **Deferred upload**: On save → upload files to `/api/upload` → get Supabase URLs → POST to `/api/memorial`. URL validation rejects non-Supabase URLs.
 - **Pre-moderation**: Memory wall contributions default to pending. Owner approves/edits/deletes from dashboard.
 - **AI prompt philosophy**: "Friend at the kitchen table" framing. Emotional register matching, specific reactions (not generic), grief-bleed handling. Banned phrases: "Thank you for sharing," "What a special bond," "crossed the rainbow bridge," "forever in our hearts," "healing journey," "processing." See `src/lib/tribute-prompts.ts`.
+- **Pronoun system**: Gender-aware pronouns throughout UI via `src/lib/pronouns.ts`. Pets have a `gender` field (male/female/neutral) that drives he/she/they pronouns in tributes, captions, and memorial pages.
 - **State management**: `useMemorialState` hook with localStorage persistence. Wizard seed from homepage stored as `petmemorial-wizard-seed`.
+- **Error handling**: Centralized error messages in `src/lib/error-messages.ts`. API routes return structured `{ error: { code, message, recoverable } }` via `apiError()` helper. Client-side errors use specific copy from `ERROR_MESSAGES` — error toasts use `duration: Infinity` (user must dismiss), non-critical toasts (candle) use `duration: 4000`. Offline detection via `src/components/offline-banner.tsx`. Top-level error boundary in `src/app/error.tsx`.
 
 ### Database Schema (Key Tables)
 
 ```sql
 users: id (references auth.users), email, created_at
-memorials: id, user_id, pet_name, slug, birth_date, death_date, tribute, decision_support_used, template, is_paid, is_published, auto_approve_memories, created_at, updated_at
+memorials: id, user_id, pet_name, gender, species, custom_species, slug, birth_date, death_date, tribute, decision_support_used, template, is_paid, is_published, auto_approve_memories, created_at, updated_at
 photos: id, memorial_id, url, caption, ai_detected_tags, sort_order, uploaded_by, created_at
 memories: id, memorial_id, contributor_name, contributor_email, content, photo_urls, is_approved, moderation_status, created_at, approved_at
 contributors: id, memorial_id, email, name, became_creator, created_at
+candles: id, memorial_id, user_id, created_at, unique(memorial_id, user_id) — "Light a Candle" reactions
 videos, video_clips, video_compilations — see supabase/migrations/002_video_tables.sql
 product_orders — see Gelato migration
 ```
@@ -66,7 +69,7 @@ product_orders — see Gelato migration
 | `/api/tribute` | POST | Generate tribute (Claude Haiku), accepts `mode` + `supportContext` |
 | `/api/tribute/chat` | POST | Conversational AI chat, returns `{ reply, readyForTribute }` |
 | `/api/tribute/support` | POST | Decision support reframing (rate limit 3/min) |
-| `/api/memorial` | POST | Create/save memorial |
+| `/api/memorial` | POST | Create or update memorial (upsert by `id`) |
 | `/api/upload` | POST | Upload photos to Supabase storage |
 | `/api/upload-video` | POST | Upload videos (rate limit 5/window) |
 | `/api/compile-video` | POST | FFmpeg server-side compilation (300s max) |
@@ -78,6 +81,8 @@ product_orders — see Gelato migration
 | `/api/webhooks/stripe` | POST | Stripe webhook (signature verified) |
 | `/api/caption` | POST | AI photo caption via Gemini 2.5 Flash Lite (rate limit 20/min) |
 | `/api/homepage/chat` | POST | AI-driven homepage mini-conversation |
+| `/api/candles` | GET | Get candle count + whether current user has lit |
+| `/api/candles` | POST | Toggle candle (light/unlight), auth required |
 | `/api/gelato/*` | Various | Print-on-demand preview/order/status/webhook |
 
 ## Critical Product Constraints
@@ -99,16 +104,19 @@ product_orders — see Gelato migration
 - Homepage with AI-driven conversational entry flow (name → species → memory → redirect to `/create`)
 - AI tribute chat — unified single conversation flow (no mode selection), with tribute refinement based on user feedback
 - Decision support integrated into chat flow, crisis detection, support→celebrate transition
-- Public memorial page (`/[slug]`) with hero, tribute, photo gallery, video embed, memory wall, OG meta, print CSS
+- Public memorial page (`/[slug]`) with hero, tribute, photo gallery, video embed, Kudoboard-inspired memory wall (interleaved photos/videos/text via `src/lib/interleave-wall-content.ts`), OG meta, print CSS
+- Memorial edit mode — load existing memorial from API, edit all fields, and update (PUT to `/api/memorial`)
 - Dashboard with memorial listing, moderation queue, status badges
 - Video upload, clipper, FFmpeg compilation, status polling
 - Memory wall (submission, moderation, email notifications via Resend)
 - Photo captions (user-editable, 200 char max; AI auto-generated via Gemini 2.5 Flash Lite on upload) with AI vision tags (`ai_detected_tags`) for life stage, habits, connection moments, and settings
+- "Light a Candle" reactions on memorial pages (toggle, one per user, optimistic UI, auth required to light)
 - Gelato print-on-demand (shop page at `/[slug]/shop`, webhook with HMAC verification)
 - Stripe checkout (Basic $49 / Premium $99, webhook for payment/refund)
 - Image crop modal for photo editing
 - Demo memorial page (`/demo`)
 - Legal pages (`/privacy`, `/terms`) and site footer
+- Centralized error UX — user-friendly recovery messages, offline banner, error boundary, structured API errors
 - Shadcn/ui components: button, input, label, card, textarea, dialog, separator, tabs, avatar, sonner, dropdown-menu, badge, progress
 
 ## Not Yet Built

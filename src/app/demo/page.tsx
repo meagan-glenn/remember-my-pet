@@ -67,8 +67,9 @@ export default function DemoPage() {
             src="/demo/hero.jpg"
             alt="Buddy the golden retriever"
             fill
-            className="object-cover object-[center_25%]"
+            className="object-cover object-center"
             priority
+            unoptimized
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
           <div className="absolute inset-0 flex flex-col items-center justify-end pb-10">
@@ -89,44 +90,22 @@ export default function DemoPage() {
         </p>
       </section>
 
-      {/* Tribute + Side Photos */}
+      {/* Tribute */}
       <section className="mx-auto max-w-6xl px-4 pb-3 sm:px-6">
-        <div className="flex flex-col gap-3 md:flex-row md:items-stretch md:gap-4">
-          {/* Tribute */}
-          <div className="flex-1 rounded-2xl border-l-4 border-l-amber-700 border border-amber-100 bg-amber-50/50 p-6 shadow-sm backdrop-blur-sm sm:p-8">
-            <h2 className="mb-4 font-serif text-2xl font-medium text-gray-900">
-              A Tribute
-            </h2>
-            <div className="whitespace-pre-line text-base leading-relaxed text-gray-700">
-              {DEMO_TRIBUTE}
-            </div>
-          </div>
-          {/* Side photos */}
-          <div className="flex gap-3 md:w-80 md:shrink-0 md:flex-col">
-            {DEMO_PHOTOS.slice(0, 2).map((photo, i) => (
-              <div key={i} className="overflow-hidden rounded-2xl border border-amber-100 bg-white/80 shadow-sm">
-                <div className="relative aspect-square">
-                  <Image
-                    src={photo.src}
-                    alt={photo.caption}
-                    fill
-                    sizes="(max-width: 768px) 50vw, 320px"
-                    className="object-cover"
-                  />
-                </div>
-                {photo.caption && (
-                  <p className="px-3 py-2 text-xs italic text-gray-500">{photo.caption}</p>
-                )}
-              </div>
-            ))}
+        <div className="rounded-2xl border-l-4 border-l-amber-700 border border-amber-100 bg-amber-50/50 p-6 shadow-sm backdrop-blur-sm sm:p-8">
+          <h2 className="mb-4 font-serif text-2xl font-medium text-gray-900">
+            A Tribute
+          </h2>
+          <div className="whitespace-pre-line text-base leading-relaxed text-gray-700">
+            {DEMO_TRIBUTE}
           </div>
         </div>
       </section>
 
-      {/* Masonry Wall (remaining photos + memories) */}
+      {/* Masonry Wall (all photos + memories) */}
       <section className="mx-auto max-w-6xl px-4 pb-12 sm:px-6">
         <MasonryWall
-          photos={DEMO_PHOTOS.slice(2)}
+          photos={DEMO_PHOTOS}
           memories={DEMO_MEMORIES}
           petName="Buddy"
         />

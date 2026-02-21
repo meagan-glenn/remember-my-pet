@@ -5,7 +5,7 @@ import { apiError } from "@/lib/error-messages";
 
 const MAX_PET_NAME = 100;
 const MAX_TRIBUTE = 5000;
-const MAX_PHOTOS = 20;
+const MAX_PHOTOS = 30;
 const MAX_SLUG_ATTEMPTS = 10;
 
 function generateSlug(petName: string, ownerLastName: string, deathDate: string | null): string {

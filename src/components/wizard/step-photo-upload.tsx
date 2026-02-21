@@ -31,7 +31,7 @@ interface StepPhotoUploadProps {
   gender?: "male" | "female" | "neutral";
 }
 
-const MAX_PHOTOS = 20;
+const MAX_PHOTOS = 30;
 const MAX_SIZE_MB = 10;
 const ACCEPTED_TYPES = [
   "image/jpeg",
@@ -115,9 +115,13 @@ export function StepPhotoUpload({
       if (!files) return;
       setError("");
       const remaining = MAX_PHOTOS - photos.length;
+      if (remaining <= 0) {
+        setError(`You've reached the ${MAX_PHOTOS} photo limit.`);
+        return;
+      }
       const batch = Array.from(files).slice(0, remaining);
       if (files.length > remaining) {
-        setError(`Only ${remaining} more photo(s) allowed`);
+        setError(`You can only add ${remaining} more photo${remaining === 1 ? "" : "s"} (${MAX_PHOTOS} max).`);
       }
       batch.forEach((file) => addLocalFile(file));
     },
