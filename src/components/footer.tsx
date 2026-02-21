@@ -48,12 +48,22 @@ export function Footer() {
             <h3 className="text-sm font-semibold text-gray-800">Company</h3>
             <ul className="mt-3 space-y-2 text-sm text-gray-500">
               <li>
+                <Link href="/blog" className="hover:text-amber-600 transition-colors">
+                  Blog
+                </Link>
+              </li>
+              <li>
                 <a
                   href="mailto:teamremembermypet@gmail.com"
                   className="hover:text-amber-600 transition-colors"
                 >
                   Contact
                 </a>
+              </li>
+              <li>
+                <Link href="/ai-info" className="hover:text-amber-600 transition-colors">
+                  AI Info
+                </Link>
               </li>
             </ul>
           </div>
