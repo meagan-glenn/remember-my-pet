@@ -31,11 +31,6 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/#pricing" className="hover:text-amber-600 transition-colors">
-                  Pricing
-                </Link>
-              </li>
-              <li>
                 <Link href="/demo" className="hover:text-amber-600 transition-colors">
                   See an Example
                 </Link>
@@ -86,9 +81,20 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-10 border-t border-amber-100/60 pt-6 text-center text-xs text-gray-400">
-          &copy; {new Date().getFullYear()} RememberMyPet.ai. All rights
-          reserved.
+        <div className="mt-10 border-t border-amber-100/60 pt-6 text-center space-y-3">
+          <p className="text-sm text-gray-500">
+            RememberMyPet is free while we&apos;re getting started. If it helped, a{" "}
+            <a
+              href="#support"
+              className="text-amber-600 hover:text-amber-700 underline underline-offset-2"
+            >
+              small tip goes a long way
+            </a>
+          </p>
+          <p className="text-xs text-gray-400">
+            &copy; {new Date().getFullYear()} RememberMyPet.ai. All rights
+            reserved.
+          </p>
         </div>
       </div>
     </footer>

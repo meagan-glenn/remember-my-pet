@@ -9,11 +9,10 @@ import {
   Heart,
   Users,
   Film,
-  ShoppingBag,
   ArrowRight,
   PawPrint,
   Camera,
-  Check,
+  HeartHandshake,
   ShieldCheck,
   Ban,
   Globe,
@@ -81,35 +80,14 @@ const FEATURES = [
     description:
       "Turn your photos and clips into a beautiful keepsake video to share or keep forever.",
   },
+  {
+    icon: HeartHandshake,
+    title: "Not Ready Yet? That's Okay.",
+    description:
+      "If you're carrying guilt, regret, or 'what-ifs' about how it ended, start here. A gentle space to work through those feelings before you celebrate.",
+  },
 ];
 
-const PRICING_TIERS = [
-  {
-    name: "Basic",
-    price: "$49",
-    description: "Everything you need to honor their memory",
-    features: [
-      "AI-written tribute",
-      "Photo gallery with captions",
-      "Your memorial page, always online",
-      "Shareable link",
-      "Memory wall for friends & family",
-    ],
-  },
-  {
-    name: "Premium",
-    price: "$99",
-    description: "The complete memorial experience",
-    features: [
-      "Everything in Basic",
-      "Video reel compilation",
-      "Printed memory book",
-      "Canvas print",
-      "Priority support",
-    ],
-    popular: true,
-  },
-];
 
 export default function Home() {
   const router = useRouter();
@@ -552,10 +530,12 @@ export default function Home() {
               </p>
 
               <div className="mt-12 grid gap-6 sm:grid-cols-2">
-                {FEATURES.map((feature) => (
+                {FEATURES.map((feature, i) => (
                   <div
                     key={feature.title}
-                    className="rounded-2xl border border-amber-100 bg-white/60 p-6"
+                    className={`rounded-2xl border border-amber-100 bg-white/60 p-6 ${
+                      i === FEATURES.length - 1 ? "sm:col-span-2 sm:max-w-md sm:mx-auto" : ""
+                    }`}
                   >
                     <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-amber-50">
                       <feature.icon className="h-5 w-5 text-amber-600" />
@@ -566,6 +546,15 @@ export default function Home() {
                     <p className="mt-2 text-sm leading-relaxed text-gray-500">
                       {feature.description}
                     </p>
+                    {i === FEATURES.length - 1 && (
+                      <Link
+                        href="/support"
+                        className="mt-3 inline-flex items-center gap-1 text-sm text-amber-600 hover:text-amber-700 underline underline-offset-2"
+                      >
+                        Talk it through first
+                        <ArrowRight className="h-3.5 w-3.5" />
+                      </Link>
+                    )}
                   </div>
                 ))}
               </div>
@@ -588,72 +577,6 @@ export default function Home() {
                 View example memorial
                 <ArrowRight className="h-4 w-4" />
               </Link>
-            </div>
-          </section>
-
-          {/* Pricing */}
-          <section id="pricing" className="px-4 py-6 sm:py-8">
-            <div className="mx-auto max-w-3xl">
-              <h2 className="text-center font-serif text-3xl font-medium text-gray-900 md:text-4xl">
-                Simple, one-time pricing
-              </h2>
-              <p className="mt-4 text-center text-gray-500">
-                No subscriptions. One payment, always online.
-              </p>
-
-              <div className="mt-12 grid gap-6 sm:grid-cols-2">
-                {PRICING_TIERS.map((tier) => (
-                  <div
-                    key={tier.name}
-                    className={`relative rounded-2xl border p-6 sm:p-8 ${
-                      tier.popular
-                        ? "border-amber-300 bg-amber-50/50 shadow-md"
-                        : "border-amber-100 bg-white/60"
-                    }`}
-                  >
-                    {tier.popular && (
-                      <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-amber-600 px-3 py-0.5 text-xs font-medium text-white">
-                        Most Popular
-                      </span>
-                    )}
-                    <h3 className="font-serif text-xl font-medium text-gray-900">
-                      {tier.name}
-                    </h3>
-                    <p className="mt-1 text-sm text-gray-500">
-                      {tier.description}
-                    </p>
-                    <p className="mt-4">
-                      <span className="text-4xl font-semibold text-gray-900">
-                        {tier.price}
-                      </span>
-                      <span className="ml-1 text-sm text-gray-400">
-                        one-time
-                      </span>
-                    </p>
-                    <ul className="mt-6 space-y-3">
-                      {tier.features.map((feature) => (
-                        <li
-                          key={feature}
-                          className="flex items-start gap-2 text-sm text-gray-600"
-                        >
-                          <Check className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
-                          {feature}
-                        </li>
-                      ))}
-                    </ul>
-                    <Button
-                      onClick={() => router.push("/create")}
-                      className={`mt-8 w-full h-12 rounded-full text-base font-medium ${
-                        tier.popular
-                          ? "bg-amber-600 hover:bg-amber-700"
-                          : "bg-gray-900 hover:bg-gray-800"
-                      }`}
-                    >
-                      Get started
-                    </Button>
-                  </div>
-                ))}
-              </div>
             </div>
           </section>
 

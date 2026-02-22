@@ -5,7 +5,7 @@ import { FeatureCard } from "@/components/workspace/feature-card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ImagePlus, X, Camera, PenLine, Film, Eye, Check } from "lucide-react";
+import { ImagePlus, X, Camera, PenLine, Film, Eye, Check, HeartHandshake } from "lucide-react";
 import Link from "next/link";
 import { useState, useRef, useCallback, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
@@ -264,6 +264,7 @@ function Dashboard() {
     setHeroPhotoFile,
     cameFromSeed,
     lastSaved,
+    supportContext,
     hydrated,
   } = useMemorialContext();
   const [editingDetails, setEditingDetails] = useState(false);
@@ -308,8 +309,13 @@ function Dashboard() {
       ? "complete" as const
       : "in-progress" as const;
 
+  const supportStatus = supportContext.length === 0
+    ? "Not started"
+    : `${supportContext.length} concern${supportContext.length !== 1 ? "s" : ""} addressed`;
+  const supportStatusType = supportContext.length === 0 ? "not-started" as const : "complete" as const;
+
   return (
-    <div className={`py-8 px-4 ${photoCount > 0 || !tributeNotStarted || videos.length > 0 || compilationUrl ? "pb-28" : "pb-8"}`}>
+    <div className={`py-8 px-4 ${photoCount > 0 || !tributeNotStarted || videos.length > 0 || compilationUrl || supportContext.length > 0 ? "pb-28" : "pb-8"}`}>
       <div className="mx-auto max-w-lg space-y-8">
         {/* Pet details header */}
         <div className="text-center space-y-1">
@@ -383,6 +389,14 @@ function Dashboard() {
         {/* Feature cards */}
         <div className="space-y-3">
           <FeatureCard
+            title="Work Through the Hard Stuff"
+            description="If you're carrying guilt or 'what-ifs,' start here first"
+            status={supportStatus}
+            statusType={supportStatusType}
+            href="/create/support"
+            icon={<HeartHandshake className="h-6 w-6" />}
+          />
+          <FeatureCard
             title="Upload Photos"
             description="Add photos to the memorial gallery"
             status={photoStatus}
@@ -422,7 +436,7 @@ function Dashboard() {
       </div>
 
       {/* Sticky save bar — only show after user has started at least one section */}
-      {(photoCount > 0 || !tributeNotStarted || videos.length > 0 || compilationUrl) ? (
+      {(photoCount > 0 || !tributeNotStarted || videos.length > 0 || compilationUrl || supportContext.length > 0) ? (
         <div className="fixed bottom-0 left-0 right-0 border-t border-gray-200 bg-white/95 backdrop-blur-sm px-4 py-4">
           <div className="mx-auto max-w-lg">
             <Link href="/create/preview">
@@ -436,7 +450,8 @@ function Dashboard() {
       ) : (
         <div className="mt-8 text-center space-y-3">
           <p className="text-sm text-gray-400">
-            Most people start with photos — it&apos;s the gentlest way to begin.
+            Not sure where to start? If you&apos;re carrying something heavy, try
+            &ldquo;Work Through the Hard Stuff&rdquo; first. Otherwise, most people begin with photos.
           </p>
           <Link href="/demo" className="text-sm text-amber-600 hover:text-amber-700 underline underline-offset-2">
             Want to see what a finished memorial looks like? View example →

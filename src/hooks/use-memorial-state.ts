@@ -169,6 +169,10 @@ export function useMemorialState() {
               { role: "user" as const, content: seed.memory },
             ];
           }
+          // Carry over support context from standalone support page
+          if (Array.isArray(seed.supportContext) && seed.supportContext.length > 0) {
+            loaded.supportContext = seed.supportContext;
+          }
         }
       } catch {
         // ignore malformed seed
