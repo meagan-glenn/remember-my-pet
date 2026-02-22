@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase-server";
+import { createServiceClient } from "@/lib/supabase";
 import { rateLimit } from "@/lib/rate-limit";
 import { apiError } from "@/lib/error-messages";
 
@@ -46,7 +47,8 @@ export async function POST(request: Request) {
   const path = `${folder}/${Date.now()}.${ext}`;
 
   const arrayBuffer = await file.arrayBuffer();
-  const { error } = await supabase.storage
+  const storage = createServiceClient();
+  const { error } = await storage.storage
     .from("memorial-photos")
     .upload(path, arrayBuffer, {
       contentType: file.type,
@@ -60,7 +62,7 @@ export async function POST(request: Request) {
 
   const {
     data: { publicUrl },
-  } = supabase.storage.from("memorial-photos").getPublicUrl(path);
+  } = storage.storage.from("memorial-photos").getPublicUrl(path);
 
   return NextResponse.json({ url: publicUrl });
 }

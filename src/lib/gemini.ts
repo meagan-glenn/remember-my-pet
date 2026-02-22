@@ -1,7 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { getPronouns, type Gender } from "@/lib/pronouns";
 
-const MODEL = "claude-haiku-3-5-20241022";
+const MODEL = "claude-haiku-4-5-20251001";
 
 let _client: Anthropic | null = null;
 
@@ -29,9 +29,9 @@ export async function generatePhotoMetadata(
   const safeGender: Gender = typeof gender === "string" && ["male", "female", "neutral"].includes(gender) ? gender as Gender : undefined;
   const { subject, possessive } = getPronouns(safeGender);
 
-  const prompt = `Analyze this photo of a pet named ${petName} and return a JSON object with two fields. Use ${subject}/${possessive} pronouns when referring to ${petName}.
+  const prompt = `Analyze this photo of a pet named ${petName} and return a JSON object with two fields. If you need a pronoun, use ${subject}/${possessive}.
 
-1. "caption": A short, warm sentence suitable for a memorial photo caption. Focus on what ${subject}'s doing or the setting. Use ${subject}/${possessive} pronouns naturally. Keep it under 150 characters. Do not use quotes or clichés like "rainbow bridge," "forever in our hearts," or "best friend."
+1. "caption": A short, warm sentence for a memorial photo caption. Describe only what's visible — the activity, expression, or setting. Prefer using ${petName}'s name over pronouns. Do not narrate emotions, relationships, or what anyone is feeling (e.g. avoid "loved," "someone she loves," "favorite person"). Vary your sentence structure. Keep it under 150 characters. No clichés like "rainbow bridge," "forever in our hearts," or "best friend."
 
 2. "tags": An array of relevant tags from these categories:
    - Life stage: "puppy", "kitten", "young", "adult", "senior"
@@ -41,7 +41,7 @@ export async function generatePhotoMetadata(
    Only include tags that clearly apply. Use 1-5 tags.
 
 Return ONLY valid JSON, no markdown fences. Example:
-{"caption": "Stretching out in a warm patch of sunlight", "tags": ["sunny_spot", "indoor", "senior"]}`;
+{"caption": "Stretching out in a warm patch of afternoon sunlight", "tags": ["sunny_spot", "indoor", "senior"]}`;
 
   const response = await getClient().messages.create({
     model: MODEL,
@@ -64,7 +64,9 @@ Return ONLY valid JSON, no markdown fences. Example:
     ],
   });
 
-  const text = response.content[0].type === "text" ? response.content[0].text.trim() : "";
+  const raw = response.content[0].type === "text" ? response.content[0].text.trim() : "";
+  // Strip markdown code fences if present (e.g. ```json ... ```)
+  const text = raw.replace(/^```(?:json)?\s*\n?/i, "").replace(/\n?```\s*$/i, "").trim();
 
   try {
     const parsed = JSON.parse(text);
