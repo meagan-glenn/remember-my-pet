@@ -111,15 +111,12 @@ export function StepDecisionSupport({
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="text-center space-y-3">
+      <div className="text-center space-y-2">
         <h1 className="font-serif text-2xl font-medium text-gray-900">
           You don&apos;t have to be ready yet
         </h1>
-        <p className="text-gray-500 leading-relaxed">
-          Sometimes before we can celebrate who they were, we need to sit with
-          how it ended. If you&apos;re carrying guilt, regret, or
-          &ldquo;what-ifs&rdquo; about {petName}, this is a safe place to say it
-          out loud.
+        <p className="text-gray-500 text-sm">
+          If something about {petName} is weighing on you, say it here first.
         </p>
       </div>
 
