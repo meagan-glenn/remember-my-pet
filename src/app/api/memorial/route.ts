@@ -34,7 +34,7 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json();
-  const { petName, species, customSpecies, gender, birthDate, deathDate, tribute, ownerLastName, memorialId, heroPhotoCropY } = body;
+  const { petName, species, customSpecies, gender, birthDate, deathDate, tribute, ownerLastName, memorialId, heroPhotoCropY, publish, showInFeed } = body;
   // Support both new { url, caption, aiDetectedTags } format and legacy string[] format
   const photoItems: { url: string; caption?: string; aiDetectedTags?: string[] }[] = body.photos
     ? body.photos.map((p: { url: string; caption?: string; aiDetectedTags?: string[] }) => p)
@@ -87,7 +87,7 @@ export async function POST(request: Request) {
     // Verify ownership
     const { data: existing } = await supabase
       .from("memorials")
-      .select("id, slug, user_id")
+      .select("id, slug, user_id, is_published")
       .eq("id", memorialId)
       .single();
 
@@ -95,9 +95,22 @@ export async function POST(request: Request) {
       return apiError("AUTH_REQUIRED", 403, "You don't have permission to edit this memorial.");
     }
 
+    const updateFields: Record<string, unknown> = { ...memorialFields };
+
+    // Publish a draft memorial
+    if (publish && !existing.is_published) {
+      updateFields.is_paid = true;
+      updateFields.is_published = true;
+    }
+
+    // Set feed visibility (on publish or on update of published memorial)
+    if (typeof showInFeed === "boolean") {
+      updateFields.show_in_feed = showInFeed;
+    }
+
     const { error: updateError } = await supabase
       .from("memorials")
-      .update(memorialFields)
+      .update(updateFields)
       .eq("id", memorialId);
 
     if (updateError) {
@@ -151,8 +164,9 @@ export async function POST(request: Request) {
         user_id: user.id,
         ...memorialFields,
         slug,
-        is_paid: false,
-        is_published: false,
+        is_paid: !!publish,
+        is_published: !!publish,
+        show_in_feed: !!publish && !!showInFeed,
       })
       .select()
       .single();

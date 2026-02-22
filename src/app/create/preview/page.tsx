@@ -3,8 +3,8 @@
 import { useMemorialContext } from "@/contexts/memorial-state-context";
 import { StepPreview } from "@/components/wizard/step-preview";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
-import { PricingCards } from "@/components/checkout/pricing-cards";
+import { ArrowLeft, Check } from "lucide-react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -23,6 +23,22 @@ function PreviewContent() {
     id: string;
     slug: string;
   } | null>(null);
+  const [showInFeed, setShowInFeed] = useState(false);
+  const showInFeedInitialized = useRef(false);
+
+  // Initialize showInFeed from existing memorial when editing
+  useEffect(() => {
+    if (!ctx.memorialId || !ctx.hydrated || showInFeedInitialized.current) return;
+    showInFeedInitialized.current = true;
+    fetch(`/api/memorial/${ctx.memorialId}`)
+      .then((res) => res.ok ? res.json() : null)
+      .then((data) => {
+        if (data?.memorial?.show_in_feed) {
+          setShowInFeed(true);
+        }
+      })
+      .catch(() => {});
+  }, [ctx.memorialId, ctx.hydrated]);
 
   const uploadFile = useCallback(async (file: File): Promise<string> => {
     const formData = new FormData();
@@ -31,7 +47,7 @@ function PreviewContent() {
     if (res.status === 401) throw new Error("__AUTH_REQUIRED__");
     if (!res.ok) {
       const data = await res.json();
-      throw new Error(data.error || "Upload failed");
+      throw new Error(data.error?.message || data.error || "Upload failed");
     }
     const { url } = await res.json();
     return url;
@@ -91,17 +107,19 @@ function PreviewContent() {
         tribute: ctx.generatedTribute,
         heroPhotoCropY: ctx.petDetails.heroPhotoCropY ?? 50,
         photos,
+        publish: true,
+        showInFeed,
       }),
     });
 
     if (!res.ok) {
       const data = await res.json();
-      throw new Error(data.error || "Failed to save memorial");
+      throw new Error(data.error?.message || data.error || "Failed to save memorial");
     }
 
     const { memorialId, slug } = await res.json();
     setSavedMemorial({ id: memorialId, slug });
-  }, [ctx, uploadFile, router]);
+  }, [ctx, uploadFile, router, showInFeed]);
 
   // Auto-trigger save when returning from auth redirect
   useEffect(() => {
@@ -167,11 +185,29 @@ function PreviewContent() {
   if (savedMemorial) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-amber-50/60 via-orange-50/30 to-white py-12 px-4">
-        <PricingCards
-          memorialId={savedMemorial.id}
-          slug={savedMemorial.slug}
-          onLeave={() => ctx.reset()}
-        />
+        <div className="mx-auto max-w-md text-center space-y-6">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
+            <Check className="h-8 w-8 text-green-600" />
+          </div>
+          <h2 className="font-serif text-2xl font-semibold text-gray-900">
+            {ctx.petDetails.petName}&apos;s memorial is live
+          </h2>
+          <p className="text-gray-500">
+            Share it with the people who loved them.
+          </p>
+          <div className="space-y-3">
+            <Link href={`/${savedMemorial.slug}`}>
+              <Button className="w-full h-12 bg-amber-600 hover:bg-amber-700">
+                View memorial
+              </Button>
+            </Link>
+            <Link href="/dashboard" onClick={() => ctx.reset()}>
+              <Button variant="outline" className="w-full h-12 mt-3">
+                Go to dashboard
+              </Button>
+            </Link>
+          </div>
+        </div>
       </div>
     );
   }
@@ -201,6 +237,8 @@ function PreviewContent() {
         onBack={() => router.push("/create")}
         heroPhotoCropY={ctx.petDetails.heroPhotoCropY ?? 50}
         onUpdateCropY={(y) => ctx.updatePetDetails({ heroPhotoCropY: y })}
+        showInFeed={showInFeed}
+        onShowInFeedChange={setShowInFeed}
       />
     </div>
   );

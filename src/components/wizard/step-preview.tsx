@@ -73,6 +73,8 @@ interface StepPreviewProps {
   onBack?: () => void;
   heroPhotoCropY?: number;
   onUpdateCropY?: (y: number) => void;
+  showInFeed?: boolean;
+  onShowInFeedChange?: (value: boolean) => void;
 }
 
 export function StepPreview({
@@ -86,6 +88,8 @@ export function StepPreview({
   onBack,
   heroPhotoCropY = 50,
   onUpdateCropY,
+  showInFeed = false,
+  onShowInFeedChange,
 }: StepPreviewProps) {
   const [editingTribute, setEditingTribute] = useState(false);
   const [editedTribute, setEditedTribute] = useState(tribute);
@@ -378,6 +382,26 @@ export function StepPreview({
       <div className="mx-auto max-w-md px-4 pt-8 pb-12 sm:px-6 space-y-4">
         {error && <p className="text-sm text-red-500 text-center">{error}</p>}
 
+        {/* Feed opt-in */}
+        {onShowInFeedChange && (
+          <label className="flex items-start gap-3 rounded-xl border border-amber-100 bg-amber-50/50 p-4 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={showInFeed}
+              onChange={(e) => onShowInFeedChange(e.target.checked)}
+              className="mt-0.5 h-4 w-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+            />
+            <div>
+              <p className="text-sm font-medium text-gray-700">
+                Share on our community feed
+              </p>
+              <p className="text-xs text-gray-500 mt-0.5">
+                Let others light a candle for {petDetails.petName}. You can change this anytime.
+              </p>
+            </div>
+          </label>
+        )}
+
         <div className="flex gap-3">
           {onBack && (
             <Button
@@ -398,16 +422,16 @@ export function StepPreview({
             {saving ? (
               <span className="flex items-center gap-2">
                 <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                Saving...
+                Publishing...
               </span>
             ) : (
-              "Save Memorial"
+              "Publish Memorial"
             )}
           </Button>
         </div>
 
         <p className="text-center text-xs text-gray-400">
-          Saved on this device. Sign in to publish. Your memorial will be private until you choose to share it.
+          Your memorial will be visible at its own page. You can change feed visibility anytime from your dashboard.
         </p>
       </div>
     </div>

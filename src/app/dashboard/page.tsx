@@ -12,6 +12,7 @@ import {
 import Link from "next/link";
 import { SignOutButton } from "./sign-out-button";
 import { DashboardTabs } from "./dashboard-tabs";
+import { FeedToggle } from "@/components/dashboard/feed-toggle";
 
 export default async function Dashboard() {
   const supabase = await createServerSupabase();
@@ -25,7 +26,7 @@ export default async function Dashboard() {
 
   const { data: memorials } = await supabase
     .from("memorials")
-    .select("id, pet_name, slug, is_paid, is_published, created_at")
+    .select("id, pet_name, slug, is_paid, is_published, show_in_feed, created_at")
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
 
@@ -101,9 +102,14 @@ export default async function Dashboard() {
                     >
                       View memorial
                     </Link>
-                    {!memorial.is_paid && (
+                    {memorial.is_published ? (
+                      <FeedToggle
+                        memorialId={memorial.id}
+                        initialValue={memorial.show_in_feed}
+                      />
+                    ) : (
                       <Link
-                        href={`/${memorial.slug}/checkout`}
+                        href={`/create?edit=${memorial.id}`}
                         className="text-sm font-medium text-amber-700 bg-amber-100 hover:bg-amber-200 px-3 py-1 rounded-full transition-colors"
                       >
                         Publish

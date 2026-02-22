@@ -6,15 +6,30 @@ import { Button } from "@/components/ui/button";
 import { X, Upload, ImagePlus } from "lucide-react";
 import { EarlyAuthBanner } from "@/components/wizard/early-auth-banner";
 
-function fileToBase64(file: File): Promise<string> {
+/** Resize image to max 768px for caption generation (keeps payload under 1MB) */
+function resizeForCaption(file: File): Promise<{ base64: string; mimeType: string }> {
   return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const result = reader.result as string;
-      resolve(result.split(",")[1]);
+    const img = new Image();
+    img.onload = () => {
+      const MAX = 768;
+      let { width, height } = img;
+      if (width > MAX || height > MAX) {
+        const scale = MAX / Math.max(width, height);
+        width = Math.round(width * scale);
+        height = Math.round(height * scale);
+      }
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) { reject(new Error("No canvas context")); return; }
+      ctx.drawImage(img, 0, 0, width, height);
+      const dataUrl = canvas.toDataURL("image/jpeg", 0.8);
+      resolve({ base64: dataUrl.split(",")[1], mimeType: "image/jpeg" });
+      URL.revokeObjectURL(img.src);
     };
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
+    img.onerror = () => { URL.revokeObjectURL(img.src); reject(new Error("Image load failed")); };
+    img.src = URL.createObjectURL(file);
   });
 }
 
@@ -77,14 +92,14 @@ export function StepPhotoUpload({
       // Auto-generate caption in background
       if (onSetCaption) {
         setCaptioning((prev) => new Set(prev).add(id));
-        fileToBase64(file)
-          .then((base64) =>
+        resizeForCaption(file)
+          .then(({ base64, mimeType: resizedMime }) =>
             fetch("/api/caption", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
                 imageBase64: base64,
-                mimeType: file.type,
+                mimeType: resizedMime,
                 petName,
                 gender,
               }),
@@ -212,12 +227,12 @@ export function StepPhotoUpload({
                 </button>
               </div>
               {onSetCaption && (
-                <input
-                  type="text"
+                <textarea
+                  rows={2}
                   placeholder={captioning.has(photo.id) ? "Generating caption..." : "Add a caption..."}
                   value={photo.caption || ""}
                   onChange={(e) => onSetCaption(photo.id, e.target.value)}
-                  className={`w-full rounded-md border border-gray-200 px-2 py-1 text-xs text-gray-700 placeholder:text-gray-400 focus:border-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-400 ${captioning.has(photo.id) ? "animate-pulse bg-amber-50" : ""}`}
+                  className={`w-full rounded-md border border-gray-200 px-2 py-1.5 text-xs text-gray-700 placeholder:text-gray-400 focus:border-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-400 resize-none ${captioning.has(photo.id) ? "animate-pulse bg-amber-50" : ""}`}
                   maxLength={200}
                 />
               )}
