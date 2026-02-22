@@ -24,7 +24,7 @@ npm run lint     # Run ESLint
 | Database & Storage | Supabase (PostgreSQL + Storage) |
 | CDN | Cloudflare R2 (not yet integrated) |
 | Auth | Supabase Auth (Google OAuth + magic links) |
-| AI | Claude Haiku (tribute generation, theme detection), Claude Sonnet (decision support, journal responses), Gemini Flash (photo captions/vision) |
+| AI | Claude Haiku (tribute generation, photo captions/vision, decision support), Claude Sonnet (journal responses) |
 | Payments | Stripe Checkout + Customer Portal |
 | Print-on-Demand | Gelato API (primary), Printful (backup) |
 | Hosting | Vercel |
@@ -36,7 +36,7 @@ npm run lint     # Run ESLint
 - **Next.js App Router** with API routes serving as the backend
 - **Supabase** for PostgreSQL database, file storage, and real-time subscriptions
 - Memorial pages served at `remembermypet.ai/petname-lastname-year` slug pattern
-- **Two-part product**: Web memorial (core, $49-99 one-time) + optional mobile grief companion app (free with purchase)
+- **Two-part product**: Web memorial (currently free while launching) + optional mobile grief companion app (planned)
 
 ### Key Patterns
 
@@ -46,7 +46,7 @@ npm run lint     # Run ESLint
 - **Pre-moderation**: Memory wall contributions default to pending. Owner approves/edits/deletes from dashboard.
 - **AI prompt philosophy**: "Friend at the kitchen table" framing. Emotional register matching, specific reactions (not generic), grief-bleed handling. Banned phrases: "Thank you for sharing," "What a special bond," "crossed the rainbow bridge," "forever in our hearts," "healing journey," "processing." See `src/lib/tribute-prompts.ts`.
 - **Pronoun system**: Gender-aware pronouns throughout UI via `src/lib/pronouns.ts`. Pets have a `gender` field (male/female/neutral) that drives he/she/they pronouns in tributes, captions, and memorial pages.
-- **State management**: `useMemorialState` hook with localStorage persistence. Wizard seed from homepage stored as `petmemorial-wizard-seed`.
+- **State management**: `useMemorialState` hook with localStorage persistence. Wizard seed from homepage stored as `petmemorial-wizard-seed`. Standalone support page state stored as `petmemorial-support-seed`, carried into wizard on transition.
 - **Error handling**: Centralized error messages in `src/lib/error-messages.ts`. API routes return structured `{ error: { code, message, recoverable } }` via `apiError()` helper. Client-side errors use specific copy from `ERROR_MESSAGES` — error toasts use `duration: Infinity` (user must dismiss), non-critical toasts (candle) use `duration: 4000`. Offline detection via `src/components/offline-banner.tsx`. Top-level error boundary in `src/app/error.tsx`.
 
 ### Database Schema (Key Tables)
@@ -79,8 +79,10 @@ product_orders — see Gelato migration
 | `/api/memories/upload` | POST | Anonymous photo upload for memories |
 | `/api/checkout` | POST | Stripe Checkout session |
 | `/api/webhooks/stripe` | POST | Stripe webhook (signature verified) |
-| `/api/caption` | POST | AI photo caption via Gemini 2.5 Flash Lite (rate limit 20/min) |
+| `/api/caption` | POST | AI photo caption via Claude Haiku (rate limit 20/min) |
 | `/api/homepage/chat` | POST | AI-driven homepage mini-conversation |
+| `/api/feed` | GET | Public activity feed (published + opted-in memorials) |
+| `/api/memorial/[id]/feed` | PATCH | Toggle feed visibility (owner-only) |
 | `/api/candles` | GET | Get candle count + whether current user has lit |
 | `/api/candles` | POST | Toggle candle (light/unlight), auth required |
 | `/api/gelato/*` | Various | Print-on-demand preview/order/status/webhook |
@@ -100,22 +102,24 @@ product_orders — see Gelato migration
 ## What's Built
 
 - Auth (Google OAuth + magic link sign-in/sign-up, middleware, callback with redirect protection, auth error page)
-- Memorial creation wizard (4 steps: pet details → photos → tribute chat → preview) with auto-save indicator and early auth banner
-- Homepage with AI-driven conversational entry flow (name → species → memory → redirect to `/create`)
+- Memorial creation wizard (pet details → dashboard with feature cards: decision support, photos, tribute chat, video reel → preview) with auto-save indicator and early auth banner
+- Homepage with AI-driven conversational entry flow (name → species → memory → redirect to `/create`), activity feed, and features grid with decision support link
 - AI tribute chat — unified single conversation flow (no mode selection), with tribute refinement based on user feedback
-- Decision support integrated into chat flow, crisis detection, support→celebrate transition
+- Decision support: dedicated `/support` standalone page (direct from homepage, no auth required for first 3 exchanges), `/create/support` wizard page, plus inline guilt detection in tribute chat. All paths write to `supportContext` which flows into tribute generation.
 - Public memorial page (`/[slug]`) with hero, tribute, photo gallery, video embed, Kudoboard-inspired memory wall (interleaved photos/videos/text via `src/lib/interleave-wall-content.ts`), OG meta, print CSS
 - Memorial edit mode — load existing memorial from API, edit all fields, and update (PUT to `/api/memorial`)
 - Dashboard with memorial listing, moderation queue, status badges
 - Video upload, clipper, FFmpeg compilation, status polling
 - Memory wall (submission, moderation, email notifications via Resend)
-- Photo captions (user-editable, 200 char max; AI auto-generated via Gemini 2.5 Flash Lite on upload) with AI vision tags (`ai_detected_tags`) for life stage, habits, connection moments, and settings
+- Photo captions (user-editable, 200 char max; AI auto-generated via Claude Haiku on upload) with AI vision tags (`ai_detected_tags`) for life stage, habits, connection moments, and settings
 - "Light a Candle" reactions on memorial pages (toggle, one per user, optimistic UI, auth required to light)
 - Gelato print-on-demand (shop page at `/[slug]/shop`, webhook with HMAC verification)
-- Stripe checkout (Basic $49 / Premium $99, webhook for payment/refund)
+- Stripe checkout (webhook for payment/refund — currently disabled, launching free)
 - Image crop modal for photo editing
 - Demo memorial page (`/demo`)
-- Legal pages (`/privacy`, `/terms`) and site footer
+- Activity feed on homepage (opt-in at publish, candle interaction, public browsing)
+- Blog (`/blog`) with founding story and pet loss coping article
+- Legal pages (`/privacy`, `/terms`) and site footer with support/tip link
 - Centralized error UX — user-friendly recovery messages, offline banner, error boundary, structured API errors
 - Shadcn/ui components: button, input, label, card, textarea, dialog, separator, tabs, avatar, sonner, dropdown-menu, badge, progress
 
@@ -127,14 +131,8 @@ product_orders — see Gelato migration
 - Cloudflare R2 CDN integration
 ### Go-Live Blockers
 
-**Gemini Flash API:**
-- `GOOGLE_AI_API_KEY` needed for photo auto-captioning and vision tags
-- Currently optional — must be configured for production
-
-**Stripe (currently test mode):**
-- Switch to live Stripe keys (`STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`)
-- Create live price IDs for Basic ($49) and Premium ($99) plans
-- Update `STRIPE_WEBHOOK_SECRET` for live endpoint
+**Stripe (currently disabled — launching free):**
+- When ready to monetize: switch to live Stripe keys, create price IDs, update webhook secret
 
 **Gelato Print-on-Demand (significant work remaining):**
 - `GELATO_API_KEY` configuration (live key, not test)
@@ -167,7 +165,6 @@ product_orders — see Gelato migration
 ### Optional
 - `RESEND_API_KEY` (email notifications)
 - `GELATO_API_KEY` (print-on-demand)
-- `GOOGLE_AI_API_KEY` (Gemini 2.5 Flash Lite — photo auto-captioning)
 
 ## Reference Documents
 
