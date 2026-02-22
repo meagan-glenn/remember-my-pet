@@ -19,6 +19,7 @@ import {
   Globe,
 } from "lucide-react";
 import Link from "next/link";
+import { ActivityFeed } from "@/components/feed/activity-feed";
 
 const OPENING_QUESTIONS = [
   (name: string) => `What's your favorite memory with ${name}?`,
@@ -535,6 +536,9 @@ export default function Home() {
           )}
         </AnimatePresence>
       </section>
+
+      {/* Activity Feed */}
+      <ActivityFeed />
 
       {/* Below-fold content */}
       <section className="px-4 py-6 sm:py-8">
