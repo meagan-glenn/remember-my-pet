@@ -217,6 +217,7 @@ export default function Home() {
           species: species === "Other" ? "" : species,
           gender: gender || undefined,
           chatHistory: conversationMessages,
+          exchangeCount: userExchangeCount + 1,
         }),
       });
 

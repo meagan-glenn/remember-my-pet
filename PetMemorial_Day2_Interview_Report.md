@@ -1,20 +1,22 @@
-# PetMemorial.ai User Research - Day 2 Follow-Up Interview
+# PetMemorial.ai User Research - Day 2 & Day 4 Follow-Up Interviews
 
-**Date:** January 30, 2026  
-**Time Since Loss:** Approximately 45 hours  
-**Participant:** Meagan (33, female, childfree millennial)  
-**Pet:** Skylar (dog, 12 years)  
-**Context:** Follow-up interview tracking grief progression from acute phase (Day 0) to Day 2
+**Dates:** January 30 (Day 2) & February 1 (Day 4), 2026
+**Participant:** Meagan (33, female, childfree millennial)
+**Pet:** Skylar (dog, 12 years)
+**Context:** Follow-up interviews tracking grief progression from acute phase (Day 0) through Day 4
 
 ---
 
 ## Executive Summary
 
-This follow-up interview documents the emotional and behavioral changes between Day 0 (day of euthanasia) and Day 2, providing critical insights into how grief evolves in the acute phase and what users need from the product at different stages.
+These follow-up interviews document emotional and behavioral changes from Day 0 (day of euthanasia) through Day 4, providing critical insights into how grief evolves in the acute phase and what users need from the product at different stages.
 
-**Key Finding:** Grief needs shift rapidly in the first 72 hours. Product features must be accessible non-linearly, allowing users to engage with different creation modes based on their current emotional state rather than forcing a predetermined flow.
+**Key Finding:** Grief needs shift rapidly in the first 96 hours. Product features must be accessible non-linearly, allowing users to engage with different creation modes based on their current emotional state rather than forcing a predetermined flow.
 
-**Critical Product Validation:** Video compilation feature is not a "reflection tool" for later—it's an **acute grief survival tool** for Day 2-3 when users need something active to do with their pain.
+**Critical Product Validations:**
+- Video compilation is an **acute grief survival tool** for Day 2-3, not an ongoing need (video consumption drops to zero by Day 4)
+- Tribute AI prompts are **therapeutic**, actively transforming which memories dominate and preventing fixation on traumatic final moments
+- Privacy needs persist through Day 4—private creation period is essential, not just a Day 0-1 preference
 
 ---
 
@@ -236,24 +238,116 @@ Memorial becomes a **grief companion**—a living workspace users return to over
 
 ---
 
-## Comparison Table: Day 0 vs Day 2
+---
 
-| Dimension | Day 0 (Euthanasia Day) | Day 2 (45 Hours Later) |
-|-----------|------------------------|------------------------|
-| **Primary Fear** | Forgetting her | Never finding another like her; pain is permanent |
-| **Physical State** | Acute emotional devastation | Somatic grief (head/stomach pain, physical hurt) |
-| **Media Consumption** | Mostly photos | Shifted to mostly videos |
-| **Why Videos/Photos** | Documenting details, fear of forgetting | "Being with her however I can" |
-| **Sharing Readiness** | Would share privately with family "next few days" | Can barely tell 2 people in DMs; no public sharing |
-| **Creation Preference** | Private creation, then deliberate sharing | Alone or just with husband |
-| **Feature Priority** | Photos first | Videos 100% |
-| **Coping Strategy** | Going through photos, organizing | Watching videos constantly, staying busy |
-| **Spiritual Need** | Move on but not forget; remember joy not pain | Sign that she's okay; permission to believe she still exists |
+# DAY 4 FOLLOW-UP (February 1, 2026)
+
+**Time Since Loss:** Approximately 93 hours
+
+---
+
+## Emotional & Physical State: Day 4
+
+### Major Shift from Day 2
+
+- **Day 2:** "Like I'm in physical pain. Head hurts. Stomach hurts."
+- **Day 4:** Physical pain **GONE**, breathing better, hasn't cried today
+
+This is a dramatic improvement in 48 hours. The acute somatic phase may be shorter than expected.
+
+---
+
+## Media Consumption Pattern: Day 4
+
+### Shift Back to Photos
+
+- **Day 2:** Videos "literally all day" (needed to hear her)
+- **Day 4:** Zero videos, back to photos heavily
+
+**Key Insight:** The video need was **acute and Day 2-3 specific**. By Day 4, photos are enough again.
+
+**Product Implication:** Video compilation is absolutely a Day 2-3 survival tool, not an ongoing need. Photos are the constant comfort medium across all days.
+
+---
+
+## The Verbal Ritual Discovery
+
+**Quote:** *"I am speaking to her verbally in the house though. 'Morning Skylar.' 'Goodnight Skylar.' 'I love you baby.'"*
+
+This **validates the mobile app notification design**. She's naturally doing what the app was designed to support:
+- **Morning:** "Skylar is with you today" → She's saying "Morning Skylar"
+- **Evening:** "Skylar is happy and at peace" → She's saying "Goodnight Skylar"
+
+She created the ritual herself. The app would formalize and support it.
+
+---
+
+## CRITICAL: Tribute AI as Therapy
+
+**Quote:** *"I loooooove the tribute focus too because I think chatting through with the AI my favorite memories of her actually brings POSITIVE memories to my mind. 'What was your favorite thing to do?' etc. And then it reinforces those memories, then talks them through deeper. It leaves me with happy memories not images of the light leaving her eyes."*
+
+**This is the most important finding across all four days.**
+
+What this validates:
+1. The tribute Q&A isn't just memorial creation — it's **active therapy**
+2. AI prompts transform which memories dominate the grief experience
+3. It prevents fixation on traumatic final moments
+4. It fulfills the Day 0 North Star: *"How things ended is not what made up the other 12 years of her life"*
+
+**Competitor positioning:**
+- PetMemory.ai: Synthetic chatbot that IS your pet
+- RememberMyPet.ai: AI that helps you remember the GOOD years, not just how it ended
+
+---
+
+## Privacy: Day 4
+
+Still haven't told anyone beyond 2 people + dad. *"I've thought about it, but I'm just not ready."*
+
+**Validates:** Private creation period is essential. This isn't just a Day 0-1 preference — it persists through Day 4 and possibly beyond.
+
+---
+
+## Domain Choice Validation
+
+User chose RememberMyPet.ai herself. That's user validation in the most direct form possible.
+
+---
+
+## Decision Support Update
+
+User is talking through the decision with her husband repeatedly. AI Decision Support should acknowledge this existing behavior: *"Have you talked this through with anyone close to you? What did they say?"*
+
+---
+
+## Comparison Table: Day 0 → Day 2 → Day 4
+
+| Dimension | Day 0 (Euthanasia Day) | Day 2 (45 Hours Later) | Day 4 (93 Hours Later) |
+|-----------|------------------------|------------------------|------------------------|
+| **Primary Fear** | Forgetting her | Never finding another like her; pain is permanent | Still present, not dominant |
+| **Physical State** | Acute emotional devastation | Somatic grief (head/stomach pain, physical hurt) | Physical pain **GONE** |
+| **Media Consumption** | Mostly photos | Shifted to mostly videos | Back to photos only, zero videos |
+| **Why Videos/Photos** | Documenting details, fear of forgetting | "Being with her however I can" | Comfort, positive memory reinforcement |
+| **Sharing Readiness** | Would share privately with family "next few days" | Can barely tell 2 people in DMs; no public sharing | Added dad, still private overall |
+| **Creation Preference** | Private creation, then deliberate sharing | Alone or just with husband | Still private |
+| **Feature Priority** | Photos first | Videos 100% | Photos first (again) |
+| **Coping Strategy** | Going through photos, organizing | Watching videos constantly, staying busy | Building product, verbal rituals |
+| **Spiritual Need** | Move on but not forget; remember joy not pain | Sign that she's okay; permission to believe she still exists | Verbal rituals maintaining connection |
+
+---
+
+## Pattern Recognition: Day 0 → Day 4
+
+The progression isn't linear — it's a wave:
+- **Day 0:** Shock, photos
+- **Day 2:** PEAK acute pain, videos critical
+- **Day 4:** Subsiding, back to photos, verbal rituals emerging
 
 ---
 
 ## Key Quotes
 
+### Day 2
 > "I miss her so much it hurts. I am randomly crying out of nowhere. It's like I'm in physical pain. My head hurts. My stomach hurts."
 
 > "The only thing that has been helping me emotionally is looking at her videos and pictures constantly. It's literally all I do all day."
@@ -272,29 +366,55 @@ Memorial becomes a **grief companion**—a living workspace users return to over
 
 > "Just being with her however I can."
 
+### Day 4
+> "I am speaking to her verbally in the house though. 'Morning Skylar.' 'Goodnight Skylar.' 'I love you baby.'"
+
+> "I loooooove the tribute focus too because I think chatting through with the AI my favorite memories of her actually brings POSITIVE memories to my mind... It leaves me with happy memories not images of the light leaving her eyes."
+
+> "I've thought about it, but I'm just not ready." (on sharing publicly)
+
+---
+
+## Updated MVP Priorities Based on Day 0-4 Research
+
+### Must have (validated across multiple days):
+1. **Photo gallery** — always the first choice, constant comfort medium
+2. **Tribute AI with therapeutic prompts** — transforms which memories dominate; core differentiator
+3. **Private creation period** — still not ready to share at Day 4
+
+### Important but acute-phase specific:
+4. **Video compilation** — critical Day 2-3 survival tool, drops off by Day 4
+
+### Mobile app validates:
+5. **Morning/evening notifications** — verbal rituals already happening naturally
+
 ---
 
 ## Next Steps
 
 1. **Immediate:** Redesign creation flow to be non-linear (users choose photos/tribute/videos in any order)
 2. **MVP Build:** Move video compilation feature into MVP scope (not post-MVP)
-3. **Week 3-4:** Prototype digital picture frame sync feature
-4. **Research:** Conduct Day 7 and Day 30 follow-up interviews to track grief progression
-5. **Feature Exploration:** Investigate community stories feature (validated by user's Reddit consumption behavior)
+3. **Marketing:** Leverage tribute-as-therapy insight as primary differentiator
+4. **Decision Support:** Add partner conversation acknowledgment to AI flow
+5. **Week 3-4:** Prototype digital picture frame sync feature
+6. **Research:** Conduct Day 7 and Day 30 follow-up interviews to track grief progression
+7. **Feature Exploration:** Investigate community stories feature (validated by user's Reddit consumption behavior)
 
 ---
 
 ## Researcher Notes
 
-This interview reveals that **grief is not linear, so the product cannot be linear**. Users need different tools at different moments, and forcing a predetermined flow will fail to meet them where they are.
+These interviews reveal that **grief is not linear, so the product cannot be linear**. Users need different tools at different moments, and forcing a predetermined flow will fail to meet them where they are.
 
-The shift from Day 0 to Day 2 is stark: privacy needs intensify, fear shifts from forgetting to permanence of pain, and video becomes primary medium because it provides sensory presence.
+The Day 0 → Day 2 shift is stark: privacy needs intensify, fear shifts from forgetting to permanence of pain, and video becomes primary medium for sensory presence.
 
-Most importantly: Video compilation is not a "nice to have later." For users who cope by staying busy, it's the feature that transforms the memorial from a static tribute into an active grief companion.
+The Day 2 → Day 4 shift is equally revealing: physical pain resolves rapidly, video need drops entirely, and new coping mechanisms emerge (verbal rituals). Most critically, the Tribute AI's therapeutic effect — actively shifting memory fixation from traumatic final moments to positive memories — emerges as the product's most powerful and differentiated feature.
+
+Video compilation is not a "nice to have later," but it is a time-bounded need. For users in the Day 2-3 acute phase who cope by staying busy, it transforms the memorial from a static tribute into an active grief companion. By Day 4, photos and the tribute conversation carry the weight.
 
 ---
 
-**Interview conducted:** January 30, 2026  
-**Participant:** Meagan  
-**Pet:** Skylar (dog, 12 years)  
+**Interviews conducted:** January 30 & February 1, 2026
+**Participant:** Meagan
+**Pet:** Skylar (dog, 12 years)
 **Researcher:** Claude (AI Assistant)
