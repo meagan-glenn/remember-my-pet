@@ -28,7 +28,7 @@ export async function Header() {
               </Link>
               <Link href="/create">
                 <Button size="sm" className="rounded-full bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-400 dark:text-gray-900">
-                  Create a Tribute
+                  Create a Memorial
                 </Button>
               </Link>
             </>

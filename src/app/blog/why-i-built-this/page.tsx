@@ -21,18 +21,6 @@ export default function WhyIBuiltThisPage() {
           I lost my dog of 13 years. Then I built this.
         </h1>
 
-        <div className="mt-8 overflow-hidden rounded-2xl">
-          <Image
-            src="/blog/meagan-skylar.jpg"
-            alt="Meagan and Skylar"
-            width={640}
-            height={800}
-            className="w-full object-cover"
-            priority
-          />
-          <p className="mt-2 text-center text-sm text-gray-400">Skylar and me</p>
-        </div>
-
         <div className="mt-10 space-y-6 text-base leading-relaxed text-gray-600">
           <p>
             Skylar was a husky. Mouthy the way huskies are — she had opinions about everything and
@@ -43,6 +31,17 @@ export default function WhyIBuiltThisPage() {
           <p>
             I lost her on January 28th.
           </p>
+
+          <div className="mx-auto max-w-xs overflow-hidden rounded-2xl">
+            <Image
+              src="/blog/meagan-skylar.jpg"
+              alt="Meagan and Skylar"
+              width={320}
+              height={400}
+              className="w-full object-cover"
+            />
+            <p className="mt-2 text-center text-sm text-gray-400">Skylar and me</p>
+          </div>
 
           <p>
             I don&apos;t have a softer way to say what that felt like. My whole world stopped. The

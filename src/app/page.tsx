@@ -259,7 +259,7 @@ export default function Home() {
               </h1>
 
               <p className="mt-6 text-lg text-gray-500 dark:text-gray-400">
-                Create a beautiful, lasting tribute for the pet who changed your
+                Create a beautiful, lasting memorial for the pet who changed your
                 life.
               </p>
 
@@ -281,7 +281,7 @@ export default function Home() {
                   disabled={!petName.trim()}
                   className="h-12 rounded-full bg-amber-600 px-6 text-base font-medium hover:bg-amber-700 disabled:opacity-40 dark:bg-amber-500 dark:hover:bg-amber-400 dark:text-gray-900"
                 >
-                  Begin their tribute
+                  Begin their memorial
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </form>
@@ -436,7 +436,7 @@ export default function Home() {
                         variant="outline"
                         className="w-full rounded-full border-amber-300 text-amber-700 hover:bg-amber-50 dark:border-amber-800/40 dark:text-amber-200 dark:hover:bg-amber-900/20"
                       >
-                        Create {petName.trim()}&apos;s Tribute
+                        Create {petName.trim()}&apos;s Memorial
                       </Button>
                     )}
                     {chatError && (

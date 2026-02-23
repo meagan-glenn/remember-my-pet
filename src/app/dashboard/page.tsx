@@ -52,7 +52,7 @@ export default async function Dashboard() {
 
         <Link href="/create">
           <Button className="w-full h-12 bg-amber-600 hover:bg-amber-700 text-base">
-            Create a Tribute
+            Create a Memorial
           </Button>
         </Link>
 

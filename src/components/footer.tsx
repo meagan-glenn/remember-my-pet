@@ -16,7 +16,7 @@ export function Footer() {
               RememberMyPet.ai
             </Link>
             <p className="mt-3 text-sm text-gray-500 leading-relaxed">
-              Create a beautiful, lasting tribute for the pet who changed your
+              Create a beautiful, lasting memorial for the pet who changed your
               life.
             </p>
           </div>
@@ -27,7 +27,7 @@ export function Footer() {
             <ul className="mt-3 space-y-2 text-sm text-gray-500 dark:text-gray-400">
               <li>
                 <Link href="/create" className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors">
-                  Create a Tribute
+                  Create a Memorial
                 </Link>
               </li>
               <li>

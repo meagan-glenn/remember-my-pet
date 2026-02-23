@@ -406,7 +406,7 @@ function Dashboard() {
           />
           <FeatureCard
             title="Write Tribute"
-            description="Create a personal tribute with AI assistance"
+            description="Write a personal tribute with AI to tell their story"
             status={tributeStatus}
             statusType={tributeStatusType}
             href="/create/tribute"
