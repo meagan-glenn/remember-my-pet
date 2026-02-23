@@ -373,42 +373,54 @@ function Dashboard() {
           />
           <FeatureCard
             step={3}
-            title="Create Video Reel"
-            description="Upload videos and compile a memorial reel"
-            status={
-              compilationUrl
-                ? "Complete"
-                : videos.length === 0
-                  ? "Not started"
-                  : `${videos.length} video${videos.length !== 1 ? "s" : ""} uploaded`
-            }
-            statusType={
-              compilationUrl
-                ? "complete"
-                : videos.length === 0
-                  ? "not-started"
-                  : "in-progress"
-            }
-            href="/create/reel"
-            icon={<Film className="h-6 w-6" />}
+            title="Preview & Publish"
+            description="See how it all comes together and share it with the world"
+            status=""
+            statusType="not-started"
+            href="/create/preview"
+            icon={<Eye className="h-6 w-6" />}
           />
         </div>
 
-        {/* Optional support */}
+        {/* Optional extras */}
         <div>
           <div className="flex items-center gap-3 mb-3">
             <div className="h-px flex-1 bg-gray-200 dark:bg-gray-800" />
-            <span className="text-xs text-gray-400 dark:text-gray-500">If you need support</span>
+            <span className="text-xs text-gray-400 dark:text-gray-500">More options</span>
             <div className="h-px flex-1 bg-gray-200 dark:bg-gray-800" />
           </div>
-          <FeatureCard
-            title="Talk It Through"
-            description="A safe space to work through guilt, regrets, or the &lsquo;what-ifs&rsquo; — at your own pace"
-            status={supportContext.length > 0 ? supportStatus : ""}
-            statusType={supportStatusType}
-            href="/create/support"
-            icon={<HeartHandshake className="h-6 w-6" />}
-          />
+          <div className="flex flex-col gap-4">
+            <FeatureCard
+              title="Talk It Through"
+              description="A safe space to work through guilt, regrets, or the &lsquo;what-ifs&rsquo; — at your own pace"
+              status={supportContext.length > 0 ? supportStatus : ""}
+              statusType={supportStatusType}
+              href="/create/support"
+              icon={<HeartHandshake className="h-6 w-6" />}
+            />
+            {process.env.NEXT_PUBLIC_FEATURE_VIDEO_REEL === "true" && (
+              <FeatureCard
+                title="Create Video Reel"
+                description="Upload videos and compile a memorial reel"
+                status={
+                  compilationUrl
+                    ? "Complete"
+                    : videos.length === 0
+                      ? "Not started"
+                      : `${videos.length} video${videos.length !== 1 ? "s" : ""} uploaded`
+                }
+                statusType={
+                  compilationUrl
+                    ? "complete"
+                    : videos.length === 0
+                      ? "not-started"
+                      : "in-progress"
+                }
+                href="/create/reel"
+                icon={<Film className="h-6 w-6" />}
+              />
+            )}
+          </div>
         </div>
       </div>
 
