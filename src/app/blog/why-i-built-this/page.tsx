@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 
 export const metadata: Metadata = {
@@ -19,6 +20,18 @@ export default function WhyIBuiltThisPage() {
         <h1 className="mt-2 font-serif text-3xl font-medium text-gray-900 leading-snug md:text-4xl">
           I lost my dog of 13 years. Then I built this.
         </h1>
+
+        <div className="mt-8 overflow-hidden rounded-2xl">
+          <Image
+            src="/blog/meagan-skylar.jpg"
+            alt="Meagan and Skylar"
+            width={640}
+            height={800}
+            className="w-full object-cover"
+            priority
+          />
+          <p className="mt-2 text-center text-sm text-gray-400">Skylar and me</p>
+        </div>
 
         <div className="mt-10 space-y-6 text-base leading-relaxed text-gray-600">
           <p>
