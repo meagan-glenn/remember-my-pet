@@ -12,9 +12,6 @@ import {
   ArrowRight,
   PawPrint,
   Camera,
-  ShieldCheck,
-  Ban,
-  Globe,
 } from "lucide-react";
 import Link from "next/link";
 import { ActivityFeed } from "@/components/feed/activity-feed";
@@ -279,15 +276,18 @@ export default function Home() {
                 <Button
                   type="submit"
                   disabled={!petName.trim()}
-                  className="h-12 rounded-full bg-amber-600 px-6 text-base font-medium hover:bg-amber-700 disabled:opacity-40 dark:bg-amber-500 dark:hover:bg-amber-400 dark:text-gray-900"
+                  className="h-12 rounded-full bg-amber-600 px-8 text-base font-medium hover:bg-amber-700 disabled:opacity-40 dark:bg-amber-500 dark:hover:bg-amber-400 dark:text-gray-900"
                 >
                   Begin their memorial
-                  <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </form>
 
               <p className="mt-4 text-sm text-gray-400 dark:text-gray-500">
                 Take your time. There&apos;s no rush here.
+              </p>
+
+              <p className="mt-6 text-xs text-gray-400 dark:text-gray-500">
+                Photos stay private &nbsp;&middot;&nbsp; No pressure, no timers &nbsp;&middot;&nbsp; Hosted forever
               </p>
             </motion.div>
           ) : (
@@ -527,7 +527,7 @@ export default function Home() {
               {/* Decision support callout */}
               <div className="mt-10 text-center">
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Not ready to celebrate yet?{" "}
+                  Not ready yet?{" "}
                   <Link
                     href="/support"
                     className="text-amber-600 hover:text-amber-700 underline underline-offset-2 dark:text-amber-400 dark:hover:text-amber-300"
@@ -539,7 +539,7 @@ export default function Home() {
             </div>
       </section>
 
-      {/* Example Memorial + Testimonial + Trust Signals */}
+      {/* Example Memorial */}
       <section className="px-4 py-8 sm:py-12 bg-amber-50/40 dark:bg-gray-900/50">
             <div className="mx-auto max-w-3xl text-center">
               <h2 className="font-serif text-3xl font-medium text-gray-900 dark:text-amber-50 md:text-4xl">
@@ -555,26 +555,6 @@ export default function Home() {
                 View example memorial
                 <ArrowRight className="h-4 w-4" />
               </Link>
-
-              <blockquote className="mt-12 font-serif text-xl italic text-gray-600 dark:text-amber-100/70 md:text-2xl">
-                &ldquo;I finally felt like I could breathe again. Like she was
-                being remembered the way she deserved.&rdquo;
-              </blockquote>
-              <p className="mt-4 text-sm text-gray-400">
-                &mdash; Sarah, remembering Luna
-              </p>
-
-              <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-sm text-gray-400 dark:text-gray-500">
-                <span className="flex items-center gap-1.5">
-                  <ShieldCheck className="h-4 w-4" /> Your photos stay private
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <Ban className="h-4 w-4" /> No pressure, no timers
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <Globe className="h-4 w-4" /> Hosted forever
-                </span>
-              </div>
             </div>
       </section>
     </div>
