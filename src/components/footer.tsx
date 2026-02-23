@@ -83,15 +83,16 @@ export function Footer() {
 
         <div className="mt-10 border-t border-amber-100/60 dark:border-amber-900/30 pt-6 text-center space-y-3">
           <p className="text-sm text-gray-500">
-            RememberMyPet is free while we&apos;re getting started. If it helped, a{" "}
+            RememberMyPet is free while we&apos;re getting started. If it helped,{" "}
             <a
               href="https://buymeacoffee.com/meaganglenn"
               target="_blank"
               rel="noopener noreferrer"
               className="text-amber-600 hover:text-amber-700 underline underline-offset-2 dark:text-amber-400 dark:hover:text-amber-300"
             >
-              small tip goes a long way
-            </a>
+              showing your support
+            </a>{" "}
+            will help keep it that way.
           </p>
           <p className="text-xs text-gray-400">
             &copy; {new Date().getFullYear()} RememberMyPet.ai. All rights
