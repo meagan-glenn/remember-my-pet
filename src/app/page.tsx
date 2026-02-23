@@ -12,7 +12,6 @@ import {
   ArrowRight,
   PawPrint,
   Camera,
-  HeartHandshake,
   ShieldCheck,
   Ban,
   Globe,
@@ -80,12 +79,6 @@ const FEATURES = [
     description:
       "Turn your photos and clips into a beautiful keepsake video to share or keep forever.",
   },
-  {
-    icon: HeartHandshake,
-    title: "Not Ready Yet? That's Okay.",
-    description:
-      "If you're carrying guilt, regret, or 'what-ifs' about how it ended, start here. A gentle space to work through those feelings before you celebrate.",
-  },
 ];
 
 
@@ -101,7 +94,6 @@ export default function Home() {
   const [isTyping, setIsTyping] = useState(false);
   const [species, setSpecies] = useState("");
   const [gender, setGender] = useState<"male" | "female" | "neutral" | "">("");
-  const [readyToCreate, setReadyToCreate] = useState(false);
   const [openingQuestion] = useState(() => pickOpeningQuestion());
   const [aiLoading, setAiLoading] = useState(false);
   const [userExchangeCount, setUserExchangeCount] = useState(0);
@@ -238,7 +230,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50/60 via-orange-50/30 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-amber-50/60 via-orange-50/30 to-white dark:from-gray-950 dark:via-gray-950 dark:to-gray-950">
       {/* Hero Section */}
       <section className="flex flex-col items-center justify-center px-4 pt-10 pb-2 md:pt-14 md:pb-4">
         <AnimatePresence mode="wait">
@@ -255,18 +247,18 @@ export default function Home() {
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.1, duration: 0.5 }}
-                className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-amber-100"
+                className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/30"
               >
                 <PawPrint className="h-8 w-8 text-amber-600" />
               </motion.div>
 
-              <h1 className="font-serif text-4xl font-medium tracking-tight text-gray-900 md:text-5xl">
+              <h1 className="font-serif text-4xl font-medium tracking-tight text-gray-900 dark:text-amber-50 md:text-5xl">
                 Remember the joy,
                 <br />
                 not just how it ended.
               </h1>
 
-              <p className="mt-6 text-lg text-gray-500">
+              <p className="mt-6 text-lg text-gray-500 dark:text-gray-400">
                 Create a beautiful, lasting tribute for the pet who changed your
                 life.
               </p>
@@ -281,20 +273,20 @@ export default function Home() {
                     placeholder="Your pet's name"
                     value={petName}
                     onChange={(e) => setPetName(e.target.value)}
-                    className="h-12 rounded-full border-amber-200 bg-white pl-5 pr-4 text-base shadow-sm transition-shadow focus:shadow-amber-100/50 focus:border-amber-300"
+                    className="h-12 rounded-full border-amber-200 bg-white pl-5 pr-4 text-base shadow-sm transition-shadow focus:border-amber-400 focus:ring-1 focus:ring-amber-400 dark:border-amber-800/40 dark:bg-gray-900 dark:text-amber-50 dark:placeholder:text-gray-500"
                   />
                 </div>
                 <Button
                   type="submit"
                   disabled={!petName.trim()}
-                  className="h-12 rounded-full bg-amber-600 px-6 text-base font-medium hover:bg-amber-700 disabled:opacity-40"
+                  className="h-12 rounded-full bg-amber-600 px-6 text-base font-medium hover:bg-amber-700 disabled:opacity-40 dark:bg-amber-500 dark:hover:bg-amber-400 dark:text-gray-900"
                 >
                   Begin their tribute
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </form>
 
-              <p className="mt-4 text-sm text-gray-400">
+              <p className="mt-4 text-sm text-gray-400 dark:text-gray-500">
                 Take your time. There&apos;s no rush here.
               </p>
             </motion.div>
@@ -306,9 +298,9 @@ export default function Home() {
               transition={{ duration: 0.5 }}
               className="mx-auto w-full max-w-xl"
             >
-              <div className="rounded-2xl border border-amber-100 bg-white/80 p-6 shadow-sm backdrop-blur-sm">
+              <div className="rounded-2xl border border-amber-100 bg-white/80 p-6 shadow-sm backdrop-blur-sm dark:border-amber-900/30 dark:bg-gray-900/80">
                 <div className="mb-4 text-center">
-                  <p className="font-serif text-xl text-gray-800">
+                  <p className="font-serif text-xl text-gray-800 dark:text-amber-100">
                     Tell me about {petName.trim()}
                   </p>
                 </div>
@@ -327,8 +319,8 @@ export default function Home() {
                       <div
                         className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
                           msg.role === "user"
-                            ? "bg-amber-600 text-white"
-                            : "bg-amber-50 text-gray-700"
+                            ? "bg-amber-600 text-white dark:bg-amber-500/20 dark:text-amber-100"
+                            : "bg-amber-50 text-gray-700 dark:bg-amber-950/30 dark:text-amber-100/80"
                         }`}
                       >
                         {msg.content}
@@ -342,7 +334,7 @@ export default function Home() {
                       animate={{ opacity: 1 }}
                       className="flex justify-start"
                     >
-                      <div className="rounded-2xl bg-amber-50">
+                      <div className="rounded-2xl bg-amber-50 dark:bg-amber-950/30">
                         <TypingIndicator />
                       </div>
                     </motion.div>
@@ -365,7 +357,7 @@ export default function Home() {
                           key={opt}
                           variant="outline"
                           onClick={() => handleSpeciesSelect(opt)}
-                          className="flex-1 rounded-full border-amber-200 hover:bg-amber-50 hover:border-amber-300"
+                          className="flex-1 rounded-full border-amber-200 hover:bg-amber-50 hover:border-amber-300 dark:border-amber-800/40 dark:text-amber-200 dark:hover:bg-amber-900/20"
                         >
                           {opt}
                         </Button>
@@ -388,7 +380,7 @@ export default function Home() {
                           key={value}
                           variant="outline"
                           onClick={() => handleGenderSelect(value)}
-                          className="flex-1 rounded-full border-amber-200 hover:bg-amber-50 hover:border-amber-300"
+                          className="flex-1 rounded-full border-amber-200 hover:bg-amber-50 hover:border-amber-300 dark:border-amber-800/40 dark:text-amber-200 dark:hover:bg-amber-900/20"
                         >
                           {label}
                         </Button>
@@ -397,7 +389,7 @@ export default function Home() {
                   )}
 
                 {/* Memory/conversation text input */}
-                {!isTyping && !aiLoading && conversationStep === 1 && !readyToCreate && userExchangeCount < 3 && (
+                {!isTyping && !aiLoading && conversationStep === 1 && userExchangeCount < 3 && (
                   <motion.form
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -423,7 +415,7 @@ export default function Home() {
                           }
                         }}
                         placeholder={userExchangeCount === 0 ? "Share a memory..." : "Tell me more..."}
-                        className="flex-1 rounded-2xl border border-amber-200 bg-white px-4 py-2 text-sm resize-none overflow-hidden leading-snug focus:outline-none focus:ring-2 focus:ring-amber-300 focus:border-amber-300"
+                        className="flex-1 rounded-2xl border border-amber-200 bg-white px-4 py-2 text-sm resize-none overflow-hidden leading-snug focus:outline-none focus:ring-1 focus:ring-amber-400 focus:border-amber-400 dark:border-amber-800/40 dark:bg-gray-900 dark:text-amber-50 dark:placeholder:text-gray-500"
                         rows={1}
                         autoFocus
                         disabled={aiLoading}
@@ -432,7 +424,7 @@ export default function Home() {
                         type="submit"
                         disabled={!userInput.trim() || aiLoading}
                         size="sm"
-                        className="rounded-full bg-amber-600 hover:bg-amber-700"
+                        className="rounded-full bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-400 dark:text-gray-900"
                       >
                         <ArrowRight className="h-4 w-4" />
                       </Button>
@@ -442,7 +434,7 @@ export default function Home() {
                         type="button"
                         onClick={handleCreateClick}
                         variant="outline"
-                        className="w-full rounded-full border-amber-300 text-amber-700 hover:bg-amber-50"
+                        className="w-full rounded-full border-amber-300 text-amber-700 hover:bg-amber-50 dark:border-amber-800/40 dark:text-amber-200 dark:hover:bg-amber-900/20"
                       >
                         Create {petName.trim()}&apos;s Tribute
                       </Button>
@@ -463,7 +455,7 @@ export default function Home() {
                 )}
 
                 {/* CTA only — after 3 exchanges */}
-                {!isTyping && !aiLoading && conversationStep === 1 && !readyToCreate && userExchangeCount >= 3 && (
+                {!isTyping && !aiLoading && conversationStep === 1 && userExchangeCount >= 3 && (
                   <motion.div
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -472,34 +464,18 @@ export default function Home() {
                   >
                     <Button
                       onClick={handleCreateClick}
-                      className="w-full rounded-full bg-amber-600 hover:bg-amber-700 h-11 text-base"
+                      className="w-full rounded-full bg-amber-600 hover:bg-amber-700 h-11 text-base dark:bg-amber-500 dark:hover:bg-amber-400 dark:text-gray-900"
                     >
                       Create {petName.trim()}&apos;s Tribute
                     </Button>
                   </motion.div>
                 )}
 
-                {/* CTA after user clicks create */}
-                {readyToCreate && !isTyping && !aiLoading && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3 }}
-                    className="mt-4"
-                  >
-                    <Button
-                      onClick={() => router.push("/create")}
-                      className="w-full rounded-full bg-amber-600 hover:bg-amber-700 h-11 text-base"
-                    >
-                      Create {petName.trim()}&apos;s Tribute
-                    </Button>
-                  </motion.div>
-                )}
                 <Link
                   href="/demo"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-4 block text-center text-sm text-amber-600 hover:text-amber-700 transition-colors"
+                  className="mt-4 block text-center text-sm text-amber-600 hover:text-amber-700 transition-colors dark:text-amber-400 dark:hover:text-amber-300"
                 >
                   Want to see what a memorial looks like first? View an example →
                 </Link>
@@ -507,7 +483,7 @@ export default function Home() {
 
               <button
                 onClick={handleCreateClick}
-                className="mt-4 block w-full text-center text-sm text-gray-400 hover:text-gray-600 transition-colors"
+                className="mt-4 block w-full text-center text-sm text-gray-400 hover:text-gray-600 transition-colors dark:text-gray-500 dark:hover:text-gray-400"
               >
                 Skip to full creator
               </button>
@@ -522,68 +498,65 @@ export default function Home() {
       {/* Below-fold content */}
       <section className="px-4 py-6 sm:py-8">
             <div className="mx-auto max-w-4xl">
-              <h2 className="text-center font-serif text-3xl font-medium text-gray-900 md:text-4xl">
+              <h2 className="text-center font-serif text-3xl font-medium text-gray-900 dark:text-amber-50 md:text-4xl">
                 Everything you need to honor their memory
               </h2>
-              <p className="mt-4 text-center text-gray-500">
+              <p className="mt-4 text-center text-gray-500 dark:text-gray-400">
                 A beautiful space to celebrate the life you shared.
               </p>
 
               <div className="mt-12 grid gap-6 sm:grid-cols-2">
-                {FEATURES.map((feature, i) => (
+                {FEATURES.map((feature) => (
                   <div
                     key={feature.title}
-                    className={`rounded-2xl border border-amber-100 bg-white/60 p-6 ${
-                      i === FEATURES.length - 1 ? "sm:col-span-2 sm:max-w-md sm:mx-auto" : ""
-                    }`}
+                    className="rounded-2xl border border-amber-100 bg-white/60 p-6 dark:border-amber-900/30 dark:bg-gray-900/40"
                   >
-                    <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-amber-50">
+                    <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-amber-50 dark:bg-amber-900/20">
                       <feature.icon className="h-5 w-5 text-amber-600" />
                     </div>
-                    <h3 className="font-serif text-lg font-medium text-gray-800">
+                    <h3 className="font-serif text-lg font-medium text-gray-800 dark:text-amber-100">
                       {feature.title}
                     </h3>
-                    <p className="mt-2 text-sm leading-relaxed text-gray-500">
+                    <p className="mt-2 text-sm leading-relaxed text-gray-500 dark:text-gray-400">
                       {feature.description}
                     </p>
-                    {i === FEATURES.length - 1 && (
-                      <Link
-                        href="/support"
-                        className="mt-3 inline-flex items-center gap-1 text-sm text-amber-600 hover:text-amber-700 underline underline-offset-2"
-                      >
-                        Talk it through first
-                        <ArrowRight className="h-3.5 w-3.5" />
-                      </Link>
-                    )}
                   </div>
                 ))}
+              </div>
+
+              {/* Decision support callout */}
+              <div className="mt-10 text-center">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Not ready to celebrate yet?{" "}
+                  <Link
+                    href="/support"
+                    className="text-amber-600 hover:text-amber-700 underline underline-offset-2 dark:text-amber-400 dark:hover:text-amber-300"
+                  >
+                    Talk it through first
+                  </Link>
+                </p>
               </div>
             </div>
       </section>
 
-      {/* Example Memorial */}
-          <section className="px-4 py-6 sm:py-8 bg-amber-50/40">
+      {/* Example Memorial + Testimonial + Trust Signals */}
+      <section className="px-4 py-8 sm:py-12 bg-amber-50/40 dark:bg-gray-900/50">
             <div className="mx-auto max-w-3xl text-center">
-              <h2 className="font-serif text-3xl font-medium text-gray-900 md:text-4xl">
+              <h2 className="font-serif text-3xl font-medium text-gray-900 dark:text-amber-50 md:text-4xl">
                 See what a memorial looks like
               </h2>
-              <p className="mt-4 text-gray-500">
+              <p className="mt-4 text-gray-500 dark:text-gray-400">
                 Browse a sample memorial to see what you&apos;ll create.
               </p>
               <Link
                 href="/demo"
-                className="mt-8 inline-flex items-center gap-2 rounded-full bg-amber-600 px-8 py-3 text-base font-medium text-white hover:bg-amber-700 transition-colors"
+                className="mt-8 inline-flex items-center gap-2 rounded-full bg-amber-600 px-8 py-3 text-base font-medium text-white hover:bg-amber-700 transition-colors dark:bg-amber-500 dark:hover:bg-amber-400 dark:text-gray-900"
               >
                 View example memorial
                 <ArrowRight className="h-4 w-4" />
               </Link>
-            </div>
-          </section>
 
-          {/* Testimonial + Trust Signals */}
-          <section className="px-4 py-10 sm:py-12 bg-amber-50/40">
-            <div className="mx-auto max-w-2xl text-center">
-              <blockquote className="font-serif text-xl italic text-gray-600 md:text-2xl">
+              <blockquote className="mt-12 font-serif text-xl italic text-gray-600 dark:text-amber-100/70 md:text-2xl">
                 &ldquo;I finally felt like I could breathe again. Like she was
                 being remembered the way she deserved.&rdquo;
               </blockquote>
@@ -591,7 +564,7 @@ export default function Home() {
                 &mdash; Sarah, remembering Luna
               </p>
 
-              <div className="mt-12 flex flex-wrap items-center justify-center gap-6 text-sm text-gray-400">
+              <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-sm text-gray-400 dark:text-gray-500">
                 <span className="flex items-center gap-1.5">
                   <ShieldCheck className="h-4 w-4" /> Your photos stay private
                 </span>

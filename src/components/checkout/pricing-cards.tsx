@@ -80,7 +80,7 @@ export function PricingCards({ memorialId, slug, onLeave }: PricingCardsProps) {
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <div className="text-center space-y-2">
-        <h2 className="font-serif text-2xl font-semibold text-gray-900">
+        <h2 className="font-serif text-2xl font-medium text-gray-900">
           Publish your memorial
         </h2>
         <p className="text-gray-500">

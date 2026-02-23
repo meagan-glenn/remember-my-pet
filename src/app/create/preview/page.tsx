@@ -189,7 +189,7 @@ function PreviewContent() {
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
             <Check className="h-8 w-8 text-green-600" />
           </div>
-          <h2 className="font-serif text-2xl font-semibold text-gray-900">
+          <h2 className="font-serif text-2xl font-medium text-gray-900">
             {ctx.petDetails.petName}&apos;s memorial is live
           </h2>
           <p className="text-gray-500">

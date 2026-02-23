@@ -207,18 +207,18 @@ export function StepTributeChat({
   return (
     <div className="space-y-6">
       <div className="text-center space-y-2">
-        <h1 className="text-2xl font-semibold text-gray-900">
+        <h1 className="text-2xl font-semibold text-gray-900 dark:text-amber-50">
           {generatedTribute
             ? `${petName || "Your pet"}\u2019s Tribute`
             : `Tell us about ${petName || "your pet"}`}
         </h1>
         {!generatedTribute && (
-          <p className="text-gray-500">
+          <p className="text-gray-500 dark:text-gray-400">
             Share some memories and we&apos;ll write a tribute together.
           </p>
         )}
         {generatedTribute && (
-          <p className="text-gray-500">
+          <p className="text-gray-500 dark:text-gray-400">
             Review your tribute below, then continue to preview your memorial.
           </p>
         )}
@@ -229,7 +229,7 @@ export function StepTributeChat({
         <>
           {/* Crisis banner */}
           {crisisBanner && (
-            <div className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
+            <div className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800 dark:border-blue-800/40 dark:bg-blue-950/30 dark:text-blue-200">
               <div className="flex items-start justify-between gap-2">
                 <p>
                   If you&apos;re in crisis, please reach out:{" "}
@@ -258,8 +258,8 @@ export function StepTributeChat({
                 <div
                   className={`rounded-2xl px-4 py-3 max-w-[85%] text-sm ${
                     msg.role === "user"
-                      ? "bg-amber-600 text-white"
-                      : "bg-gray-100 text-gray-800"
+                      ? "bg-amber-100 text-amber-900 dark:bg-amber-500/15 dark:text-amber-100"
+                      : "bg-amber-50/80 text-gray-700 dark:bg-amber-950/30 dark:text-amber-100/80"
                   }`}
                 >
                   {msg.content}
@@ -268,18 +268,18 @@ export function StepTributeChat({
             ))}
             {(isTyping || chatLoading) && (
               <div className="flex justify-start">
-                <div className="rounded-2xl px-4 py-3 bg-gray-100 flex items-center gap-1">
+                <div className="rounded-2xl px-4 py-3 bg-amber-50/80 dark:bg-amber-950/30 flex items-center gap-1">
                   <span
-                    className="h-2 w-2 rounded-full bg-gray-400 animate-bounce"
+                    className="h-2 w-2 rounded-full bg-amber-400 animate-pulse"
                     style={{ animationDelay: "0ms" }}
                   />
                   <span
-                    className="h-2 w-2 rounded-full bg-gray-400 animate-bounce"
-                    style={{ animationDelay: "150ms" }}
+                    className="h-2 w-2 rounded-full bg-amber-400 animate-pulse"
+                    style={{ animationDelay: "200ms" }}
                   />
                   <span
-                    className="h-2 w-2 rounded-full bg-gray-400 animate-bounce"
-                    style={{ animationDelay: "300ms" }}
+                    className="h-2 w-2 rounded-full bg-amber-400 animate-pulse"
+                    style={{ animationDelay: "400ms" }}
                   />
                 </div>
               </div>
@@ -293,7 +293,7 @@ export function StepTributeChat({
               <Button
                 onClick={() => handleGenerateTribute()}
                 disabled={generating}
-                className="w-full h-12 bg-amber-600 hover:bg-amber-700"
+                className="w-full h-12 bg-amber-500 hover:bg-amber-600 dark:bg-amber-500 dark:hover:bg-amber-400 dark:text-gray-900"
               >
                 {generating ? (
                   <span className="flex items-center gap-2">
@@ -301,7 +301,7 @@ export function StepTributeChat({
                     Writing your tribute...
                   </span>
                 ) : (
-                  "Generate Tribute"
+                  "Write My Tribute"
                 )}
               </Button>
               {error && (
@@ -327,7 +327,7 @@ export function StepTributeChat({
                       handleSend();
                     }
                   }}
-                  className="flex-1 min-h-[48px] rounded-md border border-input bg-background px-3 py-3 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none overflow-hidden"
+                  className="flex-1 min-h-[48px] rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-400 disabled:cursor-not-allowed disabled:opacity-50 resize-none overflow-hidden leading-relaxed dark:border-amber-800/30 dark:bg-gray-900 dark:text-amber-50 dark:placeholder:text-gray-500"
                   rows={1}
                   autoFocus
                   disabled={isTyping || chatLoading}
@@ -337,7 +337,7 @@ export function StepTributeChat({
                   disabled={
                     !input.trim() || isTyping || chatLoading
                   }
-                  className="h-12 px-6 bg-amber-600 hover:bg-amber-700"
+                  className="h-12 px-6 border border-amber-300 text-amber-700 hover:bg-amber-50 bg-transparent dark:border-amber-800/40 dark:text-amber-200 dark:hover:bg-amber-900/20"
                 >
                   Send
                 </Button>
@@ -380,11 +380,11 @@ export function StepTributeChat({
       {/* Generated tribute display */}
       {generatedTribute && (
         <div className="space-y-4">
-          <div className="rounded-xl bg-white border border-amber-200 p-6 shadow-sm">
-            <h2 className="font-semibold text-gray-900 mb-3">
+          <div className="rounded-xl bg-white border border-amber-200 p-6 shadow-sm dark:bg-gray-900/60 dark:border-amber-800/30">
+            <h2 className="font-semibold text-gray-900 dark:text-amber-50 mb-3">
               Your Tribute
             </h2>
-            <div className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+            <div className="text-gray-700 dark:text-amber-100/80 leading-relaxed whitespace-pre-wrap">
               {generatedTribute}
             </div>
           </div>
@@ -395,7 +395,7 @@ export function StepTributeChat({
                 value={refinementFeedback}
                 onChange={(e) => setRefinementFeedback(e.target.value)}
                 placeholder="What would you like to change? e.g. &quot;Remove the part about car rides&quot; or &quot;It says 'your' a few times — make it third person&quot;"
-                className="w-full rounded-lg border border-gray-300 p-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500 resize-none"
+                className="w-full rounded-xl border border-gray-200 p-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-400 resize-none dark:border-amber-800/30 dark:bg-gray-900 dark:text-amber-50 dark:placeholder:text-gray-500"
                 rows={3}
                 maxLength={1000}
               />
@@ -413,7 +413,7 @@ export function StepTributeChat({
                 <Button
                   onClick={() => handleGenerateTribute(refinementFeedback)}
                   disabled={generating || !refinementFeedback.trim()}
-                  className="h-10 flex-1 bg-amber-600 hover:bg-amber-700"
+                  className="h-10 flex-1 bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-400 dark:text-gray-900"
                 >
                   {generating ? "Rewriting…" : "Rewrite Tribute"}
                 </Button>
@@ -431,7 +431,7 @@ export function StepTributeChat({
               </Button>
               <Button
                 onClick={onNext}
-                className="h-12 flex-1 bg-amber-600 hover:bg-amber-700"
+                className="h-12 flex-1 bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-400 dark:text-gray-900"
               >
                 Continue to Preview
               </Button>

@@ -112,17 +112,17 @@ export function StepDecisionSupport({
     <div className="space-y-6">
       {/* Header */}
       <div className="text-center space-y-2">
-        <h1 className="font-serif text-2xl font-medium text-gray-900">
+        <h1 className="font-serif text-2xl font-medium text-gray-900 dark:text-amber-50">
           You don&apos;t have to be ready yet
         </h1>
-        <p className="text-gray-500 text-sm">
+        <p className="text-gray-500 dark:text-gray-400 text-sm">
           If something about {petName} is weighing on you, say it here first.
         </p>
       </div>
 
       {/* Crisis banner */}
       {crisisBanner && (
-        <div className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
+        <div className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800 dark:border-blue-800/40 dark:bg-blue-950/30 dark:text-blue-200">
           <div className="flex items-start justify-between gap-2">
             <p>
               If you&apos;re in crisis, please reach out:{" "}
@@ -151,13 +151,13 @@ export function StepDecisionSupport({
             <div key={i} className="space-y-3">
               {/* User concern */}
               <div className="flex justify-end">
-                <div className="max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed bg-amber-600 text-white">
+                <div className="max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed bg-amber-100 text-amber-900 dark:bg-amber-500/15 dark:text-amber-100">
                   {entry.userConcern}
                 </div>
               </div>
               {/* AI reframing */}
               <div className="flex justify-start">
-                <div className="max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed bg-amber-50/80 text-gray-700">
+                <div className="max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed bg-amber-50/80 text-gray-700 dark:bg-amber-950/30 dark:text-amber-100/80">
                   {entry.aiReframing}
                 </div>
               </div>
@@ -165,7 +165,7 @@ export function StepDecisionSupport({
           ))}
           {loading && (
             <div className="flex justify-start">
-              <div className="rounded-2xl bg-amber-50/80">
+              <div className="rounded-2xl bg-amber-50/80 dark:bg-amber-950/30">
                 <TypingIndicator />
               </div>
             </div>
@@ -176,7 +176,7 @@ export function StepDecisionSupport({
       {/* Loading indicator when no exchanges yet */}
       {!hasExchanges && loading && (
         <div className="flex justify-start px-1">
-          <div className="rounded-2xl bg-amber-50/80">
+          <div className="rounded-2xl bg-amber-50/80 dark:bg-amber-950/30">
             <TypingIndicator />
           </div>
         </div>
@@ -212,7 +212,7 @@ export function StepDecisionSupport({
                 : `What's weighing on you about ${petName}?`
             }
             rows={hasExchanges ? 3 : 4}
-            className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-400 resize-none leading-relaxed"
+            className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-400 resize-none leading-relaxed dark:border-amber-800/30 dark:bg-gray-900 dark:text-amber-50 dark:placeholder:text-gray-500"
           />
           {!hasExchanges && (
             <p className="text-xs text-gray-400 leading-relaxed">
@@ -224,7 +224,7 @@ export function StepDecisionSupport({
           <Button
             type="submit"
             disabled={!input.trim() || loading}
-            className="w-full h-11 bg-amber-600 hover:bg-amber-700 disabled:opacity-40"
+            className="w-full h-11 border border-amber-300 text-amber-700 hover:bg-amber-50 bg-transparent disabled:opacity-40 dark:border-amber-800/40 dark:text-amber-200 dark:hover:bg-amber-900/20"
           >
             Share
           </Button>
@@ -239,7 +239,7 @@ export function StepDecisionSupport({
               type="button"
               variant="outline"
               onClick={onBack}
-              className="w-full h-11 border-amber-300 text-amber-700 hover:bg-amber-50"
+              className="w-full h-11 border-amber-300 text-amber-700 hover:bg-amber-50 dark:border-amber-800/40 dark:text-amber-200 dark:hover:bg-amber-900/20"
             >
               I&apos;m ready to continue
               <ArrowRight className="ml-2 h-4 w-4" />
@@ -250,7 +250,7 @@ export function StepDecisionSupport({
               type="button"
               variant="outline"
               onClick={onReadyToCreate}
-              className="w-full h-11 border-amber-300 text-amber-700 hover:bg-amber-50"
+              className="w-full h-11 border-amber-300 text-amber-700 hover:bg-amber-50 dark:border-amber-800/40 dark:text-amber-200 dark:hover:bg-amber-900/20"
             >
               Create {petName}&apos;s memorial when you&apos;re ready
               <ArrowRight className="ml-2 h-4 w-4" />
