@@ -11,7 +11,7 @@ import { useState, useRef, useCallback, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import type { PetDetails } from "@/hooks/use-memorial-state";
 import { ImageCropModal } from "@/components/image-crop-modal";
-import { createBrowserSupabase } from "@/lib/supabase";
+
 
 function LoadingSkeleton() {
   return (
@@ -74,14 +74,14 @@ function IntroForm() {
   if (!hydrated) return <LoadingSkeleton />;
 
   return (
-    <div className="py-8 px-4">
+    <div className="min-h-screen bg-white py-8 px-4 dark:bg-gray-950">
       <div className="mx-auto max-w-lg">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="text-center space-y-2">
-            <h1 className="text-2xl font-semibold text-gray-900">
+            <h1 className="text-2xl font-semibold text-gray-900 dark:text-amber-50">
               Let&apos;s remember them
             </h1>
-            <p className="text-gray-500">
+            <p className="text-gray-500 dark:text-gray-400">
               Tell us a little about your pet to get started.
             </p>
           </div>
@@ -123,8 +123,8 @@ function IntroForm() {
                     onClick={() => updatePetDetails({ species: s })}
                     className={`flex-1 rounded-lg border px-4 py-3 text-sm font-medium capitalize transition-colors ${
                       petDetails.species === s
-                        ? "border-amber-500 bg-amber-50 text-amber-700"
-                        : "border-gray-200 text-gray-600 hover:border-gray-300"
+                        ? "border-amber-500 bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-700"
+                        : "border-gray-200 text-gray-600 hover:border-gray-300 dark:border-amber-900/30 dark:text-gray-400 dark:hover:border-amber-800/50"
                     }`}
                   >
                     {s}
@@ -171,7 +171,7 @@ function IntroForm() {
             <div className="space-y-2">
               <Label>Primary photo</Label>
               {petDetails.heroPhoto ? (
-                <div className="relative w-full overflow-hidden rounded-xl bg-gray-100">
+                <div className="relative w-full overflow-hidden rounded-xl bg-gray-100 dark:bg-gray-800">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={petDetails.heroPhoto}
@@ -190,13 +190,13 @@ function IntroForm() {
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="flex w-full flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 p-8 hover:border-gray-300 transition-colors"
+                  className="flex w-full flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 p-8 hover:border-gray-300 transition-colors dark:border-amber-900/30 dark:bg-gray-900/40 dark:hover:border-amber-800/50"
                 >
-                  <ImagePlus className="h-10 w-10 text-gray-400 mb-2" />
-                  <p className="text-sm font-medium text-gray-700">
+                  <ImagePlus className="h-10 w-10 text-gray-400 dark:text-gray-500 mb-2" />
+                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
                     Add a favorite photo
                   </p>
-                  <p className="text-xs text-gray-400 mt-1">
+                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
                     This will be the main image on the memorial
                   </p>
                 </button>
@@ -220,7 +220,7 @@ function IntroForm() {
 
           <Button
             type="submit"
-            className="w-full h-12 text-base bg-amber-600 hover:bg-amber-700"
+            className="w-full h-12 text-base bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-400 dark:text-gray-900"
             disabled={!petDetails.petName.trim()}
           >
             Continue
@@ -248,8 +248,6 @@ function IntroForm() {
 
 // ── Dashboard Mode: Workspace with feature cards ──────────────────────────────
 
-const AUTOSAVE_DISMISSED_KEY = "petmemorial-autosave-dismissed";
-
 function Dashboard() {
   const {
     petDetails,
@@ -269,18 +267,6 @@ function Dashboard() {
   } = useMemorialContext();
   const [editingDetails, setEditingDetails] = useState(false);
   const [showPulse, setShowPulse] = useState(false);
-  const [showAutoSaveMsg, setShowAutoSaveMsg] = useState(false);
-
-  useEffect(() => {
-    if (!hydrated) return;
-    if (localStorage.getItem(AUTOSAVE_DISMISSED_KEY)) return;
-    // Don't show "create an account" banner if already signed in
-    const supabase = createBrowserSupabase();
-    supabase.auth.getUser().then(({ data }) => {
-      if (!data.user) setShowAutoSaveMsg(true);
-    });
-  }, [hydrated]);
-
   useEffect(() => {
     if (lastSaved === null) return;
     setShowPulse(true);
@@ -315,12 +301,12 @@ function Dashboard() {
   const supportStatusType = supportContext.length === 0 ? "not-started" as const : "complete" as const;
 
   return (
-    <div className={`py-8 px-4 ${photoCount > 0 || !tributeNotStarted || videos.length > 0 || compilationUrl || supportContext.length > 0 ? "pb-28" : "pb-8"}`}>
+    <div className={`min-h-screen bg-white py-8 px-4 dark:bg-gray-950 ${photoCount > 0 || !tributeNotStarted || videos.length > 0 || compilationUrl || supportContext.length > 0 ? "pb-28" : "pb-8"}`}>
       <div className="mx-auto max-w-lg space-y-8">
         {/* Pet details header */}
         <div className="text-center space-y-1">
           {petDetails.heroPhoto && (
-            <div className="mx-auto mb-4 h-20 w-20 overflow-hidden rounded-full border-2 border-amber-200">
+            <div className="mx-auto mb-4 h-20 w-20 overflow-hidden rounded-full border-2 border-amber-200 dark:border-amber-800">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={petDetails.heroPhoto}
@@ -329,51 +315,30 @@ function Dashboard() {
               />
             </div>
           )}
-          <h1 className="text-2xl font-semibold text-gray-900">
+          <h1 className="text-2xl font-semibold text-gray-900 dark:text-amber-50">
             {cameFromSeed
               ? <>Let&apos;s build {petDetails.petName}&apos;s memorial</>
               : <>You&apos;ve started {petDetails.petName}&apos;s memorial</>}
           </h1>
-          <p className="text-gray-500">
+          <p className="text-gray-500 dark:text-gray-400">
             What would you like to do next?
           </p>
           {lastSaved !== null && (
             <div className={`flex items-center justify-center gap-1.5 text-xs transition-opacity duration-700 ${
               showPulse ? 'opacity-100' : 'opacity-50'
             }`}>
-              <Check className="h-3 w-3 text-green-600" />
-              <span className="text-gray-400">Saved to this device</span>
+              <Check className="h-3 w-3 text-green-600 dark:text-green-500" />
+              <span className="text-gray-400 dark:text-gray-500">Saved to this device</span>
             </div>
           )}
           <button
             type="button"
             onClick={() => setEditingDetails(!editingDetails)}
-            className="text-sm text-amber-600 hover:text-amber-700 mt-1"
+            className="text-sm text-amber-600 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-300 mt-1"
           >
             {editingDetails ? "Done editing" : "Edit pet details"}
           </button>
         </div>
-
-        {/* One-time auto-save message */}
-        {showAutoSaveMsg && (
-          <div className="rounded-xl border border-blue-200 bg-blue-50/50 p-4 flex items-start gap-3">
-            <Check className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
-            <p className="flex-1 text-sm text-gray-700">
-              Your work saves automatically on this device. When you&apos;re ready, you&apos;ll create an account to publish.
-            </p>
-            <button
-              type="button"
-              onClick={() => {
-                localStorage.setItem(AUTOSAVE_DISMISSED_KEY, "true");
-                setShowAutoSaveMsg(false);
-              }}
-              className="flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors"
-              aria-label="Dismiss"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          </div>
-        )}
 
         {/* Inline pet details editor */}
         {editingDetails && (
@@ -386,17 +351,10 @@ function Dashboard() {
           />
         )}
 
-        {/* Feature cards */}
-        <div className="space-y-3">
+        {/* Steps */}
+        <div className="flex flex-col gap-4">
           <FeatureCard
-            title="Work Through the Hard Stuff"
-            description="If you're carrying guilt or 'what-ifs,' start here first"
-            status={supportStatus}
-            statusType={supportStatusType}
-            href="/create/support"
-            icon={<HeartHandshake className="h-6 w-6" />}
-          />
-          <FeatureCard
+            step={1}
             title="Upload Photos"
             description="Add photos to the memorial gallery"
             status={photoStatus}
@@ -405,6 +363,7 @@ function Dashboard() {
             icon={<Camera className="h-6 w-6" />}
           />
           <FeatureCard
+            step={2}
             title="Write Tribute"
             description="Write a personal tribute with AI to tell their story"
             status={tributeStatus}
@@ -413,6 +372,7 @@ function Dashboard() {
             icon={<PenLine className="h-6 w-6" />}
           />
           <FeatureCard
+            step={3}
             title="Create Video Reel"
             description="Upload videos and compile a memorial reel"
             status={
@@ -433,14 +393,31 @@ function Dashboard() {
             icon={<Film className="h-6 w-6" />}
           />
         </div>
+
+        {/* Optional support */}
+        <div>
+          <div className="flex items-center gap-3 mb-3">
+            <div className="h-px flex-1 bg-gray-200 dark:bg-gray-800" />
+            <span className="text-xs text-gray-400 dark:text-gray-500">If you need support</span>
+            <div className="h-px flex-1 bg-gray-200 dark:bg-gray-800" />
+          </div>
+          <FeatureCard
+            title="Talk It Through"
+            description="A safe space to work through guilt, regrets, or the &lsquo;what-ifs&rsquo; — at your own pace"
+            status={supportContext.length > 0 ? supportStatus : ""}
+            statusType={supportStatusType}
+            href="/create/support"
+            icon={<HeartHandshake className="h-6 w-6" />}
+          />
+        </div>
       </div>
 
       {/* Sticky save bar — only show after user has started at least one section */}
       {(photoCount > 0 || !tributeNotStarted || videos.length > 0 || compilationUrl || supportContext.length > 0) ? (
-        <div className="fixed bottom-0 left-0 right-0 border-t border-gray-200 bg-white/95 backdrop-blur-sm px-4 py-4">
+        <div className="fixed bottom-0 left-0 right-0 border-t border-gray-200 bg-white/95 backdrop-blur-sm px-4 py-4 dark:border-amber-900/30 dark:bg-gray-950/95">
           <div className="mx-auto max-w-lg">
             <Link href="/create/preview">
-              <Button className="w-full h-12 text-base bg-amber-600 hover:bg-amber-700 gap-2">
+              <Button className="w-full h-12 text-base bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-400 dark:text-gray-900 gap-2">
                 <Eye className="h-5 w-5" />
                 Preview & Save
               </Button>
@@ -449,11 +426,11 @@ function Dashboard() {
         </div>
       ) : (
         <div className="mt-8 text-center space-y-3">
-          <p className="text-sm text-gray-400">
+          <p className="text-sm text-gray-400 dark:text-gray-500">
             Not sure where to start? If you&apos;re carrying something heavy, try
             &ldquo;Work Through the Hard Stuff&rdquo; first. Otherwise, most people begin with photos.
           </p>
-          <Link href="/demo" className="text-sm text-amber-600 hover:text-amber-700 underline underline-offset-2">
+          <Link href="/demo" className="text-sm text-amber-600 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-300 underline underline-offset-2">
             Want to see what a finished memorial looks like? View example →
           </Link>
         </div>
@@ -481,7 +458,7 @@ function PetDetailsEditor({
   const [cropSrc, setCropSrc] = useState<string | null>(null);
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5 space-y-4">
+    <div className="rounded-2xl border border-gray-200 bg-white p-5 space-y-4 dark:border-amber-900/30 dark:bg-gray-900/40">
       <div className="space-y-2">
         <Label htmlFor="edit-petName">Pet&apos;s name</Label>
         <Input
@@ -513,8 +490,8 @@ function PetDetailsEditor({
               onClick={() => onUpdate({ species: s })}
               className={`flex-1 rounded-lg border px-4 py-3 text-sm font-medium capitalize transition-colors ${
                 petDetails.species === s
-                  ? "border-amber-500 bg-amber-50 text-amber-700"
-                  : "border-gray-200 text-gray-600 hover:border-gray-300"
+                  ? "border-amber-500 bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-700"
+                  : "border-gray-200 text-gray-600 hover:border-gray-300 dark:border-amber-900/30 dark:text-gray-400 dark:hover:border-amber-800/50"
               }`}
             >
               {s}
@@ -541,8 +518,8 @@ function PetDetailsEditor({
               onClick={() => onUpdate({ gender: petDetails.gender === value ? undefined : value })}
               className={`flex-1 rounded-lg border px-4 py-3 text-sm font-medium transition-colors ${
                 petDetails.gender === value
-                  ? "border-amber-500 bg-amber-50 text-amber-700"
-                  : "border-gray-200 text-gray-600 hover:border-gray-300"
+                  ? "border-amber-500 bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-700"
+                  : "border-gray-200 text-gray-600 hover:border-gray-300 dark:border-amber-900/30 dark:text-gray-400 dark:hover:border-amber-800/50"
               }`}
             >
               {label}
@@ -578,7 +555,7 @@ function PetDetailsEditor({
       <div className="space-y-2">
         <Label>Primary photo</Label>
         {petDetails.heroPhoto ? (
-          <div className="relative w-full overflow-hidden rounded-xl bg-gray-100">
+          <div className="relative w-full overflow-hidden rounded-xl bg-gray-100 dark:bg-gray-800">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={petDetails.heroPhoto}
@@ -597,10 +574,10 @@ function PetDetailsEditor({
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="flex w-full flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 p-8 hover:border-gray-300 transition-colors"
+            className="flex w-full flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 p-8 hover:border-gray-300 transition-colors dark:border-amber-900/30 dark:bg-gray-900/40 dark:hover:border-amber-800/50"
           >
-            <ImagePlus className="h-10 w-10 text-gray-400 mb-2" />
-            <p className="text-sm font-medium text-gray-700">Add a favorite photo</p>
+            <ImagePlus className="h-10 w-10 text-gray-400 dark:text-gray-500 mb-2" />
+            <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Add a favorite photo</p>
           </button>
         )}
         <input
@@ -671,8 +648,8 @@ function EditLoader() {
     return (
       <div className="flex min-h-screen items-center justify-center px-4">
         <div className="text-center space-y-3">
-          <p className="text-gray-600">{error}</p>
-          <a href="/dashboard" className="text-sm text-amber-600 hover:underline">
+          <p className="text-gray-600 dark:text-gray-400">{error}</p>
+          <a href="/dashboard" className="text-sm text-amber-600 hover:underline dark:text-amber-400">
             Back to dashboard
           </a>
         </div>

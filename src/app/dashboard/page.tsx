@@ -43,15 +43,15 @@ export default async function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white py-8 px-4">
+    <div className="min-h-screen bg-gradient-to-b from-amber-50 to-white py-8 px-4 dark:from-gray-950 dark:to-gray-950">
       <div className="mx-auto max-w-2xl space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-gray-900">My Memorials</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-amber-50">My Memorials</h1>
           <SignOutButton />
         </div>
 
         <Link href="/create">
-          <Button className="w-full h-12 bg-amber-600 hover:bg-amber-700 text-base">
+          <Button className="w-full h-12 bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-400 dark:text-gray-900 text-base">
             Create a Memorial
           </Button>
         </Link>
@@ -98,7 +98,7 @@ export default async function Dashboard() {
                   <CardContent className="flex items-center gap-4">
                     <Link
                       href={`/${memorial.slug}`}
-                      className="text-sm text-amber-600 hover:underline"
+                      className="text-sm text-amber-600 hover:underline dark:text-amber-400"
                     >
                       View memorial
                     </Link>
@@ -110,7 +110,7 @@ export default async function Dashboard() {
                     ) : (
                       <Link
                         href={`/create?edit=${memorial.id}`}
-                        className="text-sm font-medium text-amber-700 bg-amber-100 hover:bg-amber-200 px-3 py-1 rounded-full transition-colors"
+                        className="text-sm font-medium text-amber-700 bg-amber-100 hover:bg-amber-200 px-3 py-1 rounded-full transition-colors dark:text-amber-300 dark:bg-amber-900/30 dark:hover:bg-amber-900/50"
                       >
                         Publish
                       </Link>
