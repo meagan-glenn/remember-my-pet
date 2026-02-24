@@ -118,7 +118,7 @@ product_orders — see Gelato migration
 - Image crop modal for photo editing
 - Demo memorial page (`/demo`)
 - Activity feed on homepage (opt-in at publish, candle interaction, public browsing)
-- Blog (`/blog`) with founding story and pet loss coping article
+- Blog (`/blog`) with founding story, pet loss coping article, and grief-day validation post
 - Legal pages (`/privacy`, `/terms`) and site footer with support/tip link
 - Centralized error UX — user-friendly recovery messages, offline banner, error boundary, structured API errors
 - Shadcn/ui components: button, input, label, card, textarea, dialog, separator, tabs, avatar, sonner, dropdown-menu, badge, progress

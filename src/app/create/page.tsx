@@ -141,6 +141,26 @@ function IntroForm() {
               )}
             </div>
 
+            <div className="space-y-2">
+              <Label>Gender (optional)</Label>
+              <div className="flex gap-2">
+                {([["male", "Boy"], ["female", "Girl"], ["neutral", "Other"]] as const).map(([value, label]) => (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => updatePetDetails({ gender: petDetails.gender === value ? undefined : value })}
+                    className={`flex-1 rounded-lg border px-4 py-3 text-sm font-medium transition-colors ${
+                      petDetails.gender === value
+                        ? "border-amber-500 bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-700"
+                        : "border-gray-200 text-gray-600 hover:border-gray-300 dark:border-amber-900/30 dark:text-gray-400 dark:hover:border-amber-800/50"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="birthDate">Born (optional)</Label>
