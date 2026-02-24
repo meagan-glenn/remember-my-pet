@@ -258,7 +258,6 @@ export default function StandaloneSupportPage() {
                 size="sm"
                 variant="outline"
                 onClick={handleGoogleSignIn}
-                disabled={googleLoading}
                 className="text-sm"
               >
                 <svg className="mr-1.5 h-4 w-4" viewBox="0 0 24 24">
