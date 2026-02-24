@@ -47,7 +47,7 @@ const jsonLd = {
   ],
   contactPoint: {
     "@type": "ContactPoint",
-    email: "teamremembermypet@gmail.com",
+    email: "team@remembermypet.ai",
     contactType: "customer support",
   },
 };
@@ -248,10 +248,10 @@ export default function AiInfoPage() {
               <p className="mt-3">
                 For questions, support, or press inquiries:{" "}
                 <a
-                  href="mailto:teamremembermypet@gmail.com"
+                  href="mailto:team@remembermypet.ai"
                   className="text-amber-600 hover:underline dark:text-amber-400"
                 >
-                  teamremembermypet@gmail.com
+                  team@remembermypet.ai
                 </a>
               </p>
             </section>

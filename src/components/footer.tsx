@@ -54,7 +54,7 @@ export function Footer() {
               </li>
               <li>
                 <a
-                  href="mailto:teamremembermypet@gmail.com"
+                  href="mailto:team@remembermypet.ai"
                   className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors"
                 >
                   Contact

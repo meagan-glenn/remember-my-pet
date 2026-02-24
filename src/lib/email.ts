@@ -1,6 +1,6 @@
 import { Resend } from "resend";
 
-const FROM_EMAIL = "PetMemorial.ai <noreply@petmemorial.ai>";
+const FROM_EMAIL = "Remember My Pet <noreply@remembermypet.ai>";
 
 function getResend() {
   return new Resend(process.env.RESEND_API_KEY);

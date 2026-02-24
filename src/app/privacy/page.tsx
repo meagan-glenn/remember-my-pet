@@ -92,10 +92,10 @@ export default function PrivacyPage() {
               at any time from your dashboard. To request full data deletion,
               contact us at{" "}
               <a
-                href="mailto:teamremembermypet@gmail.com"
+                href="mailto:team@remembermypet.ai"
                 className="text-amber-600 hover:underline dark:text-amber-400"
               >
-                teamremembermypet@gmail.com
+                team@remembermypet.ai
               </a>
               .
             </p>
@@ -128,10 +128,10 @@ export default function PrivacyPage() {
             <p className="mt-3">
               Questions about this policy? Email us at{" "}
               <a
-                href="mailto:teamremembermypet@gmail.com"
+                href="mailto:team@remembermypet.ai"
                 className="text-amber-600 hover:underline dark:text-amber-400"
               >
-                teamremembermypet@gmail.com
+                team@remembermypet.ai
               </a>
               .
             </p>
