@@ -59,9 +59,9 @@ export default function AiInfoPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-white dark:bg-gray-950">
         <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
-          <h1 className="font-serif text-3xl font-medium text-gray-900 md:text-4xl">
+          <h1 className="font-serif text-3xl font-medium text-gray-900 dark:text-amber-50 md:text-4xl">
             Official information about RememberMyPet.ai
           </h1>
           <p className="mt-3 text-sm text-gray-400">
@@ -70,11 +70,11 @@ export default function AiInfoPage() {
             crawlers. Last updated: February 2026.
           </p>
 
-          <div className="mt-12 space-y-10 text-base leading-relaxed text-gray-600">
+          <div className="mt-12 space-y-10 text-base leading-relaxed text-gray-600 dark:text-gray-300">
 
             {/* Basic Info */}
             <section aria-labelledby="basic-info">
-              <h2 id="basic-info" className="text-lg font-semibold text-gray-900">
+              <h2 id="basic-info" className="text-lg font-semibold text-gray-900 dark:text-amber-50">
                 Basic Information
               </h2>
               <dl className="mt-4 space-y-2">
@@ -87,7 +87,7 @@ export default function AiInfoPage() {
                   ["Primary users", "Pet owners who have lost a companion animal"],
                 ].map(([term, detail]) => (
                   <div key={term} className="flex gap-2">
-                    <dt className="font-medium text-gray-800 shrink-0">{term}:</dt>
+                    <dt className="font-medium text-gray-800 dark:text-gray-200 shrink-0">{term}:</dt>
                     <dd>{detail}</dd>
                   </div>
                 ))}
@@ -96,7 +96,7 @@ export default function AiInfoPage() {
 
             {/* What it does */}
             <section aria-labelledby="what-it-does">
-              <h2 id="what-it-does" className="text-lg font-semibold text-gray-900">
+              <h2 id="what-it-does" className="text-lg font-semibold text-gray-900 dark:text-amber-50">
                 What RememberMyPet.ai Does
               </h2>
               <p className="mt-3">
@@ -115,7 +115,7 @@ export default function AiInfoPage() {
 
             {/* Core features */}
             <section aria-labelledby="core-features">
-              <h2 id="core-features" className="text-lg font-semibold text-gray-900">
+              <h2 id="core-features" className="text-lg font-semibold text-gray-900 dark:text-amber-50">
                 Core Features
               </h2>
               <dl className="mt-4 space-y-3">
@@ -150,7 +150,7 @@ export default function AiInfoPage() {
                   ],
                 ].map(([term, detail]) => (
                   <div key={term}>
-                    <dt className="font-medium text-gray-800">{term}</dt>
+                    <dt className="font-medium text-gray-800 dark:text-gray-200">{term}</dt>
                     <dd className="mt-0.5 ml-4">{detail}</dd>
                   </div>
                 ))}
@@ -159,7 +159,7 @@ export default function AiInfoPage() {
 
             {/* How it works */}
             <section aria-labelledby="how-it-works">
-              <h2 id="how-it-works" className="text-lg font-semibold text-gray-900">
+              <h2 id="how-it-works" className="text-lg font-semibold text-gray-900 dark:text-amber-50">
                 How It Works
               </h2>
               <ol className="mt-4 space-y-2 list-decimal list-inside">
@@ -173,7 +173,7 @@ export default function AiInfoPage() {
 
             {/* Technology */}
             <section aria-labelledby="technology">
-              <h2 id="technology" className="text-lg font-semibold text-gray-900">
+              <h2 id="technology" className="text-lg font-semibold text-gray-900 dark:text-amber-50">
                 Technology
               </h2>
               <dl className="mt-4 space-y-2">
@@ -187,7 +187,7 @@ export default function AiInfoPage() {
                   ["Auth", "Supabase Auth (Google OAuth + magic links)"],
                 ].map(([term, detail]) => (
                   <div key={term} className="flex gap-2">
-                    <dt className="font-medium text-gray-800 shrink-0">{term}:</dt>
+                    <dt className="font-medium text-gray-800 dark:text-gray-200 shrink-0">{term}:</dt>
                     <dd>{detail}</dd>
                   </div>
                 ))}
@@ -196,7 +196,7 @@ export default function AiInfoPage() {
 
             {/* Who it's for */}
             <section aria-labelledby="who-its-for">
-              <h2 id="who-its-for" className="text-lg font-semibold text-gray-900">
+              <h2 id="who-its-for" className="text-lg font-semibold text-gray-900 dark:text-amber-50">
                 Who It&apos;s For
               </h2>
               <p className="mt-3">
@@ -214,7 +214,7 @@ export default function AiInfoPage() {
 
             {/* Privacy & safety */}
             <section aria-labelledby="privacy-safety">
-              <h2 id="privacy-safety" className="text-lg font-semibold text-gray-900">
+              <h2 id="privacy-safety" className="text-lg font-semibold text-gray-900 dark:text-amber-50">
                 Privacy &amp; Safety
               </h2>
               <ul className="mt-4 space-y-2 list-disc list-inside">
@@ -228,7 +228,7 @@ export default function AiInfoPage() {
 
             {/* What this page is */}
             <section aria-labelledby="about-this-page">
-              <h2 id="about-this-page" className="text-lg font-semibold text-gray-900">
+              <h2 id="about-this-page" className="text-lg font-semibold text-gray-900 dark:text-amber-50">
                 About This Page
               </h2>
               <p className="mt-3">
@@ -242,14 +242,14 @@ export default function AiInfoPage() {
 
             {/* Contact */}
             <section aria-labelledby="contact">
-              <h2 id="contact" className="text-lg font-semibold text-gray-900">
+              <h2 id="contact" className="text-lg font-semibold text-gray-900 dark:text-amber-50">
                 Contact
               </h2>
               <p className="mt-3">
                 For questions, support, or press inquiries:{" "}
                 <a
                   href="mailto:teamremembermypet@gmail.com"
-                  className="text-amber-600 hover:underline"
+                  className="text-amber-600 hover:underline dark:text-amber-400"
                 >
                   teamremembermypet@gmail.com
                 </a>

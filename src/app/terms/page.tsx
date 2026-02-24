@@ -7,18 +7,18 @@ export const metadata: Metadata = {
 
 export default function TermsPage() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white dark:bg-gray-950">
       <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
-        <h1 className="font-serif text-3xl font-medium text-gray-900 md:text-4xl">
+        <h1 className="font-serif text-3xl font-medium text-gray-900 dark:text-amber-50 md:text-4xl">
           Terms of Service
         </h1>
         <p className="mt-2 text-sm text-gray-400">
           Last updated: January 31, 2026
         </p>
 
-        <div className="mt-10 space-y-8 text-base leading-relaxed text-gray-600">
+        <div className="mt-10 space-y-8 text-base leading-relaxed text-gray-600 dark:text-gray-300">
           <section>
-            <h2 className="text-lg font-semibold text-gray-900">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-amber-50">
               1. Acceptance of Terms
             </h2>
             <p className="mt-3">
@@ -29,7 +29,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-lg font-semibold text-gray-900">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-amber-50">
               2. Description of Service
             </h2>
             <p className="mt-3">
@@ -41,7 +41,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-lg font-semibold text-gray-900">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-amber-50">
               3. User Accounts
             </h2>
             <p className="mt-3">
@@ -53,7 +53,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-lg font-semibold text-gray-900">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-amber-50">
               4. Content Ownership
             </h2>
             <p className="mt-3">
@@ -66,7 +66,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-lg font-semibold text-gray-900">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-amber-50">
               5. Acceptable Use
             </h2>
             <p className="mt-3">You agree not to:</p>
@@ -79,7 +79,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-lg font-semibold text-gray-900">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-amber-50">
               6. Payments & Refunds
             </h2>
             <p className="mt-3">
@@ -88,7 +88,7 @@ export default function TermsPage() {
               purchase, contact us within 30 days at{" "}
               <a
                 href="mailto:teamremembermypet@gmail.com"
-                className="text-amber-600 hover:underline"
+                className="text-amber-600 hover:underline dark:text-amber-400"
               >
                 teamremembermypet@gmail.com
               </a>{" "}
@@ -97,7 +97,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-lg font-semibold text-gray-900">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-amber-50">
               7. Memorial Hosting
             </h2>
             <p className="mt-3">
@@ -111,7 +111,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-lg font-semibold text-gray-900">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-amber-50">
               8. Memory Wall Contributions
             </h2>
             <p className="mt-3">
@@ -123,7 +123,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-lg font-semibold text-gray-900">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-amber-50">
               9. Limitation of Liability
             </h2>
             <p className="mt-3">
@@ -136,7 +136,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-lg font-semibold text-gray-900">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-amber-50">
               10. Changes to Terms
             </h2>
             <p className="mt-3">
@@ -147,14 +147,14 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-lg font-semibold text-gray-900">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-amber-50">
               11. Contact
             </h2>
             <p className="mt-3">
               Questions about these terms? Email us at{" "}
               <a
                 href="mailto:teamremembermypet@gmail.com"
-                className="text-amber-600 hover:underline"
+                className="text-amber-600 hover:underline dark:text-amber-400"
               >
                 teamremembermypet@gmail.com
               </a>

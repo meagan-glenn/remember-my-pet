@@ -8,6 +8,13 @@ export const metadata: Metadata = {
 
 const posts = [
   {
+    slug: "some-days-are-harder",
+    title: "Some days are just harder — and that's okay",
+    date: "February 23, 2026",
+    excerpt:
+      "I thought I was doing better. Then today happened. If you're having one of those days where the grief hits all over again, this is for you.",
+  },
+  {
     slug: "coping-with-pet-loss",
     title: "Coping with pet loss: what actually helped me",
     date: "February 20, 2026",
@@ -25,28 +32,28 @@ const posts = [
 
 export default function BlogPage() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white dark:bg-gray-950">
       <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
-        <h1 className="font-serif text-3xl font-medium text-gray-900 md:text-4xl">
+        <h1 className="font-serif text-3xl font-medium text-gray-900 dark:text-amber-50 md:text-4xl">
           Blog
         </h1>
-        <p className="mt-3 text-gray-500 text-base leading-relaxed">
+        <p className="mt-3 text-gray-500 dark:text-gray-400 text-base leading-relaxed">
           Thoughts on pet loss, grief, and honoring the animals who shaped our lives.
         </p>
 
         <div className="mt-12 space-y-10">
           {posts.map((post) => (
-            <article key={post.slug} className="border-b border-gray-100 pb-10">
+            <article key={post.slug} className="border-b border-gray-100 dark:border-amber-900/30 pb-10">
               <p className="text-xs text-gray-400 uppercase tracking-wide">{post.date}</p>
-              <h2 className="mt-2 font-serif text-xl font-medium text-gray-900 leading-snug">
-                <Link href={`/blog/${post.slug}`} className="hover:text-amber-600 transition-colors">
+              <h2 className="mt-2 font-serif text-xl font-medium text-gray-900 dark:text-amber-50 leading-snug">
+                <Link href={`/blog/${post.slug}`} className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors">
                   {post.title}
                 </Link>
               </h2>
-              <p className="mt-3 text-gray-500 text-sm leading-relaxed">{post.excerpt}</p>
+              <p className="mt-3 text-gray-500 dark:text-gray-400 text-sm leading-relaxed">{post.excerpt}</p>
               <Link
                 href={`/blog/${post.slug}`}
-                className="mt-4 inline-block text-sm text-amber-600 hover:text-amber-700 transition-colors"
+                className="mt-4 inline-block text-sm text-amber-600 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-300 transition-colors"
               >
                 Read more →
               </Link>

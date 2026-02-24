@@ -9,18 +9,18 @@ export const metadata: Metadata = {
 
 export default function CopingWithPetLossPage() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white dark:bg-gray-950">
       <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6">
-        <Link href="/blog" className="text-sm text-amber-600 hover:text-amber-700 transition-colors">
+        <Link href="/blog" className="text-sm text-amber-600 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-300 transition-colors">
           ← Back to blog
         </Link>
 
         <p className="mt-8 text-xs text-gray-400 uppercase tracking-wide">February 20, 2026</p>
-        <h1 className="mt-2 font-serif text-3xl font-medium text-gray-900 leading-snug md:text-4xl">
+        <h1 className="mt-2 font-serif text-3xl font-medium text-gray-900 dark:text-amber-50 leading-snug md:text-4xl">
           Coping with pet loss: what actually helped me
         </h1>
 
-        <div className="mt-10 space-y-6 text-base leading-relaxed text-gray-600">
+        <div className="mt-10 space-y-6 text-base leading-relaxed text-gray-600 dark:text-gray-300">
           <p>
             I lost my dog Skylar on January 28th. She was a husky, 13 and a half years old, and
             she was my whole world. When she died, I didn&apos;t know what to do with myself. I
@@ -34,7 +34,7 @@ export default function CopingWithPetLossPage() {
             another.
           </p>
 
-          <h2 className="text-xl font-semibold text-gray-900 pt-2">Get out of the house</h2>
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-amber-50 pt-2">Get out of the house</h2>
           <p>
             This was the hardest and most important thing. The house is full of them — the spot
             where they slept, the bowl, the leash hanging by the door. Staying home and sitting in
@@ -48,7 +48,7 @@ export default function CopingWithPetLossPage() {
             Even just a walk somewhere new helped.
           </p>
 
-          <h2 className="text-xl font-semibold text-gray-900 pt-2">Stay busy — intentionally</h2>
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-amber-50 pt-2">Stay busy — intentionally</h2>
           <p>
             Idle time is the worst. Not because you should suppress what you&apos;re feeling, but
             because unstructured silence just loops you back to the same thoughts. Find something
@@ -61,7 +61,7 @@ export default function CopingWithPetLossPage() {
             something that felt meaningful, made the days feel less empty.
           </p>
 
-          <h2 className="text-xl font-semibold text-gray-900 pt-2">Let yourself want what you want</h2>
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-amber-50 pt-2">Let yourself want what you want</h2>
           <p>
             I want a new puppy. I&apos;ve wanted one since about two weeks after Skylar died. My
             husband isn&apos;t ready, which I understand — we grieve differently, on different
@@ -74,7 +74,7 @@ export default function CopingWithPetLossPage() {
             helps them heal. Both are okay.
           </p>
 
-          <h2 className="text-xl font-semibold text-gray-900 pt-2">Find people who get it</h2>
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-amber-50 pt-2">Find people who get it</h2>
           <p>
             Not everyone will understand. Some people will say the wrong thing — not out of malice,
             just because they haven&apos;t been through it. That&apos;s okay. Find the ones who
@@ -83,7 +83,7 @@ export default function CopingWithPetLossPage() {
             feeling is real and it&apos;s shared.
           </p>
 
-          <h2 className="text-xl font-semibold text-gray-900 pt-2">Preserve what you can</h2>
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-amber-50 pt-2">Preserve what you can</h2>
           <p>
             One thing I wish I&apos;d done sooner was gather everything — the photos scattered
             across my phone, the videos, the memories I was afraid I&apos;d start to forget. Grief
@@ -96,7 +96,7 @@ export default function CopingWithPetLossPage() {
             me more than I expected.
           </p>
 
-          <h2 className="text-xl font-semibold text-gray-900 pt-2">There&apos;s no timeline</h2>
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-amber-50 pt-2">There&apos;s no timeline</h2>
           <p>
             You don&apos;t have to be over it in a week. Or a month. Or a year. The people who
             tell you it gets easier are right — but they usually forget to mention that it gets
@@ -105,16 +105,16 @@ export default function CopingWithPetLossPage() {
             to rush past.
           </p>
 
-          <p className="text-gray-400 text-sm pt-4">— Meagan, founder of RememberMyPet.ai</p>
+          <p className="text-gray-400 dark:text-gray-500 text-sm pt-4">— Meagan, founder of RememberMyPet.ai</p>
         </div>
 
-        <div className="mt-12 rounded-2xl bg-amber-50 border border-amber-100 p-6 text-center space-y-3">
-          <p className="text-gray-700 text-sm leading-relaxed">
+        <div className="mt-12 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-100 dark:border-amber-900/30 p-6 text-center space-y-3">
+          <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
             Want to preserve their memory somewhere that lasts?
           </p>
           <Link
             href="/create"
-            className="inline-block rounded-full bg-amber-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-amber-700 transition-colors"
+            className="inline-block rounded-full bg-amber-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-amber-700 dark:bg-amber-500 dark:text-gray-900 dark:hover:bg-amber-400 transition-colors"
           >
             Create a memorial
           </Link>

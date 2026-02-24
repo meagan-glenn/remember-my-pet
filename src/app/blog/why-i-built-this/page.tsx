@@ -10,18 +10,18 @@ export const metadata: Metadata = {
 
 export default function WhyIBuiltThisPage() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white dark:bg-gray-950">
       <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6">
-        <Link href="/blog" className="text-sm text-amber-600 hover:text-amber-700 transition-colors">
+        <Link href="/blog" className="text-sm text-amber-600 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-300 transition-colors">
           ← Back to blog
         </Link>
 
         <p className="mt-8 text-xs text-gray-400 uppercase tracking-wide">February 20, 2026</p>
-        <h1 className="mt-2 font-serif text-3xl font-medium text-gray-900 leading-snug md:text-4xl">
+        <h1 className="mt-2 font-serif text-3xl font-medium text-gray-900 dark:text-amber-50 leading-snug md:text-4xl">
           I lost my dog of 13 years. Then I built this.
         </h1>
 
-        <div className="mt-10 space-y-6 text-base leading-relaxed text-gray-600">
+        <div className="mt-10 space-y-6 text-base leading-relaxed text-gray-600 dark:text-gray-300">
           <p>
             Skylar was a husky. Mouthy the way huskies are — she had opinions about everything and
             wasn&apos;t shy about sharing them. She was funny and playful and had more energy than
@@ -40,7 +40,7 @@ export default function WhyIBuiltThisPage() {
               height={400}
               className="w-full object-cover"
             />
-            <p className="mt-2 text-center text-sm text-gray-400">Skylar and me</p>
+            <p className="mt-2 text-center text-sm text-gray-400 dark:text-gray-500">Skylar and me</p>
           </div>
 
           <p>
@@ -83,16 +83,16 @@ export default function WhyIBuiltThisPage() {
             like. I hope this helps, even a little.
           </p>
 
-          <p className="text-gray-400 text-sm">— Meagan, founder of RememberMyPet.ai</p>
+          <p className="text-gray-400 dark:text-gray-500 text-sm">— Meagan, founder of RememberMyPet.ai</p>
         </div>
 
-        <div className="mt-12 rounded-2xl bg-amber-50 border border-amber-100 p-6 text-center space-y-3">
-          <p className="text-gray-700 text-sm leading-relaxed">
+        <div className="mt-12 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-100 dark:border-amber-900/30 p-6 text-center space-y-3">
+          <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
             Ready to create a memorial for your pet?
           </p>
           <Link
             href="/create"
-            className="inline-block rounded-full bg-amber-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-amber-700 transition-colors"
+            className="inline-block rounded-full bg-amber-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-amber-700 dark:bg-amber-500 dark:text-gray-900 dark:hover:bg-amber-400 transition-colors"
           >
             Create a memorial
           </Link>
