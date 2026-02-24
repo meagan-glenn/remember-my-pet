@@ -43,3 +43,18 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# claude
+CLAUDE.md
+
+# strategy & research docs (keep local, not in public repo)
+SOUL.md
+DESIGN.md
+PRD.md
+PRD_v3.0.md
+PRD_v3.1.md
+PetMemorial_PRD_v3_2.md
+PetMemorial_PRD_v3_3.md
+PetMemorial_PRD_v3_3_Changes_Summary.md
+PetMemorial_Day2_Interview_Report.md
+USER_RESEARCH.md
