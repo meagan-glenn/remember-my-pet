@@ -321,7 +321,7 @@ function Dashboard() {
               : <>You&apos;ve started {petDetails.petName}&apos;s memorial</>}
           </h1>
           <p className="text-gray-500 dark:text-gray-400">
-            What would you like to do next?
+            Take it one step at a time.
           </p>
           {lastSaved !== null && (
             <div className={`flex items-center justify-center gap-1.5 text-xs transition-opacity duration-700 ${
@@ -356,7 +356,7 @@ function Dashboard() {
           <FeatureCard
             step={1}
             title="Upload Photos"
-            description="Add photos to the memorial gallery"
+            description="The moments that tell their story"
             status={photoStatus}
             statusType={photoStatusType}
             href="/create/photos"
@@ -365,7 +365,7 @@ function Dashboard() {
           <FeatureCard
             step={2}
             title="Write Tribute"
-            description="Write a personal tribute with AI to tell their story"
+            description="We'll help you find the right words"
             status={tributeStatus}
             statusType={tributeStatusType}
             href="/create/tribute"
@@ -374,7 +374,7 @@ function Dashboard() {
           <FeatureCard
             step={3}
             title="Preview & Publish"
-            description="See how it all comes together and share it with the world"
+            description="See how it all looks before going live"
             status=""
             statusType="not-started"
             href="/create/preview"
@@ -439,11 +439,10 @@ function Dashboard() {
       ) : (
         <div className="mt-8 text-center space-y-3">
           <p className="text-sm text-gray-400 dark:text-gray-500">
-            Not sure where to start? If you&apos;re carrying something heavy, try
-            &ldquo;Work Through the Hard Stuff&rdquo; first. Otherwise, most people begin with photos.
+            Most people start with photos — but there&apos;s no wrong place to begin.
           </p>
           <Link href="/demo" className="text-sm text-amber-600 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-300 underline underline-offset-2">
-            Want to see what a finished memorial looks like? View example →
+            See what a finished memorial looks like
           </Link>
         </div>
       )}

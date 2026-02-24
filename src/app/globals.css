@@ -125,3 +125,8 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Hide footer on focused workspace pages (e.g. /create) */
+body.hide-footer footer {
+  display: none;
+}

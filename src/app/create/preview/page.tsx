@@ -9,6 +9,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { ERROR_MESSAGES } from "@/lib/error-messages";
+import { getPronouns } from "@/lib/pronouns";
 
 function PreviewContent() {
   const ctx = useMemorialContext();
@@ -140,16 +141,16 @@ function PreviewContent() {
 
   if (!ctx.hydrated || saving) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center dark:bg-gray-950">
         <div className="text-center space-y-3 px-4">
           {showWelcomeBack && (
-            <p className="text-base text-gray-700 mb-4">
+            <p className="text-base text-gray-700 dark:text-gray-300 mb-4">
               Welcome back. Picking up right where you left off.
             </p>
           )}
           <div className="h-8 w-8 mx-auto animate-spin rounded-full border-2 border-amber-500 border-t-transparent" />
           {saving && (
-            <p className="text-sm text-gray-500">Saving your memorial...</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Saving your memorial...</p>
           )}
         </div>
       </div>
@@ -158,10 +159,10 @@ function PreviewContent() {
 
   if (autoSaveFailed) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center dark:bg-gray-950">
         <div className="text-center space-y-4 px-4">
-          <p className="text-gray-700">{ERROR_MESSAGES.MEMORIAL_SAVE_FAILED.message}</p>
-          <p className="text-sm text-gray-500">Your progress is safe — you can try again.</p>
+          <p className="text-gray-700 dark:text-gray-300">{ERROR_MESSAGES.MEMORIAL_SAVE_FAILED.message}</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Your progress is safe — you can try again.</p>
           <Button
             onClick={() => {
               setAutoSaveFailed(false);
@@ -173,7 +174,7 @@ function PreviewContent() {
                 })
                 .finally(() => setSaving(false));
             }}
-            className="bg-amber-600 hover:bg-amber-700"
+            className="bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-400 dark:text-gray-900"
           >
             Try again
           </Button>
@@ -184,20 +185,20 @@ function PreviewContent() {
 
   if (savedMemorial) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-amber-50/60 via-orange-50/30 to-white py-12 px-4">
+      <div className="min-h-screen bg-gradient-to-b from-amber-50/60 via-orange-50/30 to-white dark:from-gray-950 dark:via-gray-950 dark:to-gray-950 py-12 px-4">
         <div className="mx-auto max-w-md text-center space-y-6">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-            <Check className="h-8 w-8 text-green-600" />
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
+            <Check className="h-8 w-8 text-green-600 dark:text-green-400" />
           </div>
-          <h2 className="font-serif text-2xl font-medium text-gray-900">
+          <h2 className="font-serif text-2xl font-medium text-gray-900 dark:text-amber-50">
             {ctx.petDetails.petName}&apos;s memorial is live
           </h2>
-          <p className="text-gray-500">
-            Share it with the people who loved them.
+          <p className="text-gray-500 dark:text-gray-400">
+            Share it with the people who loved {getPronouns(ctx.petDetails.gender).object}.
           </p>
           <div className="space-y-3">
             <Link href={`/${savedMemorial.slug}`}>
-              <Button className="w-full h-12 bg-amber-600 hover:bg-amber-700">
+              <Button className="w-full h-12 bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-400 dark:text-gray-900">
                 View memorial
               </Button>
             </Link>
@@ -213,13 +214,13 @@ function PreviewContent() {
   }
 
   return (
-    <div>
+    <div className="min-h-screen bg-gradient-to-b from-amber-50/60 via-orange-50/30 to-white dark:from-gray-950 dark:via-gray-950 dark:to-gray-950">
       <div className="px-4 pt-4 sm:px-6">
         <Button
           variant="ghost"
           size="sm"
           onClick={() => router.push("/create")}
-          className="mb-2 -ml-2 text-gray-600 hover:text-gray-900"
+          className="mb-2 -ml-2 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-amber-50"
         >
           <ArrowLeft className="h-4 w-4 mr-1" />
           Back to workspace

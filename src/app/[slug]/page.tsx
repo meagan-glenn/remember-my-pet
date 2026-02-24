@@ -3,6 +3,7 @@ import { createServerSupabase } from "@/lib/supabase-server";
 import type { Metadata } from "next";
 import Image from "next/image";
 import { PawPrint, Gift } from "lucide-react";
+import { getPronouns } from "@/lib/pronouns";
 import { ShareButton } from "./share-button";
 import { MasonryWall } from "@/components/memorial-wall/masonry-wall";
 import { MemoryForm } from "@/components/memory-wall/memory-form";
@@ -162,6 +163,7 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
   const heroCropY = memorial.hero_photo_crop_y ?? 50;
   const birthFormatted = formatDate(memorial.birth_date);
   const deathFormatted = formatDate(memorial.death_date);
+  const pronouns = getPronouns(memorial.gender as "male" | "female" | "neutral" | null | undefined);
 
   const siteUrl =
     process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
@@ -236,7 +238,7 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
       {/* Wall intro */}
       <section className="mx-auto max-w-6xl px-4 pt-8 sm:px-6">
         <p className="mb-6 text-center text-sm text-gray-400 italic">
-          {memorial.pet_name}&apos;s life, through the eyes of those who loved them
+          {memorial.pet_name}&apos;s life, through the eyes of those who loved {pronouns.object}
         </p>
       </section>
 

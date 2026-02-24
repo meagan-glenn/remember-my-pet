@@ -29,9 +29,18 @@ export async function generatePhotoMetadata(
   const safeGender: Gender = typeof gender === "string" && ["male", "female", "neutral"].includes(gender) ? gender as Gender : undefined;
   const { subject, possessive } = getPronouns(safeGender);
 
-  const prompt = `Analyze this photo of a pet named ${petName} and return a JSON object with two fields. If you need a pronoun, use ${subject}/${possessive}.
+  const prompt = `This is a photo of a pet named ${petName}. Write a caption the way ${possessive} owner would — like a fond memory shared with a friend, not an image description. Use ${subject}/${possessive} for pronouns.
 
-1. "caption": A short, warm sentence for a memorial photo caption. Describe only what's visible — the activity, expression, or setting. Prefer using ${petName}'s name over pronouns. Do not narrate emotions, relationships, or what anyone is feeling (e.g. avoid "loved," "someone she loves," "favorite person"). Vary your sentence structure. Keep it under 150 characters. No clichés like "rainbow bridge," "forever in our hearts," or "best friend."
+Return a JSON object with two fields:
+
+1. "caption": A short, casual caption (under 100 characters) written from the owner's perspective. Think Instagram caption energy — warm, personal, sometimes playful or funny.
+   - Focus on personality, habits, or the vibe of the moment — not what the image literally shows.
+   - If there's a person in the photo, write as if the owner is in it (e.g. "Snuggles with mom on the couch" not "Skylar sits beside a person").
+   - If ${petName} looks silly, proud, regal, cozy — lean into that personality.
+   - Keep it simple. Short is better. A few words can say everything.
+   - This is a starting point the owner will edit, so capture the right *tone* even if you can't know the specific memory.
+   - No clichés like "rainbow bridge," "forever in our hearts," or "best friend."
+   Examples of good captions: "The Queen soaking up the sun", "Always ready for an adventure", "That face got ${subject} out of everything", "Nap champion", "Sunday morning snuggles"
 
 2. "tags": An array of relevant tags from these categories:
    - Life stage: "puppy", "kitten", "young", "adult", "senior"
@@ -41,7 +50,7 @@ export async function generatePhotoMetadata(
    Only include tags that clearly apply. Use 1-5 tags.
 
 Return ONLY valid JSON, no markdown fences. Example:
-{"caption": "Stretching out in a warm patch of afternoon sunlight", "tags": ["sunny_spot", "indoor", "senior"]}`;
+{"caption": "That post-walk look of pure satisfaction", "tags": ["walking", "outdoor", "adult"]}`;
 
   const response = await getClient().messages.create({
     model: MODEL,

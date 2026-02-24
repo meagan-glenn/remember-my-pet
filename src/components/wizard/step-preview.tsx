@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback } from "react";
 import type { PetDetails, WizardPhoto } from "@/hooks/use-memorial-state";
+import { getPronouns } from "@/lib/pronouns";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Pencil, Check, GripVertical, PawPrint, Move } from "lucide-react";
@@ -56,7 +57,7 @@ function SortablePhoto({ photo }: { photo: WizardPhoto }) {
         </button>
       </div>
       {photo.caption && (
-        <p className="text-sm text-gray-500 italic px-1">{photo.caption}</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400 italic px-1">{photo.caption}</p>
       )}
     </div>
   );
@@ -160,6 +161,7 @@ export function StepPreview({
 
   const birthFormatted = formatDate(petDetails.birthDate);
   const deathFormatted = formatDate(petDetails.deathDate);
+  const pronouns = getPronouns(petDetails.gender);
 
   const handleSaveTribute = () => {
     onUpdateTribute(editedTribute);
@@ -178,13 +180,13 @@ export function StepPreview({
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50/60 via-orange-50/30 to-white">
+    <div className="bg-gradient-to-b from-amber-50/60 via-orange-50/30 to-white dark:from-gray-950 dark:via-gray-950 dark:to-gray-950">
       {/* Header */}
       <div className="text-center space-y-2 pt-8 pb-4 px-4">
-        <h1 className="text-2xl font-semibold text-gray-900">
-          Preview your tribute
+        <h1 className="text-2xl font-semibold text-gray-900 dark:text-amber-50">
+          Preview your memorial
         </h1>
-        <p className="text-gray-500">
+        <p className="text-gray-500 dark:text-gray-400">
           Here&apos;s how your memorial will look. You can edit anything before
           saving.
         </p>
@@ -258,15 +260,15 @@ export function StepPreview({
             </div>
           </div>
         ) : (
-          <div className="flex h-[40vh] min-h-[280px] w-full flex-col items-center justify-center bg-gradient-to-b from-amber-100 to-amber-50">
-            <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-amber-200/60">
-              <PawPrint className="h-10 w-10 text-amber-600" />
+          <div className="flex h-[40vh] min-h-[280px] w-full flex-col items-center justify-center bg-gradient-to-b from-amber-100 to-amber-50 dark:from-gray-900 dark:to-gray-950">
+            <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-amber-200/60 dark:bg-amber-900/30">
+              <PawPrint className="h-10 w-10 text-amber-600 dark:text-amber-400" />
             </div>
-            <h2 className="font-serif text-4xl font-medium tracking-tight text-gray-900 sm:text-5xl">
+            <h2 className="font-serif text-4xl font-medium tracking-tight text-gray-900 dark:text-amber-50 sm:text-5xl">
               {petDetails.petName}
             </h2>
             {(birthFormatted || deathFormatted) && (
-              <p className="mt-3 text-lg text-gray-500">
+              <p className="mt-3 text-lg text-gray-500 dark:text-gray-400">
                 {birthFormatted && deathFormatted
                   ? `${birthFormatted} — ${deathFormatted}`
                   : deathFormatted
@@ -280,17 +282,17 @@ export function StepPreview({
 
       {/* Wall intro */}
       <section className="mx-auto max-w-6xl px-4 pt-8 sm:px-6">
-        <p className="mb-6 text-center text-sm text-gray-400 italic">
-          {petDetails.petName}&apos;s life, through the eyes of those who loved them
+        <p className="mb-6 text-center text-sm text-gray-400 dark:text-gray-500 italic">
+          {petDetails.petName}&apos;s life, through the eyes of those who loved {pronouns.object}
         </p>
       </section>
 
       {/* Tribute + Side Photos */}
       <section className="mx-auto max-w-6xl px-4 pb-3 sm:px-6">
         <div className="flex flex-col gap-3 md:flex-row md:items-stretch md:gap-4">
-          <div className="flex-1 rounded-2xl border-l-4 border-l-amber-700 border border-amber-100 bg-amber-50/50 p-6 shadow-sm backdrop-blur-sm sm:p-8">
+          <div className="flex-1 rounded-2xl border-l-4 border-l-amber-700 border border-amber-100 bg-amber-50/50 p-6 shadow-sm backdrop-blur-sm dark:border-amber-900/30 dark:border-l-amber-600 dark:bg-gray-900/40 sm:p-8">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-serif text-2xl font-medium text-gray-900">
+              <h2 className="font-serif text-2xl font-medium text-gray-900 dark:text-amber-50">
                 A Tribute
               </h2>
               <button
@@ -302,7 +304,7 @@ export function StepPreview({
                     setEditingTribute(true);
                   }
                 }}
-                className="flex items-center gap-1 text-sm text-amber-600 hover:text-amber-700"
+                className="flex items-center gap-1 text-sm text-amber-600 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-300"
               >
                 {editingTribute ? (
                   <>
@@ -324,11 +326,11 @@ export function StepPreview({
                 className="text-base leading-relaxed"
               />
             ) : tribute ? (
-              <div className="whitespace-pre-line text-base leading-relaxed text-gray-700">
+              <div className="whitespace-pre-line text-base leading-relaxed text-gray-700 dark:text-gray-300">
                 {tribute}
               </div>
             ) : (
-              <p className="text-gray-400 italic">
+              <p className="text-gray-400 dark:text-gray-500 italic">
                 No tribute yet. Click Edit to add one.
               </p>
             )}
@@ -336,7 +338,7 @@ export function StepPreview({
           {photos.length > 0 && (
             <div className="flex gap-3 md:w-80 md:shrink-0 md:flex-col">
               {photos.slice(0, 2).map((photo) => (
-                <div key={photo.id} className="overflow-hidden rounded-2xl border border-amber-100 bg-white/80 shadow-sm">
+                <div key={photo.id} className="overflow-hidden rounded-2xl border border-amber-100 bg-white/80 shadow-sm dark:border-amber-900/30 dark:bg-gray-900/40">
                   <div className="relative aspect-square">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
@@ -346,7 +348,7 @@ export function StepPreview({
                     />
                   </div>
                   {photo.caption && (
-                    <p className="px-3 py-2 text-xs italic text-gray-500">{photo.caption}</p>
+                    <p className="px-3 py-2 text-xs italic text-gray-500 dark:text-gray-400">{photo.caption}</p>
                   )}
                 </div>
               ))}
@@ -374,7 +376,7 @@ export function StepPreview({
               </div>
             </SortableContext>
           </DndContext>
-          <p className="mt-2 text-center text-xs text-gray-400">drag to reorder</p>
+          <p className="mt-2 text-center text-xs text-gray-400 dark:text-gray-500">drag to reorder</p>
         </section>
       )}
 
@@ -384,18 +386,18 @@ export function StepPreview({
 
         {/* Feed opt-in */}
         {onShowInFeedChange && (
-          <label className="flex items-start gap-3 rounded-xl border border-amber-100 bg-amber-50/50 p-4 cursor-pointer">
+          <label className="flex items-start gap-3 rounded-xl border border-amber-100 bg-amber-50/50 p-4 cursor-pointer dark:border-amber-900/30 dark:bg-gray-900/40">
             <input
               type="checkbox"
               checked={showInFeed}
               onChange={(e) => onShowInFeedChange(e.target.checked)}
-              className="mt-0.5 h-4 w-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+              className="mt-0.5 h-4 w-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500 dark:border-gray-600 dark:bg-gray-800"
             />
             <div>
-              <p className="text-sm font-medium text-gray-700">
+              <p className="text-sm font-medium text-gray-700 dark:text-gray-200">
                 Share on our community feed
               </p>
-              <p className="text-xs text-gray-500 mt-0.5">
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                 Let others light a candle for {petDetails.petName}. You can change this anytime.
               </p>
             </div>
@@ -417,7 +419,7 @@ export function StepPreview({
             type="button"
             onClick={handleSaveMemorial}
             disabled={saving}
-            className="h-12 flex-1 bg-amber-600 hover:bg-amber-700"
+            className="h-12 flex-1 bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-400 dark:text-gray-900"
           >
             {saving ? (
               <span className="flex items-center gap-2">
@@ -430,7 +432,7 @@ export function StepPreview({
           </Button>
         </div>
 
-        <p className="text-center text-xs text-gray-400">
+        <p className="text-center text-xs text-gray-400 dark:text-gray-500">
           Your memorial will be visible at its own page. You can change feed visibility anytime from your dashboard.
         </p>
       </div>

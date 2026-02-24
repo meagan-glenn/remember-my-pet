@@ -156,16 +156,11 @@ export function StepPhotoUpload({
     <div className="space-y-6">
       <div className="text-center space-y-2">
         <h1 className="text-2xl font-semibold text-gray-900">
-          Photos of {petName || "your pet"}
+          {petName ? `${petName}'s best moments` : "Your pet's best moments"}
         </h1>
         <p className="text-gray-500">
-          Share your favorite photos. You can add up to {MAX_PHOTOS}.
+          The ones that make you smile.
         </p>
-        {totalPhotos < 5 && (
-          <p className="text-sm text-gray-500">
-            The more photos you add, the richer {petName || "your pet"}&apos;s gallery will be.
-          </p>
-        )}
       </div>
 
       {/* Drop zone */}
@@ -203,6 +198,11 @@ export function StepPhotoUpload({
       {error && <p className="text-sm text-red-500 text-center">{error}</p>}
 
       {/* Photo grid */}
+      {photos.length > 0 && (
+        <p className="text-xs text-gray-400 text-center">
+          {photos.length} {photos.length === 1 ? "photo" : "photos"} · {MAX_PHOTOS - photos.length} more available
+        </p>
+      )}
       {photos.length > 0 && (
         <div className="grid grid-cols-3 gap-2">
           {photos.map((photo) => (
