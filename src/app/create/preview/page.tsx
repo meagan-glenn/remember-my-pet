@@ -10,6 +10,7 @@ import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { ERROR_MESSAGES } from "@/lib/error-messages";
 import { getPronouns } from "@/lib/pronouns";
+import { compressImage } from "@/lib/compress-image";
 
 function PreviewContent() {
   const ctx = useMemorialContext();
@@ -42,8 +43,9 @@ function PreviewContent() {
   }, [ctx.memorialId, ctx.hydrated]);
 
   const uploadFile = useCallback(async (file: File): Promise<string> => {
+    const compressed = await compressImage(file);
     const formData = new FormData();
-    formData.append("file", file);
+    formData.append("file", compressed);
     const res = await fetch("/api/upload", { method: "POST", body: formData });
     if (res.status === 401) throw new Error("__AUTH_REQUIRED__");
     if (!res.ok) {

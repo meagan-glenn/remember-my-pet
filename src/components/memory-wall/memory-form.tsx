@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { Camera, X, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { compressImage } from "@/lib/compress-image";
 import { wordCount } from "@/lib/validation";
 import { ERROR_MESSAGES } from "@/lib/error-messages";
 import Image from "next/image";
@@ -36,13 +37,15 @@ export function MemoryForm({ memorialId, petName, onSubmitted }: MemoryFormProps
   const words = content.trim() ? wordCount(content) : 0;
 
   async function uploadPhoto(file: File): Promise<string> {
+    const compressed = await compressImage(file);
     const form = new FormData();
-    form.append("file", file);
+    form.append("file", compressed);
     form.append("memorialId", memorialId);
 
     const res = await fetch("/api/memories/upload", { method: "POST", body: form });
     if (!res.ok) {
-      const data = await res.json();
+      if (res.status === 413) throw new Error("This photo is too large. Please use a smaller photo.");
+      const data = await res.json().catch(() => ({}));
       throw new Error(data.error || "Upload failed");
     }
     const data = await res.json();
