@@ -68,9 +68,9 @@ export function EarlyAuthBanner({ petName, onAuthenticated }: EarlyAuthBannerPro
   };
 
   return (
-    <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
+    <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-900/30 dark:bg-gray-900/40">
       <div className="flex flex-col gap-3">
-        <p className="text-sm text-amber-900">
+        <p className="text-sm text-amber-900 dark:text-amber-100">
           Want to make sure {petName}&apos;s memorial is saved? Create a quick
           account — or do this later.
         </p>
@@ -81,7 +81,7 @@ export function EarlyAuthBanner({ petName, onAuthenticated }: EarlyAuthBannerPro
             variant="outline"
             onClick={handleGoogleSignIn}
             disabled={googleLoading}
-            className="text-sm"
+            className="text-sm dark:border-amber-800/40 dark:text-amber-200 dark:hover:bg-amber-900/20"
           >
             <svg className="mr-1.5 h-4 w-4" viewBox="0 0 24 24">
               <path
@@ -107,7 +107,7 @@ export function EarlyAuthBanner({ petName, onAuthenticated }: EarlyAuthBannerPro
             size="sm"
             variant="ghost"
             onClick={handleDismiss}
-            className="text-sm text-amber-700"
+            className="text-sm text-amber-700 dark:text-amber-400 dark:hover:text-amber-300"
           >
             Maybe later
           </Button>

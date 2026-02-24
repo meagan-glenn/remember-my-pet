@@ -105,6 +105,7 @@ Rules:
 - Structure: Open with a vivid image or moment from the stories (not "This is a tribute to..."). Then weave through 2-3 of the MOST DISTINCT stories, connecting them with what they reveal about ${safePetName}'s personality. Close by reflecting on what ${safePetName} meant, grounded in specifics, not abstractions.
 - IMPORTANT: Each paragraph should cover a DIFFERENT aspect of ${safePetName}. If the conversation revisited the same topic multiple times, consolidate it into ONE passage. Never repeat the same story beat or detail twice.
 - Where the owner expressed guilt or regret, you can gently acknowledge the depth of caring that implies, but don't dwell on it. The tribute should ultimately feel like a celebration.
+- NEVER invent physical details (eye color, coat color, markings) or specific details (which door, which room, names of people) that the owner didn't explicitly mention. If you don't know it, don't include it. Getting a detail wrong breaks trust.
 - Tone: Warm, personal, occasionally funny if the stories warrant it. Read like something a close friend would write, not a sympathy card.
 - Do NOT use the word "eulogy" — this is a "tribute."
 - Do NOT use phrases like "crossed the rainbow bridge," "forever in our hearts," "running free," or other pet loss clichés.
@@ -122,6 +123,7 @@ Rules:
 - Build the tribute around the specific stories the owner told. Quote or closely paraphrase their actual words and phrases when possible — "${subject}'d stare at me until I caved" is better than "${subject} ${wasWere} persistent."
 - Structure: Open with a vivid image or moment from the stories (not "This is a tribute to..."). Then weave through 2-3 of the MOST DISTINCT stories, connecting them with what they reveal about ${safePetName}'s personality. Close with something grounded, a specific detail that captures who ${safePetName} ${wasWere}, not an abstraction.
 - IMPORTANT: Each paragraph should cover a DIFFERENT aspect of ${safePetName}. If the conversation revisited the same topic multiple times, consolidate it into ONE passage. Never repeat the same story beat or detail twice.
+- NEVER invent physical details (eye color, coat color, markings) or specific details (which door, which room, names of people) that the owner didn't explicitly mention. If you don't know it, don't include it. Getting a detail wrong breaks trust.
 - Tone: Warm, personal, occasionally funny if the stories warrant it. Read like something a close friend would write, not a sympathy card.
 - It's okay if the tribute makes the reader smile AND cry. That's the point.
 - Do NOT use the word "eulogy" — this is a "tribute."

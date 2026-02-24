@@ -89,7 +89,7 @@ function SignUpForm() {
       <CardContent>
         {sent ? (
           <div className="text-center space-y-4">
-            <div className="mx-auto h-12 w-12 rounded-full bg-amber-100 flex items-center justify-center text-2xl">
+            <div className="mx-auto h-12 w-12 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-2xl">
               ✉️
             </div>
             <p className="text-sm text-muted-foreground">
@@ -98,7 +98,7 @@ function SignUpForm() {
             <button
               type="button"
               onClick={() => setSent(false)}
-              className="text-sm text-amber-600 underline"
+              className="text-sm text-amber-600 dark:text-amber-400 underline"
             >
               Try a different email
             </button>
@@ -110,7 +110,7 @@ function SignUpForm() {
               variant="outline"
               onClick={handleGoogleSignUp}
               disabled={googleLoading}
-              className="w-full h-12 text-base"
+              className="w-full h-12 text-base dark:border-amber-800/40 dark:text-amber-200 dark:hover:bg-amber-900/20"
             >
               <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24">
                 <path
@@ -161,7 +161,7 @@ function SignUpForm() {
               <Button
                 type="submit"
                 disabled={loading || !email.trim()}
-                className="w-full h-12 bg-amber-600 hover:bg-amber-700"
+                className="w-full h-12 bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-400 dark:text-gray-900"
               >
                 {loading ? "Sending..." : "Send magic link"}
               </Button>
@@ -169,7 +169,7 @@ function SignUpForm() {
                 Already have an account?{" "}
                 <Link
                   href={`/sign-in${redirect !== "/create" ? `?redirect=${encodeURIComponent(redirect)}` : ""}${context ? `${redirect !== "/create" ? "&" : "?"}context=${context}` : ""}`}
-                  className="text-amber-600 underline"
+                  className="text-amber-600 dark:text-amber-400 underline"
                 >
                   Sign in
                 </Link>

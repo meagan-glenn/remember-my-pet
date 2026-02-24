@@ -290,6 +290,9 @@ export function StepTributeChat({
           {/* Input or generate button */}
           {readyForTribute ? (
             <div className="space-y-3">
+              <p className="text-center text-sm text-gray-500 dark:text-gray-400">
+                We&apos;ve got everything we need.
+              </p>
               <Button
                 onClick={() => handleGenerateTribute()}
                 disabled={generating}
@@ -301,9 +304,16 @@ export function StepTributeChat({
                     Writing your tribute...
                   </span>
                 ) : (
-                  "Write My Tribute"
+                  "Let\u2019s write it"
                 )}
               </Button>
+              <button
+                type="button"
+                onClick={() => setReadyForTribute(false)}
+                className="w-full text-sm text-gray-400 hover:text-gray-500 dark:text-gray-500 dark:hover:text-gray-400"
+              >
+                I want to share more
+              </button>
               {error && (
                 <p className="text-sm text-red-500 text-center">
                   {error}

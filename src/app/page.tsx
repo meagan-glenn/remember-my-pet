@@ -8,10 +8,10 @@ import { Input } from "@/components/ui/input";
 import {
   Heart,
   Users,
-  Film,
   ArrowRight,
   PawPrint,
   Camera,
+  HeartHandshake,
 } from "lucide-react";
 import Link from "next/link";
 import { ActivityFeed } from "@/components/feed/activity-feed";
@@ -56,25 +56,26 @@ const FEATURES = [
     icon: Heart,
     title: "AI-Written Tribute",
     description:
-      "Share your memories in a guided conversation and we'll craft a heartfelt tribute that captures who they were.",
+      "Tell us about them and we\u2019ll turn your stories into a tribute that sounds like you wrote it.",
   },
   {
     icon: Camera,
     title: "Photo Gallery",
     description:
-      "Upload your favorite photos with AI-generated captions. Arrange them into a beautiful gallery.",
+      "Their best moments, captioned and arranged into a gallery worth sharing.",
+  },
+  {
+    icon: HeartHandshake,
+    title: "Decision Support",
+    description:
+      "Carrying guilt or second-guessing a decision? You don\u2019t have to sit with that alone.",
   },
   {
     icon: Users,
     title: "Memory Wall",
     description:
-      "Invite friends and family to share their favorite moments, stories, and photos.",
-  },
-  {
-    icon: Film,
-    title: "Video Reel",
-    description:
-      "Turn your photos and clips into a beautiful keepsake video to share or keep forever.",
+      "A place for everyone who loved them to share what they remember.",
+    comingSoon: true,
   },
 ];
 
@@ -281,10 +282,6 @@ export default function Home() {
                   Begin their memorial
                 </Button>
               </form>
-
-              <p className="mt-4 text-sm text-gray-400 dark:text-gray-500">
-                Take your time. There&apos;s no rush here.
-              </p>
 
               <p className="mt-6 text-xs text-gray-400 dark:text-gray-500">
                 Photos stay private &nbsp;&middot;&nbsp; No pressure, no timers &nbsp;&middot;&nbsp; Hosted forever
@@ -509,8 +506,13 @@ export default function Home() {
                 {FEATURES.map((feature) => (
                   <div
                     key={feature.title}
-                    className="rounded-2xl border border-amber-100 bg-white/60 p-6 dark:border-amber-900/30 dark:bg-gray-900/40"
+                    className="relative rounded-2xl border border-amber-100 bg-white/60 p-6 dark:border-amber-900/30 dark:bg-gray-900/40"
                   >
+                    {feature.comingSoon && (
+                      <span className="absolute top-4 right-4 rounded-full bg-amber-100 px-2 py-0.5 text-xs text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">
+                        Coming soon
+                      </span>
+                    )}
                     <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-amber-50 dark:bg-amber-900/20">
                       <feature.icon className="h-5 w-5 text-amber-600" />
                     </div>
@@ -524,18 +526,7 @@ export default function Home() {
                 ))}
               </div>
 
-              {/* Decision support callout */}
-              <div className="mt-10 text-center">
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Not ready yet?{" "}
-                  <Link
-                    href="/support"
-                    className="text-amber-600 hover:text-amber-700 underline underline-offset-2 dark:text-amber-400 dark:hover:text-amber-300"
-                  >
-                    Talk it through first
-                  </Link>
-                </p>
-              </div>
+
             </div>
       </section>
 
