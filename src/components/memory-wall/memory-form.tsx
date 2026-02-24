@@ -126,17 +126,17 @@ export function MemoryForm({ memorialId, petName, onSubmitted }: MemoryFormProps
 
   if (submitted) {
     return (
-      <Card className="border-amber-100 bg-white/80 backdrop-blur-sm">
+      <Card className="border-amber-100 dark:border-amber-900/30 bg-white/80 dark:bg-gray-900/40 backdrop-blur-sm">
         <CardContent className="py-10 text-center">
-          <p className="text-lg font-medium text-gray-900">
+          <p className="text-lg font-medium text-gray-900 dark:text-amber-50">
             Thank you for sharing your memory
           </p>
-          <p className="mt-2 text-gray-500">
+          <p className="mt-2 text-gray-500 dark:text-gray-400">
             It will appear here once the memorial owner has reviewed it.
           </p>
           <Button
             variant="ghost"
-            className="mt-4 text-amber-600 hover:text-amber-700"
+            className="mt-4 text-amber-600 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-300"
             onClick={() => {
               setSubmitted(false);
               setName("");
@@ -153,12 +153,12 @@ export function MemoryForm({ memorialId, petName, onSubmitted }: MemoryFormProps
   }
 
   return (
-    <Card className="border-amber-100 bg-white/80 backdrop-blur-sm">
+    <Card className="border-amber-100 dark:border-amber-900/30 bg-white/80 dark:bg-gray-900/40 backdrop-blur-sm">
       <CardContent className="p-5 sm:p-6">
-        <h3 className="mb-1 font-serif text-xl font-medium text-gray-900">
+        <h3 className="mb-1 font-serif text-xl font-medium text-gray-900 dark:text-amber-50">
           Share a Memory
         </h3>
-        <p className="mb-5 text-sm text-gray-500">
+        <p className="mb-5 text-sm text-gray-500 dark:text-gray-400">
           {PROMPTS[Math.floor(Date.now() / 86400000) % PROMPTS.length]} {petName}?
         </p>
 
@@ -244,7 +244,7 @@ export function MemoryForm({ memorialId, petName, onSubmitted }: MemoryFormProps
                   size="sm"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={submitting}
-                  className="text-gray-500"
+                  className="text-gray-500 dark:text-gray-400"
                 >
                   <Camera className="mr-1.5 h-4 w-4" />
                   Add photo{photos.length > 0 ? ` (${3 - photos.length} remaining)` : ""}
@@ -256,7 +256,7 @@ export function MemoryForm({ memorialId, petName, onSubmitted }: MemoryFormProps
           <Button
             type="submit"
             disabled={submitting || !name.trim() || !content.trim()}
-            className="w-full bg-amber-600 hover:bg-amber-700"
+            className="w-full bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-400 dark:text-gray-900"
           >
             {submitting ? (
               <>
@@ -268,7 +268,7 @@ export function MemoryForm({ memorialId, petName, onSubmitted }: MemoryFormProps
             )}
           </Button>
 
-          <p className="text-center text-xs text-gray-400">
+          <p className="text-center text-xs text-gray-400 dark:text-gray-500">
             Your memory will be reviewed before appearing publicly.
           </p>
         </form>

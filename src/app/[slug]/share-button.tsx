@@ -35,7 +35,7 @@ export function ShareButton({ url, petName }: ShareButtonProps) {
       variant="outline"
       size="sm"
       onClick={handleCopy}
-      className="rounded-full border-amber-200 text-sm hover:bg-amber-50"
+      className="rounded-full border-amber-200 dark:border-amber-800/30 text-sm hover:bg-amber-50 dark:hover:bg-amber-900/20 dark:text-amber-200"
       aria-label={`Copy link to ${petName}'s memorial`}
     >
       {copied ? (

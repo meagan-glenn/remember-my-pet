@@ -50,7 +50,7 @@ function AuthErrorContent() {
         <CardDescription>{description}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">
-        <Button asChild className="w-full h-12 bg-amber-600 hover:bg-amber-700">
+        <Button asChild className="w-full h-12 bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-400 dark:text-gray-900">
           <Link
             href={`/sign-in?redirect=${encodeURIComponent(redirect)}`}
           >

@@ -144,10 +144,10 @@ export function StepVideoUpload({
   return (
     <div className="space-y-6">
       <div className="text-center space-y-2">
-        <h1 className="text-2xl font-semibold text-gray-900">
+        <h1 className="text-2xl font-semibold text-gray-900 dark:text-amber-50">
           Videos of {petName || "your pet"}
         </h1>
-        <p className="text-gray-500">
+        <p className="text-gray-500 dark:text-gray-400">
           Upload videos to create a compilation reel. Up to {MAX_VIDEOS} videos, {MAX_SIZE_MB}MB each.
         </p>
       </div>
@@ -163,15 +163,15 @@ export function StepVideoUpload({
         onClick={() => fileInputRef.current?.click()}
         className={`relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-8 cursor-pointer transition-colors ${
           dragOver
-            ? "border-amber-500 bg-amber-50"
-            : "border-gray-200 hover:border-gray-300 bg-gray-50"
+            ? "border-amber-500 bg-amber-50 dark:bg-amber-900/20"
+            : "border-gray-200 hover:border-gray-300 bg-gray-50 dark:border-amber-900/30 dark:hover:border-amber-800/50 dark:bg-gray-900/40"
         }`}
       >
-        <Film className="h-10 w-10 text-gray-400 mb-2" />
-        <p className="text-sm font-medium text-gray-700">
+        <Film className="h-10 w-10 text-gray-400 dark:text-gray-500 mb-2" />
+        <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
           {processing ? "Processing video..." : "Tap to add videos"}
         </p>
-        <p className="text-xs text-gray-400 mt-1">
+        <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
           MP4, MOV, or WebM
         </p>
         <input
@@ -210,7 +210,7 @@ export function StepVideoUpload({
                 <button
                   type="button"
                   onClick={() => setPlayingId(video.id)}
-                  className="relative aspect-video w-full rounded-lg overflow-hidden bg-gray-100"
+                  className="relative aspect-video w-full rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800"
                 >
                   {video.thumbnailUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
@@ -253,7 +253,7 @@ export function StepVideoUpload({
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="flex aspect-video items-center justify-center rounded-lg border-2 border-dashed border-gray-200 text-gray-400 hover:border-gray-300 hover:text-gray-500 transition-colors"
+              className="flex aspect-video items-center justify-center rounded-lg border-2 border-dashed border-gray-200 text-gray-400 hover:border-gray-300 hover:text-gray-500 dark:border-amber-900/30 dark:text-gray-500 dark:hover:border-amber-800/50 dark:hover:text-gray-400 transition-colors"
             >
               <Upload className="h-6 w-6" />
             </button>

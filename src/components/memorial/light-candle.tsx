@@ -93,7 +93,7 @@ export function LightCandle({ memorialId }: LightCandleProps) {
 
   if (loading) {
     return (
-      <div className="flex items-center gap-1.5 text-sm text-gray-400">
+      <div className="flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-500">
         <Flame className="h-4 w-4" />
       </div>
     );
@@ -102,7 +102,7 @@ export function LightCandle({ memorialId }: LightCandleProps) {
   return (
     <button
       onClick={handleClick}
-      className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm transition-colors hover:bg-amber-50 active:scale-95"
+      className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm transition-colors hover:bg-amber-50 dark:hover:bg-amber-900/20 active:scale-95"
       aria-label={userLit ? "Unlight your candle" : "Light a candle"}
     >
       <AnimatePresence mode="wait">
@@ -136,11 +136,11 @@ export function LightCandle({ memorialId }: LightCandleProps) {
             exit={{ scale: 0.8, opacity: 0 }}
             transition={{ duration: 0.2 }}
           >
-            <Flame className="h-4 w-4 text-gray-400" />
+            <Flame className="h-4 w-4 text-gray-400 dark:text-gray-500" />
           </motion.div>
         )}
       </AnimatePresence>
-      <span className={userLit ? "text-amber-700" : "text-gray-500"}>
+      <span className={userLit ? "text-amber-700 dark:text-amber-400" : "text-gray-500 dark:text-gray-400"}>
         {count > 0
           ? `${count} candle${count === 1 ? "" : "s"} lit`
           : "Light a candle"}

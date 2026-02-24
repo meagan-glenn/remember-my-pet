@@ -300,8 +300,14 @@ function Dashboard() {
   const photoCount = photos.length + (petDetails.heroPhoto ? 1 : 0);
   const photoStatus = photoCount === 0
     ? "Not started"
-    : `${photoCount} photo${photoCount !== 1 ? "s" : ""} uploaded`;
-  const photoStatusType = photoCount === 0 ? "not-started" as const : "complete" as const;
+    : photoCount < 4
+      ? `${photoCount} photo${photoCount !== 1 ? "s" : ""} — add more`
+      : `${photoCount} photos uploaded`;
+  const photoStatusType = photoCount === 0
+    ? "not-started" as const
+    : photoCount < 4
+      ? "in-progress" as const
+      : "complete" as const;
 
   const tributeNotStarted = chatMessages.length === 0 && !generatedTribute;
   const tributeStatus = tributeNotStarted

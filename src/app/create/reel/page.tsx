@@ -19,13 +19,13 @@ export default function ReelPage() {
   }
 
   return (
-    <div className="py-8 px-4">
+    <div className="min-h-screen py-8 px-4 bg-white dark:bg-gray-950">
       <div className="mx-auto max-w-lg">
         <Button
           variant="ghost"
           size="sm"
           onClick={() => router.push("/create")}
-          className="mb-4 -ml-2 text-gray-600 hover:text-gray-900"
+          className="mb-4 -ml-2 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-amber-50"
         >
           <ArrowLeft className="h-4 w-4 mr-1" />
           Back to workspace
@@ -42,7 +42,7 @@ export default function ReelPage() {
           <div className="mt-6">
             <Button
               onClick={() => router.push("/create/reel/clips")}
-              className="w-full h-12 text-base bg-amber-600 hover:bg-amber-700 gap-2"
+              className="w-full h-12 text-base bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-400 dark:text-gray-900 gap-2"
             >
               <Scissors className="h-5 w-5" />
               Create Clips

@@ -39,7 +39,7 @@ export default function TributePage() {
   }
 
   return (
-    <div className="min-h-screen py-8 px-4 dark:bg-gray-950">
+    <div className="min-h-screen py-8 px-4 bg-white dark:bg-gray-950">
       <div className="mx-auto max-w-lg">
         <Button
           variant="ghost"

@@ -184,7 +184,7 @@ export function StepDecisionSupport({
 
       {/* Rate limit message */}
       {rateLimited && (
-        <div className="rounded-lg bg-gray-50 px-4 py-3 text-sm text-gray-600 text-center">
+        <div className="rounded-lg bg-gray-50 dark:bg-gray-900/40 px-4 py-3 text-sm text-gray-600 dark:text-gray-400 text-center">
           Let&apos;s take a moment. You can share more in a minute.
         </div>
       )}
@@ -212,10 +212,10 @@ export function StepDecisionSupport({
                 : `What's weighing on you about ${petName}?`
             }
             rows={hasExchanges ? 3 : 4}
-            className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-400 resize-none leading-relaxed dark:border-amber-800/30 dark:bg-gray-900 dark:text-amber-50 dark:placeholder:text-gray-500"
+            className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-400 resize-none leading-relaxed dark:border-amber-800/30 dark:bg-gray-900 dark:text-amber-50 dark:placeholder:text-gray-500 dark:focus:border-amber-700/60 dark:focus:ring-amber-700/40"
           />
           {!hasExchanges && (
-            <p className="text-xs text-gray-400 leading-relaxed">
+            <p className="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
               You might be thinking about the timing of a decision, not being
               there, wondering if you did enough, or something you wish
               you&apos;d done differently.
@@ -224,7 +224,7 @@ export function StepDecisionSupport({
           <Button
             type="submit"
             disabled={!input.trim() || loading}
-            className="w-full h-11 border border-amber-300 text-amber-700 hover:bg-amber-50 bg-transparent disabled:opacity-40 dark:border-amber-800/40 dark:text-amber-200 dark:hover:bg-amber-900/20"
+            className="w-full h-11 border border-amber-300 text-amber-700 hover:bg-amber-50 bg-transparent disabled:opacity-40 dark:border-amber-700/50 dark:text-amber-200 dark:hover:bg-amber-900/20"
           >
             Share
           </Button>

@@ -157,25 +157,25 @@ export default function StandaloneSupportPage() {
   // Name entry screen
   if (!nameSubmitted) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-amber-50/60 via-orange-50/30 to-white">
+      <div className="min-h-screen bg-gradient-to-b from-amber-50/60 via-orange-50/30 to-white dark:from-gray-950 dark:via-gray-950 dark:to-gray-950">
         <div className="py-8 px-4">
           <div className="mx-auto max-w-lg">
             <Link
               href="/"
-              className="mb-8 inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 transition-colors"
+              className="mb-8 inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 transition-colors"
             >
               <ArrowLeft className="h-4 w-4" />
               Back
             </Link>
 
             <div className="text-center space-y-4 mt-8">
-              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-amber-100">
-                <PawPrint className="h-7 w-7 text-amber-600" />
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/30">
+                <PawPrint className="h-7 w-7 text-amber-600 dark:text-amber-400" />
               </div>
-              <h1 className="font-serif text-2xl font-medium text-gray-900">
+              <h1 className="font-serif text-2xl font-medium text-gray-900 dark:text-amber-50">
                 You don&apos;t have to be ready yet
               </h1>
-              <p className="text-gray-500 leading-relaxed">
+              <p className="text-gray-500 dark:text-gray-400 leading-relaxed">
                 If you&apos;re carrying something heavy about your pet, this is
                 a safe place to say it out loud. No memorial required.
               </p>
@@ -183,7 +183,7 @@ export default function StandaloneSupportPage() {
 
             <form onSubmit={handleNameSubmit} className="mt-8 space-y-4">
               <div className="space-y-2">
-                <label htmlFor="petName" className="text-sm font-medium text-gray-700">
+                <label htmlFor="petName" className="text-sm font-medium text-gray-700 dark:text-gray-300">
                   What&apos;s your pet&apos;s name?
                 </label>
                 <Input
@@ -199,7 +199,7 @@ export default function StandaloneSupportPage() {
               <Button
                 type="submit"
                 disabled={!petName.trim()}
-                className="w-full h-12 text-base bg-amber-600 hover:bg-amber-700 disabled:opacity-40"
+                className="w-full h-12 text-base bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-400 dark:text-gray-900 disabled:opacity-40"
               >
                 Continue
               </Button>
@@ -212,12 +212,12 @@ export default function StandaloneSupportPage() {
 
   // Support conversation
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50/60 via-orange-50/30 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-amber-50/60 via-orange-50/30 to-white dark:from-gray-950 dark:via-gray-950 dark:to-gray-950">
       <div className="py-8 px-4">
         <div className="mx-auto max-w-lg">
           <Link
             href="/"
-            className="mb-6 inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 transition-colors"
+            className="mb-6 inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
             Back
@@ -225,9 +225,9 @@ export default function StandaloneSupportPage() {
 
           {/* Auth banner */}
           {showAuthBanner && !isAuthenticated && (
-            <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-4">
+            <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 dark:border-amber-900/30 dark:bg-amber-950/30 p-4">
               <div className="flex flex-col gap-3">
-                <p className="text-sm text-amber-900">
+                <p className="text-sm text-amber-900 dark:text-amber-100">
                   Sign in to save your conversation and create {petName.trim()}&apos;s
                   memorial when you&apos;re ready.
                 </p>
@@ -253,7 +253,7 @@ export default function StandaloneSupportPage() {
                       size="sm"
                       variant="ghost"
                       onClick={handleDismissAuth}
-                      className="text-sm text-amber-700"
+                      className="text-sm text-amber-700 dark:text-amber-300"
                     >
                       Maybe later
                     </Button>
@@ -265,8 +265,8 @@ export default function StandaloneSupportPage() {
 
           {/* At anonymous limit message */}
           {atAnonLimit && authDismissed && (
-            <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-center">
-              <p className="text-sm text-amber-900 mb-3">
+            <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 dark:border-amber-900/30 dark:bg-amber-950/30 p-4 text-center">
+              <p className="text-sm text-amber-900 dark:text-amber-100 mb-3">
                 Sign in to continue your conversation with {petName.trim()}.
               </p>
               <Button

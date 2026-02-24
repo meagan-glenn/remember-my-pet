@@ -41,7 +41,7 @@ export function FeedToggle({
     <button
       onClick={handleToggle}
       disabled={toggling}
-      className="text-xs text-gray-500 hover:text-gray-700 underline underline-offset-2 disabled:opacity-50"
+      className="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 underline underline-offset-2 disabled:opacity-50"
     >
       {enabled ? "Hide from community feed" : "Show on community feed"}
     </button>

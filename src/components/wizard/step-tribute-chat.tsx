@@ -337,7 +337,7 @@ export function StepTributeChat({
                       handleSend();
                     }
                   }}
-                  className="flex-1 min-h-[48px] rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-400 disabled:cursor-not-allowed disabled:opacity-50 resize-none overflow-hidden leading-relaxed dark:border-amber-800/30 dark:bg-gray-900 dark:text-amber-50 dark:placeholder:text-gray-500"
+                  className="flex-1 min-h-[48px] rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-400 disabled:cursor-not-allowed disabled:opacity-50 resize-none overflow-hidden leading-relaxed dark:border-amber-800/30 dark:bg-gray-900 dark:text-amber-50 dark:placeholder:text-gray-500 dark:focus:border-amber-700/60 dark:focus:ring-amber-700/40"
                   rows={1}
                   autoFocus
                   disabled={isTyping || chatLoading}
@@ -405,7 +405,7 @@ export function StepTributeChat({
                 value={refinementFeedback}
                 onChange={(e) => setRefinementFeedback(e.target.value)}
                 placeholder="What would you like to change? e.g. &quot;Remove the part about car rides&quot; or &quot;It says 'your' a few times — make it third person&quot;"
-                className="w-full rounded-xl border border-gray-200 p-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-400 resize-none dark:border-amber-800/30 dark:bg-gray-900 dark:text-amber-50 dark:placeholder:text-gray-500"
+                className="w-full rounded-xl border border-gray-200 p-3 text-sm text-gray-700 placeholder:text-gray-400 focus:border-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-400 resize-none dark:border-amber-800/30 dark:bg-gray-900 dark:text-amber-50 dark:placeholder:text-gray-500 dark:focus:border-amber-700/60 dark:focus:ring-amber-700/40"
                 rows={3}
                 maxLength={1000}
               />

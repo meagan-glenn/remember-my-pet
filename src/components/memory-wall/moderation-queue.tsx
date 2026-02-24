@@ -144,11 +144,11 @@ export function ModerationQueue() {
           const isActioning = actionLoading === memory.id;
 
           return (
-            <Card key={memory.id} className="border-amber-100">
+            <Card key={memory.id} className="border-amber-100 dark:border-amber-900/30">
               <CardContent className="p-4 sm:p-5">
                 <div className="mb-2 flex items-center justify-between gap-2">
                   <div className="min-w-0">
-                    <span className="font-medium text-gray-900">
+                    <span className="font-medium text-gray-900 dark:text-amber-50">
                       {memory.contributor_name}
                     </span>
                     {memory.contributor_email && (
@@ -165,7 +165,7 @@ export function ModerationQueue() {
                   </div>
                 </div>
 
-                <p className="mb-3 whitespace-pre-line text-sm leading-relaxed text-gray-700">
+                <p className="mb-3 whitespace-pre-line text-sm leading-relaxed text-gray-700 dark:text-gray-300">
                   {memory.content}
                 </p>
 
@@ -191,7 +191,7 @@ export function ModerationQueue() {
                 <div className="flex gap-2">
                   <Button
                     size="sm"
-                    className="bg-amber-600 hover:bg-amber-700"
+                    className="bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-400 dark:text-gray-900"
                     disabled={isActioning}
                     onClick={() => handleAction(memory.id, "approve")}
                   >
@@ -213,7 +213,7 @@ export function ModerationQueue() {
                   <Button
                     size="sm"
                     variant="outline"
-                    className="text-red-500 hover:bg-red-50 hover:text-red-600"
+                    className="text-red-500 hover:bg-red-50 hover:text-red-600 dark:text-red-400 dark:hover:bg-red-950/30 dark:hover:text-red-300"
                     disabled={isActioning}
                     onClick={() => setDeletingId(memory.id)}
                   >
@@ -244,7 +244,7 @@ export function ModerationQueue() {
               Cancel
             </Button>
             <Button
-              className="bg-amber-600 hover:bg-amber-700"
+              className="bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-400 dark:text-gray-900"
               disabled={actionLoading === editingMemory?.id}
               onClick={() => {
                 if (editingMemory) {
@@ -264,7 +264,7 @@ export function ModerationQueue() {
           <DialogHeader>
             <DialogTitle>Delete this memory?</DialogTitle>
           </DialogHeader>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-500 dark:text-gray-400">
             This action cannot be undone.
           </p>
           <DialogFooter>

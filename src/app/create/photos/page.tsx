@@ -19,13 +19,13 @@ export default function PhotosPage() {
   }
 
   return (
-    <div className="py-8 px-4">
+    <div className="min-h-screen py-8 px-4 bg-white dark:bg-gray-950">
       <div className="mx-auto max-w-lg">
         <Button
           variant="ghost"
           size="sm"
           onClick={() => router.push("/create")}
-          className="mb-4 -ml-2 text-gray-600 hover:text-gray-900"
+          className="mb-4 -ml-2 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-amber-50"
         >
           <ArrowLeft className="h-4 w-4 mr-1" />
           Back to workspace

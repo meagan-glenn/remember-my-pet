@@ -170,7 +170,7 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
   const memorialUrl = `${siteUrl}/${memorial.slug}`;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-50/60 via-orange-50/30 to-white print:bg-white print:from-white print:via-white">
+    <div className="min-h-screen bg-gradient-to-b from-amber-50/60 via-orange-50/30 to-white dark:from-gray-950 dark:via-gray-950 dark:to-gray-950 print:bg-white print:from-white print:via-white">
       {/* Hero Section */}
       <section className="relative">
         {heroPhoto ? (
@@ -201,15 +201,15 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
             </div>
           </div>
         ) : (
-          <div className="flex h-[35vh] min-h-[280px] w-full flex-col items-center justify-center bg-gradient-to-b from-amber-100 to-amber-50">
-            <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-amber-200/60">
-              <PawPrint className="h-10 w-10 text-amber-600" />
+          <div className="flex h-[35vh] min-h-[280px] w-full flex-col items-center justify-center bg-gradient-to-b from-amber-100 to-amber-50 dark:from-gray-900 dark:to-gray-950">
+            <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-amber-200/60 dark:bg-amber-900/30">
+              <PawPrint className="h-10 w-10 text-amber-600 dark:text-amber-400" />
             </div>
-            <h1 className="font-serif text-4xl font-medium tracking-tight text-gray-900 sm:text-5xl">
+            <h1 className="font-serif text-4xl font-medium tracking-tight text-gray-900 dark:text-amber-50 sm:text-5xl">
               {memorial.pet_name}
             </h1>
             {(birthFormatted || deathFormatted) && (
-              <p className="mt-3 text-lg text-gray-500">
+              <p className="mt-3 text-lg text-gray-500 dark:text-gray-400">
                 {birthFormatted && deathFormatted
                   ? `${birthFormatted} — ${deathFormatted}`
                   : deathFormatted
@@ -226,7 +226,7 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
         {isOwner && (
           <a
             href={`/create?edit=${memorial.id}`}
-            className="text-sm text-amber-600 hover:text-amber-700 hover:underline"
+            className="text-sm text-amber-600 hover:text-amber-700 hover:underline dark:text-amber-400 dark:hover:text-amber-300"
           >
             Edit memorial
           </a>
@@ -237,7 +237,7 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
 
       {/* Wall intro */}
       <section className="mx-auto max-w-6xl px-4 pt-8 sm:px-6">
-        <p className="mb-6 text-center text-sm text-gray-400 italic">
+        <p className="mb-6 text-center text-sm text-gray-400 dark:text-gray-500 italic">
           {memorial.pet_name}&apos;s life, through the eyes of those who loved {pronouns.object}
         </p>
       </section>
@@ -245,22 +245,22 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
       {/* Tribute */}
       {memorial.tribute ? (
         <section className="mx-auto max-w-6xl px-4 pb-3 sm:px-6">
-          <div className="rounded-2xl border-l-4 border-l-amber-700 border border-amber-100 bg-amber-50/50 p-6 shadow-sm backdrop-blur-sm sm:p-8">
-            <h2 className="mb-4 font-serif text-2xl font-medium text-gray-900">
+          <div className="rounded-2xl border-l-4 border-l-amber-700 dark:border-l-amber-500 border border-amber-100 dark:border-amber-900/30 bg-amber-50/50 dark:bg-amber-950/30 p-6 shadow-sm backdrop-blur-sm sm:p-8">
+            <h2 className="mb-4 font-serif text-2xl font-medium text-gray-900 dark:text-amber-50">
               A Tribute
             </h2>
-            <div className="whitespace-pre-line text-base leading-relaxed text-gray-700">
+            <div className="whitespace-pre-line text-base leading-relaxed text-gray-700 dark:text-gray-300">
               {memorial.tribute}
             </div>
           </div>
         </section>
       ) : isOwner ? (
         <section className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-          <div className="rounded-2xl border border-dashed border-amber-200 bg-amber-50/50 p-6 text-center">
-            <p className="text-gray-500">No tribute yet.</p>
+          <div className="rounded-2xl border border-dashed border-amber-200 dark:border-amber-900/30 bg-amber-50/50 dark:bg-amber-950/30 p-6 text-center">
+            <p className="text-gray-500 dark:text-gray-400">No tribute yet.</p>
             <a
               href={`/create?edit=${memorial.id}`}
-              className="mt-2 inline-block text-sm text-amber-600 hover:underline"
+              className="mt-2 inline-block text-sm text-amber-600 dark:text-amber-400 hover:underline"
             >
               Add a tribute
             </a>
@@ -286,16 +286,16 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
         <section className="mx-auto max-w-6xl px-4 pb-8 sm:px-6 print:hidden">
           <a
             href={`/${memorial.slug}/shop`}
-            className="flex items-center gap-4 rounded-2xl border border-amber-100 bg-white/80 p-6 shadow-sm backdrop-blur-sm hover:border-amber-200 transition-colors"
+            className="flex items-center gap-4 rounded-2xl border border-amber-100 dark:border-amber-900/30 bg-white/80 dark:bg-gray-900/40 p-6 shadow-sm backdrop-blur-sm hover:border-amber-200 dark:hover:border-amber-800/50 transition-colors"
           >
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-amber-100">
-              <Gift className="h-6 w-6 text-amber-600" />
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-900/30">
+              <Gift className="h-6 w-6 text-amber-600 dark:text-amber-400" />
             </div>
             <div>
-              <h3 className="font-serif text-lg font-medium text-gray-900">
+              <h3 className="font-serif text-lg font-medium text-gray-900 dark:text-amber-50">
                 Create a Keepsake
               </h3>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
                 Turn this memorial into a memory book or canvas print.
               </p>
             </div>

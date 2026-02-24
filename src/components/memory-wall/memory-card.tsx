@@ -28,15 +28,15 @@ export function MemoryCard({ memory }: MemoryCardProps) {
   });
 
   return (
-    <Card className="border-amber-100 bg-white/80 backdrop-blur-sm">
+    <Card className="border-amber-100 dark:border-amber-900/30 bg-white/80 dark:bg-gray-900/40 backdrop-blur-sm">
       <CardContent className="p-5 sm:p-6">
         <div className="mb-3 flex items-center justify-between">
-          <span className="font-medium text-gray-900">
+          <span className="font-medium text-gray-900 dark:text-amber-50">
             {memory.contributor_name}
           </span>
-          <span className="text-sm text-gray-400">{date}</span>
+          <span className="text-sm text-gray-400 dark:text-gray-500">{date}</span>
         </div>
-        <p className="whitespace-pre-line text-base leading-relaxed text-gray-700">
+        <p className="whitespace-pre-line text-base leading-relaxed text-gray-700 dark:text-gray-300">
           {memory.content}
         </p>
         {memory.photo_urls && memory.photo_urls.length > 0 && (

@@ -32,12 +32,12 @@ function WallCardRenderer({ card, index, petName }: { card: WallCard; index: num
         <PhotoCard url={card.url} caption={card.caption} petName={petName} />
       )}
       {card.type === "memory" && (
-        <div className="rounded-2xl border border-amber-100 bg-stone-50/80 p-5 shadow-sm backdrop-blur-sm">
+        <div className="rounded-2xl border border-amber-100 dark:border-amber-900/30 bg-stone-50/80 dark:bg-gray-900/40 p-5 shadow-sm backdrop-blur-sm">
           <div className="mb-1 text-amber-400/60 text-2xl leading-none select-none">&ldquo;</div>
-          <p className="whitespace-pre-line text-base leading-relaxed text-gray-700">
+          <p className="whitespace-pre-line text-base leading-relaxed text-gray-700 dark:text-gray-300">
             {card.content}
           </p>
-          <p className="mt-3 text-sm font-medium text-gray-500">
+          <p className="mt-3 text-sm font-medium text-gray-500 dark:text-gray-400">
             &mdash; {card.contributorName}
           </p>
         </div>
@@ -77,11 +77,11 @@ export function MasonryWall({
       {/* Divider */}
       {mediaCards.length > 0 && memoryCards.length > 0 && (
         <div className="flex items-center gap-4 py-10">
-          <div className="h-px flex-1 bg-amber-200/60" />
-          <h3 className="text-sm font-medium text-gray-400 tracking-wide">
+          <div className="h-px flex-1 bg-amber-200/60 dark:bg-amber-800/30" />
+          <h3 className="text-sm font-medium text-gray-400 dark:text-gray-500 tracking-wide">
             Memories &amp; Stories
           </h3>
-          <div className="h-px flex-1 bg-amber-200/60" />
+          <div className="h-px flex-1 bg-amber-200/60 dark:bg-amber-800/30" />
         </div>
       )}
 

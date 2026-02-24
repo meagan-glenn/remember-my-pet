@@ -80,10 +80,10 @@ export function PricingCards({ memorialId, slug, onLeave }: PricingCardsProps) {
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <div className="text-center space-y-2">
-        <h2 className="font-serif text-2xl font-medium text-gray-900">
+        <h2 className="font-serif text-2xl font-medium text-gray-900 dark:text-amber-50">
           Publish your memorial
         </h2>
-        <p className="text-gray-500">
+        <p className="text-gray-500 dark:text-gray-400">
           Your memorial is saved. When you&apos;re ready, choose a plan to
           publish and share it.
         </p>
@@ -95,27 +95,27 @@ export function PricingCards({ memorialId, slug, onLeave }: PricingCardsProps) {
             key={tier.id}
             className={
               tier.highlight
-                ? "border-amber-300 ring-2 ring-amber-200"
-                : undefined
+                ? "border-amber-300 ring-2 ring-amber-200 dark:border-amber-600 dark:ring-amber-700/40"
+                : "dark:border-amber-900/30"
             }
           >
             <CardHeader>
               <CardTitle className="flex items-baseline gap-2">
                 <span className="text-2xl font-bold">{tier.price}</span>
-                <span className="text-base font-normal text-gray-500">
+                <span className="text-base font-normal text-gray-500 dark:text-gray-400">
                   one-time
                 </span>
               </CardTitle>
-              <CardDescription className="text-base font-medium text-gray-900">
+              <CardDescription className="text-base font-medium text-gray-900 dark:text-amber-50">
                 {tier.name}
               </CardDescription>
-              <p className="text-sm text-gray-500">{tier.description}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">{tier.description}</p>
             </CardHeader>
             <CardContent className="space-y-4">
               <ul className="space-y-2">
                 {tier.features.map((feature) => (
                   <li key={feature} className="flex items-start gap-2 text-sm">
-                    <Check className="h-4 w-4 mt-0.5 shrink-0 text-amber-600" />
+                    <Check className="h-4 w-4 mt-0.5 shrink-0 text-amber-600 dark:text-amber-400" />
                     <span>{feature}</span>
                   </li>
                 ))}
@@ -125,8 +125,8 @@ export function PricingCards({ memorialId, slug, onLeave }: PricingCardsProps) {
                 disabled={loading !== null}
                 className={`w-full h-11 ${
                   tier.highlight
-                    ? "bg-amber-600 hover:bg-amber-700"
-                    : "bg-gray-900 hover:bg-gray-800"
+                    ? "bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-400 dark:text-gray-900"
+                    : "bg-gray-900 hover:bg-gray-800 dark:bg-gray-100 dark:hover:bg-gray-200 dark:text-gray-900"
                 }`}
               >
                 {loading === tier.id ? (
@@ -143,15 +143,15 @@ export function PricingCards({ memorialId, slug, onLeave }: PricingCardsProps) {
         ))}
       </div>
 
-      {error && <p className="text-sm text-red-500 text-center">{error}</p>}
+      {error && <p className="text-sm text-red-500 dark:text-red-400 text-center">{error}</p>}
 
-      <p className="text-center text-xs text-gray-400">
+      <p className="text-center text-xs text-gray-400 dark:text-gray-500">
         Secure payment via Stripe.
       </p>
 
-      <p className="text-center text-sm text-gray-500">
+      <p className="text-center text-sm text-gray-500 dark:text-gray-400">
         Not ready yet? Your memorial is saved to your{" "}
-        <a href="/dashboard" className="underline hover:text-gray-700" onClick={() => onLeave?.()}>
+        <a href="/dashboard" className="underline hover:text-gray-700 dark:text-amber-400 dark:hover:text-amber-300" onClick={() => onLeave?.()}>
           dashboard
         </a>
         . You can publish anytime.

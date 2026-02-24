@@ -382,7 +382,7 @@ export function StepPreview({
 
       {/* Actions */}
       <div className="mx-auto max-w-md px-4 pt-8 pb-12 sm:px-6 space-y-4">
-        {error && <p className="text-sm text-red-500 text-center">{error}</p>}
+        {error && <p className="text-sm text-red-500 dark:text-red-400 text-center">{error}</p>}
 
         {/* Feed opt-in */}
         {onShowInFeedChange && (
@@ -394,7 +394,7 @@ export function StepPreview({
               className="mt-0.5 h-4 w-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500 dark:border-gray-600 dark:bg-gray-800"
             />
             <div>
-              <p className="text-sm font-medium text-gray-700 dark:text-gray-200">
+              <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 Share on our community feed
               </p>
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">

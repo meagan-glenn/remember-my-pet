@@ -35,23 +35,23 @@ export function KeepsakeCard({
   const price = (priceCents / 100).toFixed(2);
 
   return (
-    <div className="rounded-2xl border border-amber-100 bg-white/80 p-6 shadow-sm backdrop-blur-sm">
+    <div className="rounded-2xl border border-amber-100 bg-white/80 p-6 shadow-sm backdrop-blur-sm dark:border-amber-900/30 dark:bg-gray-900/40">
       <div className="flex items-start gap-4">
-        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-amber-100">
-          <info.Icon className="h-6 w-6 text-amber-600" />
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-900/30">
+          <info.Icon className="h-6 w-6 text-amber-600 dark:text-amber-400" />
         </div>
         <div className="flex-1 space-y-1">
-          <h3 className="font-serif text-lg font-medium text-gray-900">
+          <h3 className="font-serif text-lg font-medium text-gray-900 dark:text-amber-50">
             {info.title}
           </h3>
-          <p className="text-sm text-gray-500">{info.description}</p>
-          <p className="text-lg font-semibold text-gray-900">${price}</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">{info.description}</p>
+          <p className="text-lg font-semibold text-gray-900 dark:text-amber-50">${price}</p>
         </div>
       </div>
       <Button
         onClick={onSelect}
         disabled={loading}
-        className="mt-4 w-full bg-amber-600 hover:bg-amber-700"
+        className="mt-4 w-full bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-400 dark:text-gray-900"
       >
         {loading ? "Loading..." : `Create ${info.title}`}
       </Button>

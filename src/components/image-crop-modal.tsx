@@ -77,7 +77,7 @@ export function ImageCropModal({
         <DialogHeader className="p-4 pb-2">
           <DialogTitle>Crop photo</DialogTitle>
         </DialogHeader>
-        <div className="flex-1 min-h-0 overflow-auto flex items-center justify-center bg-gray-100 p-4">
+        <div className="flex-1 min-h-0 overflow-auto flex items-center justify-center bg-gray-100 dark:bg-gray-800 p-4">
           <ReactCrop
             crop={crop}
             onChange={(c) => setCrop(c)}
@@ -98,7 +98,7 @@ export function ImageCropModal({
             Cancel
           </Button>
           <Button
-            className="bg-amber-600 hover:bg-amber-700"
+            className="bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-400 dark:text-gray-900"
             onClick={handleConfirm}
           >
             Crop

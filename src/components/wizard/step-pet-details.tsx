@@ -66,10 +66,10 @@ export function StepPetDetails({ data, onUpdate, onSetHeroFile, onNext }: StepPe
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="text-center space-y-2">
-        <h1 className="text-2xl font-semibold text-gray-900">
+        <h1 className="text-2xl font-semibold text-gray-900 dark:text-amber-50">
           Let&apos;s remember {data.petName ? data.petName : getPronouns(data.gender).object}
         </h1>
-        <p className="text-gray-500">
+        <p className="text-gray-500 dark:text-gray-400">
           Tell us a little about your pet to get started.
         </p>
       </div>
@@ -100,8 +100,8 @@ export function StepPetDetails({ data, onUpdate, onSetHeroFile, onNext }: StepPe
                 onClick={() => onUpdate({ species: s })}
                 className={`flex-1 rounded-lg border px-4 py-3 text-sm font-medium capitalize transition-colors ${
                   data.species === s
-                    ? "border-amber-500 bg-amber-50 text-amber-700"
-                    : "border-gray-200 text-gray-600 hover:border-gray-300"
+                    ? "border-amber-500 bg-amber-50 text-amber-700 dark:border-amber-500 dark:bg-amber-500/15 dark:text-amber-200"
+                    : "border-gray-200 text-gray-600 hover:border-gray-300 dark:border-amber-800/30 dark:text-gray-400 dark:hover:border-amber-700/50"
                 }`}
               >
                 {s}
@@ -128,8 +128,8 @@ export function StepPetDetails({ data, onUpdate, onSetHeroFile, onNext }: StepPe
                 onClick={() => onUpdate({ gender: data.gender === value ? undefined : value })}
                 className={`flex-1 rounded-lg border px-4 py-3 text-sm font-medium transition-colors ${
                   data.gender === value
-                    ? "border-amber-500 bg-amber-50 text-amber-700"
-                    : "border-gray-200 text-gray-600 hover:border-gray-300"
+                    ? "border-amber-500 bg-amber-50 text-amber-700 dark:border-amber-500 dark:bg-amber-500/15 dark:text-amber-200"
+                    : "border-gray-200 text-gray-600 hover:border-gray-300 dark:border-amber-800/30 dark:text-gray-400 dark:hover:border-amber-700/50"
                 }`}
               >
                 {label}
@@ -168,7 +168,7 @@ export function StepPetDetails({ data, onUpdate, onSetHeroFile, onNext }: StepPe
         <div className="space-y-2">
           <Label>Primary photo</Label>
           {data.heroPhoto ? (
-            <div className="relative w-full overflow-hidden rounded-xl bg-gray-100">
+            <div className="relative w-full overflow-hidden rounded-xl bg-gray-100 dark:bg-gray-800">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={data.heroPhoto}
@@ -187,13 +187,13 @@ export function StepPetDetails({ data, onUpdate, onSetHeroFile, onNext }: StepPe
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="flex w-full flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 p-8 hover:border-gray-300 transition-colors"
+              className="flex w-full flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 p-8 hover:border-gray-300 transition-colors dark:border-amber-900/30 dark:bg-gray-900/40 dark:hover:border-amber-800/50"
             >
-              <ImagePlus className="h-10 w-10 text-gray-400 mb-2" />
-              <p className="text-sm font-medium text-gray-700">
+              <ImagePlus className="h-10 w-10 text-gray-400 dark:text-gray-500 mb-2" />
+              <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 Add a favorite photo
               </p>
-              <p className="text-xs text-gray-400 mt-1">
+              <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
                 This will be the main image on the memorial
               </p>
             </button>
@@ -217,7 +217,7 @@ export function StepPetDetails({ data, onUpdate, onSetHeroFile, onNext }: StepPe
 
       <Button
         type="submit"
-        className="w-full h-12 text-base bg-amber-600 hover:bg-amber-700"
+        className="w-full h-12 text-base bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-400 dark:text-gray-900"
         disabled={!data.petName.trim()}
       >
         Continue

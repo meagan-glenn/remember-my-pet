@@ -155,10 +155,10 @@ export function StepPhotoUpload({
   return (
     <div className="space-y-6">
       <div className="text-center space-y-2">
-        <h1 className="text-2xl font-semibold text-gray-900">
+        <h1 className="text-2xl font-semibold text-gray-900 dark:text-amber-50">
           {petName ? `${petName}'s best moments` : "Your pet's best moments"}
         </h1>
-        <p className="text-gray-500">
+        <p className="text-gray-500 dark:text-gray-400">
           The ones that make you smile.
         </p>
       </div>
@@ -174,15 +174,15 @@ export function StepPhotoUpload({
         onClick={() => fileInputRef.current?.click()}
         className={`relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-8 cursor-pointer transition-colors ${
           dragOver
-            ? "border-amber-500 bg-amber-50"
-            : "border-gray-200 hover:border-gray-300 bg-gray-50"
+            ? "border-amber-500 bg-amber-50 dark:bg-amber-900/20"
+            : "border-gray-200 hover:border-gray-300 bg-gray-50 dark:border-amber-900/30 dark:hover:border-amber-800/50 dark:bg-gray-900/40"
         }`}
       >
-        <ImagePlus className="h-10 w-10 text-gray-400 mb-2" />
-        <p className="text-sm font-medium text-gray-700">
+        <ImagePlus className="h-10 w-10 text-gray-400 dark:text-gray-500 mb-2" />
+        <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
           Tap to add photos
         </p>
-        <p className="text-xs text-gray-400 mt-1">
+        <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
           or drag and drop on desktop
         </p>
         <input
@@ -199,7 +199,7 @@ export function StepPhotoUpload({
 
       {/* Photo grid */}
       {photos.length > 0 && (
-        <p className="text-xs text-gray-400 text-center">
+        <p className="text-xs text-gray-400 dark:text-gray-500 text-center">
           {photos.length} {photos.length === 1 ? "photo" : "photos"} · {MAX_PHOTOS - photos.length} more available
         </p>
       )}
@@ -232,7 +232,7 @@ export function StepPhotoUpload({
                   placeholder={captioning.has(photo.id) ? "Generating caption..." : "Add a caption..."}
                   value={photo.caption || ""}
                   onChange={(e) => onSetCaption(photo.id, e.target.value)}
-                  className={`w-full rounded-md border border-gray-200 px-2 py-1.5 text-xs text-gray-700 placeholder:text-gray-400 focus:border-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-400 resize-none ${captioning.has(photo.id) ? "animate-pulse bg-amber-50" : ""}`}
+                  className={`w-full rounded-md border border-gray-200 dark:border-amber-900/30 px-2 py-1.5 text-xs text-gray-700 dark:text-gray-300 dark:bg-gray-900 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-400 dark:focus:border-amber-700/60 dark:focus:ring-amber-700/40 resize-none ${captioning.has(photo.id) ? "animate-pulse bg-amber-50 dark:bg-amber-950/30" : ""}`}
                   maxLength={200}
                 />
               )}
@@ -242,7 +242,7 @@ export function StepPhotoUpload({
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="flex aspect-square items-center justify-center rounded-lg border-2 border-dashed border-gray-200 text-gray-400 hover:border-gray-300 hover:text-gray-500 transition-colors"
+              className="flex aspect-square items-center justify-center rounded-lg border-2 border-dashed border-gray-200 text-gray-400 hover:border-gray-300 hover:text-gray-500 transition-colors dark:border-amber-900/30 dark:text-gray-500 dark:hover:border-amber-800/50 dark:hover:text-gray-400"
             >
               <Upload className="h-6 w-6" />
             </button>
@@ -271,7 +271,7 @@ export function StepPhotoUpload({
               type="button"
               onClick={onNext}
 
-              className="h-12 flex-1 bg-amber-600 hover:bg-amber-700"
+              className="h-12 flex-1 bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-400 dark:text-gray-900"
             >
               Continue
             </Button>

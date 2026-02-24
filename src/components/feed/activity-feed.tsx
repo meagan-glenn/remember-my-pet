@@ -57,23 +57,23 @@ export function ActivityFeed() {
     return (
       <section className="px-4 py-8 sm:py-12">
         <div className="mx-auto max-w-4xl">
-          <h2 className="text-center font-serif text-3xl font-medium text-gray-900 md:text-4xl">
+          <h2 className="text-center font-serif text-3xl font-medium text-gray-900 md:text-4xl dark:text-amber-50">
             Recently remembered
           </h2>
-          <p className="mt-4 text-center text-gray-500">
+          <p className="mt-4 text-center text-gray-500 dark:text-gray-400">
             Pets loved and honored by our community
           </p>
           <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {[...Array(3)].map((_, i) => (
               <div
                 key={i}
-                className="rounded-2xl border border-amber-100 bg-white/80 overflow-hidden animate-pulse"
+                className="rounded-2xl border border-amber-100 bg-white/80 overflow-hidden animate-pulse dark:border-amber-900/30 dark:bg-gray-900/40"
               >
-                <div className="aspect-[4/3] bg-gray-200" />
+                <div className="aspect-[4/3] bg-gray-200 dark:bg-gray-700" />
                 <div className="p-4 space-y-2">
-                  <div className="h-5 w-24 bg-gray-200 rounded" />
-                  <div className="h-4 w-full bg-gray-100 rounded" />
-                  <div className="h-4 w-2/3 bg-gray-100 rounded" />
+                  <div className="h-5 w-24 bg-gray-200 rounded dark:bg-gray-700" />
+                  <div className="h-4 w-full bg-gray-100 rounded dark:bg-gray-800" />
+                  <div className="h-4 w-2/3 bg-gray-100 rounded dark:bg-gray-800" />
                 </div>
               </div>
             ))}
@@ -86,10 +86,10 @@ export function ActivityFeed() {
   return (
     <section className="px-4 py-8 sm:py-12">
       <div className="mx-auto max-w-4xl">
-        <h2 className="text-center font-serif text-3xl font-medium text-gray-900 md:text-4xl">
+        <h2 className="text-center font-serif text-3xl font-medium text-gray-900 md:text-4xl dark:text-amber-50">
           Recently remembered
         </h2>
-        <p className="mt-4 text-center text-gray-500">
+        <p className="mt-4 text-center text-gray-500 dark:text-gray-400">
           Pets loved and honored by our community
         </p>
 
@@ -112,7 +112,7 @@ export function ActivityFeed() {
               variant="outline"
               onClick={loadMore}
               disabled={loadingMore}
-              className="rounded-full border-amber-200 text-amber-700 hover:bg-amber-50"
+              className="rounded-full border-amber-200 text-amber-700 hover:bg-amber-50 dark:border-amber-800/30 dark:text-amber-200 dark:hover:bg-amber-900/20"
             >
               {loadingMore ? (
                 <span className="flex items-center gap-2">
