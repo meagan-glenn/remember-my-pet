@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { createBrowserSupabase } from "@/lib/supabase";
-import { ERROR_MESSAGES } from "@/lib/error-messages";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 const DISMISS_KEY = "petmemorial-early-auth-dismissed";
 
@@ -15,8 +15,6 @@ interface EarlyAuthBannerProps {
 export function EarlyAuthBanner({ petName, onAuthenticated }: EarlyAuthBannerProps) {
   const [hidden, setHidden] = useState(true);
   const [dismissed, setDismissed] = useState(false);
-  const [googleLoading, setGoogleLoading] = useState(false);
-  const [error, setError] = useState("");
 
   useEffect(() => {
     if (localStorage.getItem(DISMISS_KEY)) {
@@ -47,24 +45,8 @@ export function EarlyAuthBanner({ petName, onAuthenticated }: EarlyAuthBannerPro
     setDismissed(true);
   };
 
-  const handleGoogleSignIn = async () => {
-    setGoogleLoading(true);
-    setError("");
-
-    try {
-      const supabase = createBrowserSupabase();
-      const { error: authError } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback?redirect=${encodeURIComponent(window.location.pathname)}`,
-        },
-      });
-
-      if (authError) throw authError;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : ERROR_MESSAGES.AUTH_FAILED.message);
-      setGoogleLoading(false);
-    }
+  const handleGoogleSignIn = () => {
+    toast("Google sign-in is coming soon! Use a magic link for now.", { duration: 4000 });
   };
 
   return (
@@ -74,13 +56,11 @@ export function EarlyAuthBanner({ petName, onAuthenticated }: EarlyAuthBannerPro
           Want to make sure {petName}&apos;s memorial is saved? Create a quick
           account — or do this later.
         </p>
-        {error && <p className="text-xs text-red-600">{error}</p>}
         <div className="flex gap-2">
           <Button
             size="sm"
             variant="outline"
             onClick={handleGoogleSignIn}
-            disabled={googleLoading}
             className="text-sm dark:border-amber-800/40 dark:text-amber-200 dark:hover:bg-amber-900/20"
           >
             <svg className="mr-1.5 h-4 w-4" viewBox="0 0 24 24">
@@ -101,7 +81,7 @@ export function EarlyAuthBanner({ petName, onAuthenticated }: EarlyAuthBannerPro
                 fill="#EA4335"
               />
             </svg>
-            {googleLoading ? "Redirecting..." : "Continue with Google"}
+            Continue with Google
           </Button>
           <Button
             size="sm"

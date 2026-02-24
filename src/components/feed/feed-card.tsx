@@ -46,12 +46,7 @@ export function FeedCard({
       } = await supabase.auth.getUser();
 
       if (!user) {
-        await supabase.auth.signInWithOAuth({
-          provider: "google",
-          options: {
-            redirectTo: `${window.location.origin}/auth/callback?redirect=${encodeURIComponent("/")}`,
-          },
-        });
+        window.location.href = `/sign-in?redirect=${encodeURIComponent("/")}`;
         return;
       }
 

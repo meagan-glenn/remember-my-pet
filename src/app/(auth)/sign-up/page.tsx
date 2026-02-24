@@ -15,6 +15,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import Link from "next/link";
+import { toast } from "sonner";
 
 function SignUpForm() {
   const searchParams = useSearchParams();
@@ -25,28 +26,11 @@ function SignUpForm() {
   const context = searchParams.get("context");
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
-  const [googleLoading, setGoogleLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
 
-  const handleGoogleSignUp = async () => {
-    setGoogleLoading(true);
-    setError("");
-
-    try {
-      const supabase = createBrowserSupabase();
-      const { error: authError } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback?redirect=${encodeURIComponent(redirect)}`,
-        },
-      });
-
-      if (authError) throw authError;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : ERROR_MESSAGES.AUTH_FAILED.message);
-      setGoogleLoading(false);
-    }
+  const handleGoogleSignUp = () => {
+    toast("Google sign-in is coming soon! Use a magic link for now.", { duration: 4000 });
   };
 
   const handleMagicLink = async (e: React.FormEvent) => {
@@ -109,7 +93,6 @@ function SignUpForm() {
               type="button"
               variant="outline"
               onClick={handleGoogleSignUp}
-              disabled={googleLoading}
               className="w-full h-12 text-base dark:border-amber-800/40 dark:text-amber-200 dark:hover:bg-amber-900/20"
             >
               <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24">
@@ -130,7 +113,7 @@ function SignUpForm() {
                   fill="#EA4335"
                 />
               </svg>
-              {googleLoading ? "Redirecting..." : "Continue with Google"}
+              Continue with Google
             </Button>
 
             <div className="relative">

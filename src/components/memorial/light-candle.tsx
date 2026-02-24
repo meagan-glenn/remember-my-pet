@@ -48,13 +48,7 @@ export function LightCandle({ memorialId }: LightCandleProps) {
     if (toggling) return;
 
     if (!isAuthenticated) {
-      const supabase = createBrowserSupabase();
-      await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback?redirect=${encodeURIComponent(window.location.pathname)}`,
-        },
-      });
+      window.location.href = `/sign-in?redirect=${encodeURIComponent(window.location.pathname)}`;
       return;
     }
 
