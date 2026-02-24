@@ -5,6 +5,10 @@ import { apiError } from "@/lib/error-messages";
 import { stripe, PRICES, type Tier } from "@/lib/stripe";
 
 export async function POST(request: Request) {
+  if (!stripe) {
+    return apiError("CHECKOUT_FAILED", 503, "Payments are not enabled yet.");
+  }
+
   const supabase = await createServerSupabase();
   const {
     data: { user },
