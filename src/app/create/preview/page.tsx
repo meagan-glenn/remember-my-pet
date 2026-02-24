@@ -47,7 +47,8 @@ function PreviewContent() {
     const res = await fetch("/api/upload", { method: "POST", body: formData });
     if (res.status === 401) throw new Error("__AUTH_REQUIRED__");
     if (!res.ok) {
-      const data = await res.json();
+      if (res.status === 413) throw new Error("This photo is too large. Please use a photo under 10MB.");
+      const data = await res.json().catch(() => ({}));
       throw new Error(data.error?.message || data.error || "Upload failed");
     }
     const { url } = await res.json();
