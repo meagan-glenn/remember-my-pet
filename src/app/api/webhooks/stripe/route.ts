@@ -3,6 +3,10 @@ import { stripe } from "@/lib/stripe";
 import { createServiceClient } from "@/lib/supabase";
 
 export async function POST(request: Request) {
+  if (!stripe) {
+    return NextResponse.json({ error: "Payments not configured" }, { status: 503 });
+  }
+
   const body = await request.text();
   const signature = request.headers.get("stripe-signature");
 
