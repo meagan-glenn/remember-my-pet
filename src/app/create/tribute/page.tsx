@@ -32,20 +32,20 @@ export default function TributePage() {
 
   if (!hydrated || !petDetails.petName.trim()) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center dark:bg-gray-950">
         <div className="h-8 w-8 animate-spin rounded-full border-2 border-amber-500 border-t-transparent" />
       </div>
     );
   }
 
   return (
-    <div className="py-8 px-4">
+    <div className="min-h-screen py-8 px-4 dark:bg-gray-950">
       <div className="mx-auto max-w-lg">
         <Button
           variant="ghost"
           size="sm"
           onClick={() => router.push("/create")}
-          className="mb-4 -ml-2 text-gray-600 hover:text-gray-900"
+          className="mb-4 -ml-2 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-amber-50"
         >
           <ArrowLeft className="h-4 w-4 mr-1" />
           Back to workspace

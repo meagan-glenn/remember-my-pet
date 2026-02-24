@@ -346,12 +346,12 @@ export function StepTributeChat({
                 type="button"
                 onClick={handleSkip}
                 disabled={isTyping || chatLoading}
-                className="text-sm text-gray-400 hover:text-gray-500 disabled:opacity-50"
+                className="text-sm text-gray-400 hover:text-gray-500 dark:text-gray-500 dark:hover:text-gray-400 disabled:opacity-50"
               >
                 Skip this question
               </button>
               {showSkipNote && (
-                <p className="text-xs text-gray-400 text-center mt-1">
+                <p className="text-xs text-gray-400 dark:text-gray-500 text-center mt-1">
                   The more you share, the more personal your tribute will be — but skip anything that&apos;s too much right now.
                 </p>
               )}
@@ -369,7 +369,7 @@ export function StepTributeChat({
               type="button"
               variant="ghost"
               onClick={onBack}
-              className="w-full text-gray-500"
+              className="w-full text-gray-500 dark:text-gray-400"
             >
               Back
             </Button>
@@ -406,7 +406,7 @@ export function StepTributeChat({
                     setShowRefinementInput(false);
                     setRefinementFeedback("");
                   }}
-                  className="h-10 flex-1"
+                  className="h-10 flex-1 dark:border-amber-800/40 dark:text-amber-200 dark:hover:bg-amber-900/20"
                 >
                   Cancel
                 </Button>
@@ -425,7 +425,7 @@ export function StepTributeChat({
               <Button
                 variant="outline"
                 onClick={() => setShowRefinementInput(true)}
-                className="h-12 flex-1"
+                className="h-12 flex-1 dark:border-amber-800/40 dark:text-amber-200 dark:hover:bg-amber-900/20"
               >
                 Revise
               </Button>
