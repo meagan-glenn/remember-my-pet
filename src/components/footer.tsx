@@ -1,7 +1,27 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { PawPrint } from "lucide-react";
 
+// Known top-level routes that should show the footer
+const ROUTES_WITH_FOOTER = new Set([
+  "/", "/create", "/dashboard", "/demo", "/support", "/community",
+  "/privacy", "/terms", "/ai-info", "/sign-in", "/sign-up",
+]);
+
+function shouldShowFooter(pathname: string): boolean {
+  if (ROUTES_WITH_FOOTER.has(pathname)) return true;
+  // Show on sub-routes of known sections (e.g. /blog/*, /create/*)
+  if (pathname.startsWith("/blog") || pathname.startsWith("/create")) return true;
+  return false;
+}
+
 export function Footer() {
+  const pathname = usePathname();
+
+  if (!shouldShowFooter(pathname)) return null;
+
   return (
     <footer className="border-t border-amber-100/60 bg-white/70 mt-auto dark:border-amber-900/30 dark:bg-gray-950/70">
       <div className="mx-auto max-w-5xl px-4 py-12">

@@ -3,6 +3,7 @@ import Script from "next/script";
 import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
 import { Providers } from "@/components/providers";
 import { Header } from "@/components/header";
+import { HeaderWrapper } from "@/components/header-wrapper";
 import { Footer } from "@/components/footer";
 import { OfflineBanner } from "@/components/offline-banner";
 import "./globals.css";
@@ -87,7 +88,7 @@ f="XMLHttpRequest",g._w={},g._w[f]=m[f],g._w[s]=m[s],m[s]&&(m[s]=function(){retu
       >
         <Providers>
           <OfflineBanner />
-          <Header />
+          <HeaderWrapper><Header /></HeaderWrapper>
           <main className="flex-1">{children}</main>
           <Footer />
         </Providers>

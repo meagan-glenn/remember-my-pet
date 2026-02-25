@@ -332,6 +332,24 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
         </section>
       )}
 
+      {/* Memorial page nav */}
+      <div className="mx-auto max-w-6xl px-4 pb-10 pt-4 text-center print:hidden sm:px-6">
+        <a
+          href="/"
+          className="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-amber-600 dark:text-gray-500 dark:hover:text-amber-400 transition-colors"
+        >
+          <PawPrint className="h-3.5 w-3.5" />
+          RememberMyPet.ai
+        </a>
+        <span className="mx-2 text-gray-300 dark:text-gray-700">·</span>
+        <a
+          href="/create"
+          className="text-sm text-gray-400 hover:text-amber-600 dark:text-gray-500 dark:hover:text-amber-400 transition-colors"
+        >
+          Create your own memorial
+        </a>
+      </div>
+
       {/* Print footer */}
       <div className="hidden print:block print:py-8 print:text-center print:text-sm print:text-gray-400">
         Created with PetMemorial.ai
