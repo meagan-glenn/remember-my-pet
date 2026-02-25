@@ -167,7 +167,7 @@ export function MemoryForm({ memorialId, petName, onSubmitted }: MemoryFormProps
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div>
+            <div className="space-y-1.5">
               <Label htmlFor="memory-name">Your name *</Label>
               <Input
                 id="memory-name"
@@ -178,7 +178,7 @@ export function MemoryForm({ memorialId, petName, onSubmitted }: MemoryFormProps
                 disabled={submitting}
               />
             </div>
-            <div>
+            <div className="space-y-1.5">
               <Label htmlFor="memory-email">Email (optional)</Label>
               <Input
                 id="memory-email"
@@ -191,7 +191,7 @@ export function MemoryForm({ memorialId, petName, onSubmitted }: MemoryFormProps
             </div>
           </div>
 
-          <div>
+          <div className="space-y-1.5">
             <Label htmlFor="memory-content">Your memory *</Label>
             <Textarea
               id="memory-content"

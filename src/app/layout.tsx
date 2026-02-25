@@ -26,6 +26,29 @@ export const metadata: Metadata = {
   title: "RememberMyPet.ai — Create a Lasting Memorial for Your Pet",
   description:
     "Create a beautiful memorial for your pet. AI-written tributes, photo galleries, collaborative memory walls, and video reels.",
+  keywords: [
+    "pet memorial",
+    "pet loss",
+    "dog memorial",
+    "cat memorial",
+    "pet tribute",
+    "digital pet memorial",
+    "pet remembrance",
+  ],
+  openGraph: {
+    title: "RememberMyPet.ai — A Place for Their Story",
+    description:
+      "Create a beautiful digital memorial for your pet with AI-powered tributes, photo galleries, and a collaborative memory wall.",
+    type: "website",
+    url: "https://remembermypet.ai",
+    siteName: "RememberMyPet.ai",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "RememberMyPet.ai",
+    description:
+      "Create a beautiful digital memorial for your pet.",
+  },
 };
 
 export default function RootLayout({

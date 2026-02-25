@@ -132,7 +132,7 @@ export async function generateMetadata({
     : `A memorial for ${memorial.pet_name}. Forever loved, forever remembered.`;
 
   return {
-    title: `Remembering ${memorial.pet_name} — PetMemorial.ai`,
+    title: `Remembering ${memorial.pet_name} — RememberMyPet.ai`,
     description,
     openGraph: {
       title: `Remembering ${memorial.pet_name}`,
@@ -169,8 +169,21 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
     process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
   const memorialUrl = `${siteUrl}/${memorial.slug}`;
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: `Memorial for ${memorial.pet_name}`,
+    description: memorial.tribute?.slice(0, 160) || `A memorial for ${memorial.pet_name}.`,
+    url: memorialUrl,
+    ...(heroPhoto && { image: heroPhoto.url }),
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50/60 via-orange-50/30 to-white dark:from-gray-950 dark:via-gray-950 dark:to-gray-950 print:bg-white print:from-white print:via-white">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* Hero Section */}
       <section className="relative">
         {heroPhoto ? (

@@ -6,6 +6,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
+        disallow: ["/dashboard", "/create", "/api/", "/auth/"],
       },
     ],
     sitemap: "https://remembermypet.ai/sitemap.xml",
