@@ -56,6 +56,24 @@ export default async function Dashboard() {
           </Button>
         </Link>
 
+        {memorials?.some((m) => m.is_published) && (
+          <Card className="border-amber-100 bg-amber-50/50 dark:border-amber-900/30 dark:bg-amber-950/20">
+            <CardContent className="flex items-center justify-between py-4">
+              <p className="text-sm text-gray-600 dark:text-gray-300">
+                How was your experience creating a memorial?
+              </p>
+              <a
+                href="https://tally.so/r/aQBOYX"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="shrink-0 text-sm font-medium text-amber-600 hover:underline dark:text-amber-400"
+              >
+                Share feedback
+              </a>
+            </CardContent>
+          </Card>
+        )}
+
         <DashboardTabs pendingCount={pendingCount}>
           {!memorials?.length ? (
             <Card>
