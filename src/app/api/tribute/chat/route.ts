@@ -147,7 +147,7 @@ Ending the conversation:
 
   return NextResponse.json({ reply: cleanReply, readyForTribute, supportEntries });
   } catch (err) {
-    console.error("Tribute chat error:", err);
+    console.error("Tribute chat error:", err instanceof Error ? err.message : "Unknown error");
     return apiError("TRIBUTE_GENERATION_FAILED", 500);
   }
 }

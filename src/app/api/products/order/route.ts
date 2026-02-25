@@ -116,7 +116,7 @@ export async function POST(request: Request) {
       status: "ordered",
     });
   } catch (err) {
-    console.error("Gelato order error:", err);
+    console.error("Gelato order error:", err instanceof Error ? err.message : "Unknown error");
     return apiError("SHOP_ORDER_FAILED", 500);
   }
 }

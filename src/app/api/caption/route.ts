@@ -26,7 +26,7 @@ export async function POST(request: Request) {
     const { caption, tags } = await generatePhotoMetadata(imageBase64, mimeType, petName, gender);
     return NextResponse.json({ caption, tags });
   } catch (error) {
-    console.error("Caption generation failed:", error);
+    console.error("Caption generation failed:", error instanceof Error ? error.message : "Unknown error");
     return NextResponse.json({ caption: "", tags: [] });
   }
 }

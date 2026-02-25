@@ -65,6 +65,6 @@ export async function sendMemoryNotification({
     });
   } catch (error) {
     // Log but don't fail the submission if email fails
-    console.error("Failed to send memory notification email:", error);
+    console.error("Failed to send memory notification email:", error instanceof Error ? error.message : "Unknown error");
   }
 }

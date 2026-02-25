@@ -25,7 +25,7 @@ export async function POST(request: Request) {
       process.env.STRIPE_WEBHOOK_SECRET
     );
   } catch (err) {
-    console.error("Stripe webhook signature verification failed:", err);
+    console.error("Stripe webhook signature verification failed:", err instanceof Error ? err.message : "Unknown error");
     return NextResponse.json(
       { error: "Invalid signature" },
       { status: 400 }

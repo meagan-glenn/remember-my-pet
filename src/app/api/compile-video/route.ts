@@ -236,7 +236,7 @@ export async function POST(request: Request) {
     .single();
 
   if (insertError || !compilation) {
-    console.error("Failed to create compilation record:", insertError);
+    console.error("Failed to create compilation record:", insertError?.message);
     return apiError("VIDEO_COMPILATION_FAILED", 500);
   }
 
@@ -310,7 +310,7 @@ export async function POST(request: Request) {
       status: "complete",
     });
   } catch (err) {
-    console.error("Compilation error:", err);
+    console.error("Compilation error:", err instanceof Error ? err.message : "Unknown error");
 
     // Update compilation record with failure
     await supabase
