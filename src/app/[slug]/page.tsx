@@ -6,7 +6,8 @@ import { PawPrint } from "lucide-react";
 import { getPronouns } from "@/lib/pronouns";
 import { ShareButton } from "./share-button";
 import { MasonryWall } from "@/components/memorial-wall/masonry-wall";
-import { MemoryForm } from "@/components/memory-wall/memory-form";
+import { ExpandableMemoryForm } from "@/components/memory-wall/expandable-memory-form";
+import { InviteDialog } from "@/components/memory-wall/invite-dialog";
 import { LightCandle } from "@/components/memorial/light-candle";
 
 interface MemorialPageProps {
@@ -45,6 +46,7 @@ interface Memorial {
   death_date: string | null;
   tribute: string | null;
   is_published: boolean;
+  allow_memories?: boolean | null;
   photos: Photo[];
   hero_photo_crop_y?: number | null;
   compilation_url?: string | null;
@@ -248,6 +250,9 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
             Edit memorial
           </a>
         )}
+        {isOwner && memorial.allow_memories !== false && (
+          <InviteDialog petName={memorial.pet_name} memorialUrl={memorialUrl} />
+        )}
         <LightCandle memorialId={memorial.id} />
         <ShareButton url={memorialUrl} petName={memorial.pet_name} />
       </div>
@@ -320,10 +325,10 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
         </section>
       )}
 
-      {/* Memory Form (for published memorials) */}
-      {memorial.is_published && (
+      {/* Memory Form (for published memorials with memories enabled) */}
+      {memorial.is_published && memorial.allow_memories !== false && (
         <section className="mx-auto max-w-6xl px-4 pb-16 sm:px-6">
-          <MemoryForm memorialId={memorial.id} petName={memorial.pet_name} />
+          <ExpandableMemoryForm memorialId={memorial.id} petName={memorial.pet_name} />
         </section>
       )}
 

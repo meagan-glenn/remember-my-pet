@@ -76,6 +76,8 @@ interface StepPreviewProps {
   onUpdateCropY?: (y: number) => void;
   showInFeed?: boolean;
   onShowInFeedChange?: (value: boolean) => void;
+  allowMemories?: boolean;
+  onAllowMemoriesChange?: (value: boolean) => void;
 }
 
 export function StepPreview({
@@ -91,6 +93,8 @@ export function StepPreview({
   onUpdateCropY,
   showInFeed = false,
   onShowInFeedChange,
+  allowMemories = true,
+  onAllowMemoriesChange,
 }: StepPreviewProps) {
   const [editingTribute, setEditingTribute] = useState(false);
   const [editedTribute, setEditedTribute] = useState(tribute);
@@ -404,6 +408,26 @@ export function StepPreview({
               </p>
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                 Let others light a candle for {petDetails.petName}. You can change this anytime.
+              </p>
+            </div>
+          </label>
+        )}
+
+        {/* Allow memories opt-in */}
+        {onAllowMemoriesChange && (
+          <label className="flex items-start gap-3 rounded-xl border border-amber-100 bg-amber-50/50 p-4 cursor-pointer dark:border-amber-900/30 dark:bg-gray-900/40">
+            <input
+              type="checkbox"
+              checked={allowMemories}
+              onChange={(e) => onAllowMemoriesChange(e.target.checked)}
+              className="mt-0.5 h-4 w-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500 dark:border-gray-600 dark:bg-gray-800"
+            />
+            <div>
+              <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Allow others to share memories
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                Friends and family can submit stories and photos to {petDetails.petName}&apos;s memorial. You can change this anytime.
               </p>
             </div>
           </label>

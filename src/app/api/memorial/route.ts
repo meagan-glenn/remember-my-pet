@@ -34,7 +34,7 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json();
-  const { petName, species, customSpecies, gender, birthDate, deathDate, tribute, ownerLastName, memorialId, heroPhotoCropY, publish, showInFeed } = body;
+  const { petName, species, customSpecies, gender, birthDate, deathDate, tribute, ownerLastName, memorialId, heroPhotoCropY, publish, showInFeed, allowMemories } = body;
   // Support both new { url, caption, aiDetectedTags } format and legacy string[] format
   const photoItems: { url: string; caption?: string; aiDetectedTags?: string[] }[] = body.photos
     ? body.photos.map((p: { url: string; caption?: string; aiDetectedTags?: string[] }) => p)
@@ -108,6 +108,11 @@ export async function POST(request: Request) {
       updateFields.show_in_feed = showInFeed;
     }
 
+    // Set memory wall visibility
+    if (typeof allowMemories === "boolean") {
+      updateFields.allow_memories = allowMemories;
+    }
+
     const { error: updateError } = await supabase
       .from("memorials")
       .update(updateFields)
@@ -167,6 +172,7 @@ export async function POST(request: Request) {
         is_paid: !!publish,
         is_published: !!publish,
         show_in_feed: !!publish && !!showInFeed,
+        allow_memories: allowMemories !== false,
       })
       .select()
       .single();

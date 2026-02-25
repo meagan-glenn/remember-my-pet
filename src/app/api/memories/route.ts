@@ -57,15 +57,19 @@ export async function POST(request: Request) {
     }
   }
 
-  // Verify memorial exists and is published
+  // Verify memorial exists, is published, and accepts memories
   const { data: memorial, error: memError } = await supabase
     .from("memorials")
-    .select("id, pet_name, user_id, is_published")
+    .select("id, pet_name, user_id, is_published, allow_memories")
     .eq("id", memorialId)
     .single();
 
   if (memError || !memorial || !memorial.is_published) {
     return apiError("MEMORIAL_NOT_FOUND", 404);
+  }
+
+  if (memorial.allow_memories === false) {
+    return apiError("INVALID_INPUT", 403, "This memorial is not accepting memory submissions.");
   }
 
   // Insert memory

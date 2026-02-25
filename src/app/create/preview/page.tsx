@@ -26,6 +26,7 @@ function PreviewContent() {
     slug: string;
   } | null>(null);
   const [showInFeed, setShowInFeed] = useState(false);
+  const [allowMemories, setAllowMemories] = useState(true);
   const showInFeedInitialized = useRef(false);
 
   // Initialize showInFeed from existing memorial when editing
@@ -37,6 +38,9 @@ function PreviewContent() {
       .then((data) => {
         if (data?.memorial?.show_in_feed) {
           setShowInFeed(true);
+        }
+        if (data?.memorial?.allow_memories === false) {
+          setAllowMemories(false);
         }
       })
       .catch(() => {});
@@ -113,6 +117,7 @@ function PreviewContent() {
         photos,
         publish: true,
         showInFeed,
+        allowMemories,
       }),
     });
 
@@ -123,7 +128,7 @@ function PreviewContent() {
 
     const { memorialId, slug } = await res.json();
     setSavedMemorial({ id: memorialId, slug });
-  }, [ctx, uploadFile, router, showInFeed]);
+  }, [ctx, uploadFile, router, showInFeed, allowMemories]);
 
   // Auto-trigger save when returning from auth redirect
   useEffect(() => {
@@ -257,6 +262,8 @@ function PreviewContent() {
         onUpdateCropY={(y) => ctx.updatePetDetails({ heroPhotoCropY: y })}
         showInFeed={showInFeed}
         onShowInFeedChange={setShowInFeed}
+        allowMemories={allowMemories}
+        onAllowMemoriesChange={setAllowMemories}
       />
     </div>
   );
