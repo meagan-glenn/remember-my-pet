@@ -1,16 +1,14 @@
 import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase-server";
-import { createClient } from "@supabase/supabase-js";
+import { createServiceClient } from "@/lib/supabase";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const limit = Math.min(parseInt(searchParams.get("limit") || "6", 10) || 6, 24);
   const offset = parseInt(searchParams.get("offset") || "0", 10) || 0;
 
-  const serviceClient = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
+  // Service role needed: public feed reads across all published memorials
+  const serviceClient = createServiceClient();
 
   // Fetch published memorials opted into feed, with photos
   const { data: memorials, error } = await serviceClient

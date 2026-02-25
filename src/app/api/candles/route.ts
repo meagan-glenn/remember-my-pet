@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase-server";
-import { createClient } from "@supabase/supabase-js";
+import { createServiceClient } from "@/lib/supabase";
+import { rateLimit } from "@/lib/rate-limit";
 import { apiError } from "@/lib/error-messages";
 
 export async function GET(request: Request) {
@@ -11,10 +12,8 @@ export async function GET(request: Request) {
     return apiError("INVALID_INPUT", 400, "memorial_id is required.");
   }
 
-  const serviceClient = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
+  // Service role needed: candle counts are public (no auth required for reads)
+  const serviceClient = createServiceClient();
 
   // Get count
   const { count, error } = await serviceClient
@@ -35,7 +34,7 @@ export async function GET(request: Request) {
     } = await supabase.auth.getUser();
 
     if (user) {
-      const { data } = await serviceClient
+      const { data } = await supabase
         .from("candles")
         .select("id")
         .eq("memorial_id", memorialId)
@@ -61,6 +60,10 @@ export async function POST(request: Request) {
     return apiError("AUTH_REQUIRED", 401);
   }
 
+  if (!rateLimit(`candle-toggle:${user.id}`, 20)) {
+    return apiError("RATE_LIMITED", 429);
+  }
+
   const body = await request.json();
   const { memorial_id } = body;
 
@@ -68,13 +71,8 @@ export async function POST(request: Request) {
     return apiError("INVALID_INPUT", 400, "memorial_id is required.");
   }
 
-  const serviceClient = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
-
-  // Check if candle already exists
-  const { data: existing } = await serviceClient
+  // Check if candle already exists (uses auth-aware client — RLS enforces user_id)
+  const { data: existing } = await supabase
     .from("candles")
     .select("id")
     .eq("memorial_id", memorial_id)
@@ -83,10 +81,10 @@ export async function POST(request: Request) {
 
   if (existing) {
     // Unlight
-    await serviceClient.from("candles").delete().eq("id", existing.id);
+    await supabase.from("candles").delete().eq("id", existing.id);
   } else {
     // Light
-    const { error } = await serviceClient.from("candles").insert({
+    const { error } = await supabase.from("candles").insert({
       memorial_id,
       user_id: user.id,
     });
@@ -96,7 +94,8 @@ export async function POST(request: Request) {
     }
   }
 
-  // Get updated count
+  // Get updated count (service role for public count across all users)
+  const serviceClient = createServiceClient();
   const { count } = await serviceClient
     .from("candles")
     .select("*", { count: "exact", head: true })

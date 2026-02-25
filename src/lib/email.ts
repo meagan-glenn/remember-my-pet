@@ -42,7 +42,7 @@ export async function sendMemoryNotification({
     await getResend().emails.send({
       from: FROM_EMAIL,
       to: ownerEmail,
-      subject: `Someone shared a memory of ${petName}`,
+      subject: `Someone shared a memory of ${escapeHtml(petName)}`,
       html: `
         <div style="font-family: Georgia, serif; max-width: 520px; margin: 0 auto; color: #1a1a1a;">
           <h2 style="color: #92400e; font-size: 22px; margin-bottom: 8px;">

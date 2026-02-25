@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase-server";
 import { rateLimit } from "@/lib/rate-limit";
 import { apiError } from "@/lib/error-messages";
+import { validateVideoMagicBytes, randomFileName } from "@/lib/file-validation";
 
 const MAX_SIZE = 100 * 1024 * 1024; // 100MB
 const ALLOWED_TYPES: Record<string, string> = {
@@ -40,10 +41,17 @@ export async function POST(request: Request) {
     return apiError("INVALID_FILE_TYPE", 400);
   }
 
-  const folder = `uploads/${user.id}`;
-  const path = `${folder}/${Date.now()}.${ext}`;
-
   const arrayBuffer = await file.arrayBuffer();
+
+  // Validate magic bytes match claimed MIME type
+  const verifiedExt = validateVideoMagicBytes(arrayBuffer);
+  if (!verifiedExt) {
+    return apiError("INVALID_FILE_TYPE", 400, "File content does not match a valid video type.");
+  }
+
+  const folder = `uploads/${user.id}`;
+  const path = `${folder}/${randomFileName(verifiedExt)}`;
+
   const { error } = await supabase.storage
     .from("memorial-videos")
     .upload(path, arrayBuffer, {

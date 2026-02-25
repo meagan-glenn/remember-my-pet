@@ -3,13 +3,15 @@ import { rateLimit } from "@/lib/rate-limit";
 import { apiError } from "@/lib/error-messages";
 import Anthropic from "@anthropic-ai/sdk";
 import { getPronouns, type Gender } from "@/lib/pronouns";
+import { sanitizeForPrompt } from "@/lib/sanitize-prompt";
 
 const MAX_PET_NAME = 100;
 const MAX_MESSAGES = 10;
 const MAX_MESSAGE_LENGTH = 2000;
 
 export async function POST(request: Request) {
-  const rateLimitKey = `homepage-chat:${request.headers.get("x-forwarded-for") || "anon"}`;
+  const ip = request.headers.get("x-real-ip") || request.headers.get("x-forwarded-for")?.split(",").pop()?.trim() || "anon";
+  const rateLimitKey = `homepage-chat:${ip}`;
   if (!rateLimit(rateLimitKey, 6)) {
     return apiError("RATE_LIMITED", 429);
   }
@@ -26,9 +28,10 @@ export async function POST(request: Request) {
   }
 
   const safeExchangeCount = typeof exchangeCount === "number" ? exchangeCount : 1;
-  const safePetName = petName.slice(0, MAX_PET_NAME);
-  const safeSpecies =
-    typeof species === "string" && species ? species.slice(0, 50) : "pet";
+  const safePetName = sanitizeForPrompt(petName.slice(0, MAX_PET_NAME));
+  const safeSpecies = sanitizeForPrompt(
+    typeof species === "string" && species ? species.slice(0, 50) : "pet"
+  );
   const safeGender: Gender = typeof gender === "string" && ["male", "female", "neutral"].includes(gender) ? gender as Gender : undefined;
   const { subject, object, possessive } = getPronouns(safeGender);
 

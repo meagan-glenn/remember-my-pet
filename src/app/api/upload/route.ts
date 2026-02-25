@@ -3,6 +3,7 @@ import { createServerSupabase } from "@/lib/supabase-server";
 import { createServiceClient } from "@/lib/supabase";
 import { rateLimit } from "@/lib/rate-limit";
 import { apiError } from "@/lib/error-messages";
+import { validateImageMagicBytes, randomFileName } from "@/lib/file-validation";
 
 const MAX_SIZE = 10 * 1024 * 1024; // 10MB
 const ALLOWED_TYPES: Record<string, string> = {
@@ -43,10 +44,17 @@ export async function POST(request: Request) {
     return apiError("INVALID_FILE_TYPE", 400);
   }
 
-  const folder = `uploads/${user.id}`;
-  const path = `${folder}/${Date.now()}.${ext}`;
-
   const arrayBuffer = await file.arrayBuffer();
+
+  // Validate magic bytes match claimed MIME type
+  const verifiedExt = validateImageMagicBytes(arrayBuffer);
+  if (!verifiedExt) {
+    return apiError("INVALID_FILE_TYPE", 400, "File content does not match a valid image type.");
+  }
+
+  const folder = `uploads/${user.id}`;
+  const path = `${folder}/${randomFileName(verifiedExt)}`;
+
   const storage = createServiceClient();
   const { error } = await storage.storage
     .from("memorial-photos")

@@ -4,6 +4,8 @@ import { rateLimit } from "@/lib/rate-limit";
 import { apiError } from "@/lib/error-messages";
 import Anthropic from "@anthropic-ai/sdk";
 import { getPronouns, type Gender } from "@/lib/pronouns";
+import { sanitizeForPrompt } from "@/lib/sanitize-prompt";
+import { getClientIp } from "@/lib/request-utils";
 
 const MAX_PET_NAME = 100;
 const MAX_MESSAGES = 20;
@@ -17,7 +19,8 @@ export async function POST(request: Request) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const rateLimitKey = user ? `tribute:${user.id}` : `tribute:${request.headers.get("x-forwarded-for") || "anon"}`;
+  const ip = getClientIp(request);
+  const rateLimitKey = user ? `tribute:${user.id}` : `tribute:${ip}`;
   if (!rateLimit(rateLimitKey, 5)) {
     return apiError("RATE_LIMITED", 429);
   }
@@ -80,8 +83,8 @@ export async function POST(request: Request) {
     .join("\n")
     .slice(0, MAX_PROMPT_CHARS);
 
-  const safePetName = petName.slice(0, MAX_PET_NAME);
-  const safeSpecies = typeof species === "string" ? species.slice(0, 50) : "pet";
+  const safePetName = sanitizeForPrompt(petName.slice(0, MAX_PET_NAME));
+  const safeSpecies = sanitizeForPrompt(typeof species === "string" ? species.slice(0, 50) : "pet");
   const safeGender: Gender = typeof gender === "string" && ["male", "female", "neutral"].includes(gender) ? gender as Gender : undefined;
   const { subject, object, possessive } = getPronouns(safeGender);
   const Subject = subject.charAt(0).toUpperCase() + subject.slice(1);

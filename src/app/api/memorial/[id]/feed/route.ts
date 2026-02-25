@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase-server";
+import { rateLimit } from "@/lib/rate-limit";
 import { apiError } from "@/lib/error-messages";
 
 export async function PATCH(
@@ -14,6 +15,10 @@ export async function PATCH(
 
   if (!user) {
     return apiError("AUTH_REQUIRED", 401);
+  }
+
+  if (!rateLimit(`feed-toggle:${user.id}`, 10)) {
+    return apiError("RATE_LIMITED", 429);
   }
 
   const body = await request.json();

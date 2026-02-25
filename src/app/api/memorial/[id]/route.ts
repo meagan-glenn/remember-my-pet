@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase-server";
+import { rateLimit } from "@/lib/rate-limit";
 import { apiError } from "@/lib/error-messages";
 
 export async function GET(
@@ -14,6 +15,10 @@ export async function GET(
 
   if (!user) {
     return apiError("AUTH_REQUIRED", 401);
+  }
+
+  if (!rateLimit(`memorial-get:${user.id}`, 30)) {
+    return apiError("RATE_LIMITED", 429);
   }
 
   const { data: memorial, error } = await supabase

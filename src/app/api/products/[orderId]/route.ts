@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase-server";
 import { getOrder } from "@/lib/gelato";
+import { rateLimit } from "@/lib/rate-limit";
 import { apiError } from "@/lib/error-messages";
 
 export async function GET(
@@ -15,6 +16,10 @@ export async function GET(
 
   if (!user) {
     return apiError("AUTH_REQUIRED", 401);
+  }
+
+  if (!rateLimit(`order-status:${user.id}`, 10)) {
+    return apiError("RATE_LIMITED", 429);
   }
 
   const { data: order } = await supabase

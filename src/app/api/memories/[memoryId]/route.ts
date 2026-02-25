@@ -99,6 +99,10 @@ export async function DELETE(request: Request, { params }: RouteParams) {
     return apiError("AUTH_REQUIRED", 401);
   }
 
+  if (!rateLimit(`memory-delete:${user.id}`, 10)) {
+    return apiError("RATE_LIMITED", 429);
+  }
+
   const { memoryId } = await params;
 
   const { data: memory } = await supabase

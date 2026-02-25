@@ -3,7 +3,8 @@ import { createServerSupabase } from "@/lib/supabase-server";
 import { rateLimit } from "@/lib/rate-limit";
 import { apiError } from "@/lib/error-messages";
 import Anthropic from "@anthropic-ai/sdk";
-
+import { sanitizeForPrompt } from "@/lib/sanitize-prompt";
+import { getClientIp } from "@/lib/request-utils";
 
 const MAX_PET_NAME = 100;
 const MAX_CONCERN_LENGTH = 2000;
@@ -15,7 +16,8 @@ export async function POST(request: Request) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const rateLimitKey = user ? `tribute-support:${user.id}` : `tribute-support:${request.headers.get("x-forwarded-for") || "anon"}`;
+  const ip = getClientIp(request);
+  const rateLimitKey = user ? `tribute-support:${user.id}` : `tribute-support:${ip}`;
   if (!rateLimit(rateLimitKey, 3)) {
     return apiError("RATE_LIMITED", 429);
   }
@@ -31,9 +33,10 @@ export async function POST(request: Request) {
     return apiError("INVALID_INPUT", 400, "Missing required fields.");
   }
 
-  const safePetName = petName.slice(0, MAX_PET_NAME);
-  const safeSpecies =
-    typeof species === "string" ? species.slice(0, 50) : "pet";
+  const safePetName = sanitizeForPrompt(petName.slice(0, MAX_PET_NAME));
+  const safeSpecies = sanitizeForPrompt(
+    typeof species === "string" ? species.slice(0, 50) : "pet"
+  );
   const safeConcern = concern.slice(0, MAX_CONCERN_LENGTH);
 
   // Build conversation history from prior support exchanges

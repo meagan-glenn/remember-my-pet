@@ -4,7 +4,7 @@ import { apiError } from "@/lib/error-messages";
 import { generatePhotoMetadata } from "@/lib/gemini";
 
 export async function POST(request: Request) {
-  const ip = request.headers.get("x-forwarded-for") || "unknown";
+  const ip = request.headers.get("x-real-ip") || request.headers.get("x-forwarded-for")?.split(",").pop()?.trim() || "unknown";
   if (!rateLimit(`caption:${ip}`, 20)) {
     return apiError("RATE_LIMITED", 429);
   }

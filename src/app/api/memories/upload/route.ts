@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { createServiceClient } from "@/lib/supabase";
 import { rateLimit } from "@/lib/rate-limit";
 import { apiError } from "@/lib/error-messages";
+import { getClientIp } from "@/lib/request-utils";
+import { validateImageMagicBytes, randomFileName } from "@/lib/file-validation";
 
 const MAX_SIZE = 10 * 1024 * 1024; // 10MB
 const ALLOWED_TYPES: Record<string, string> = {
@@ -11,12 +13,6 @@ const ALLOWED_TYPES: Record<string, string> = {
   "image/heic": "heic",
   "image/heif": "heif",
 };
-
-function getClientIp(request: Request): string {
-  const forwarded = request.headers.get("x-forwarded-for");
-  if (forwarded) return forwarded.split(",")[0].trim();
-  return request.headers.get("x-real-ip") || "unknown";
-}
 
 export async function POST(request: Request) {
   const ip = getClientIp(request);
@@ -46,10 +42,16 @@ export async function POST(request: Request) {
     return apiError("INVALID_FILE_TYPE", 400);
   }
 
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
+  const arrayBuffer = await file.arrayBuffer();
+
+  // Validate magic bytes match claimed MIME type
+  const verifiedExt = validateImageMagicBytes(arrayBuffer);
+  if (!verifiedExt) {
+    return apiError("INVALID_FILE_TYPE", 400, "File content does not match a valid image type.");
+  }
+
+  // Service role needed: anonymous memory uploads bypass auth
+  const supabase = createServiceClient();
 
   // Verify memorial exists and is published
   const { data: memorial } = await supabase
@@ -62,8 +64,7 @@ export async function POST(request: Request) {
     return apiError("MEMORIAL_NOT_FOUND", 404);
   }
 
-  const path = `memories/${memorialId}/${Date.now()}.${ext}`;
-  const arrayBuffer = await file.arrayBuffer();
+  const path = `memories/${memorialId}/${randomFileName(verifiedExt)}`;
 
   const { error } = await supabase.storage
     .from("memorial-photos")

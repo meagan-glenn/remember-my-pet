@@ -1,18 +1,13 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { createServiceClient } from "@/lib/supabase";
 import { rateLimit } from "@/lib/rate-limit";
 import { apiError } from "@/lib/error-messages";
 import { validateMemoryContent, validateEmail } from "@/lib/validation";
 import { sendMemoryNotification } from "@/lib/email";
+import { getClientIp } from "@/lib/request-utils";
 
 const MAX_NAME = 100;
 const MAX_PHOTOS = 3;
-
-function getClientIp(request: Request): string {
-  const forwarded = request.headers.get("x-forwarded-for");
-  if (forwarded) return forwarded.split(",")[0].trim();
-  return request.headers.get("x-real-ip") || "unknown";
-}
 
 export async function POST(request: Request) {
   const ip = getClientIp(request);
@@ -21,10 +16,8 @@ export async function POST(request: Request) {
     return apiError("RATE_LIMITED", 429);
   }
 
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
+  // Service role needed: anonymous memory submissions bypass auth
+  const supabase = createServiceClient();
 
   const { memorialId, contributorName, contributorEmail, content, photoUrls } =
     await request.json();

@@ -6,9 +6,16 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const code = searchParams.get("code");
   const rawRedirect = searchParams.get("redirect") || "/dashboard";
-  const redirect = rawRedirect.startsWith("/") && !rawRedirect.startsWith("//")
-    ? rawRedirect
-    : "/dashboard";
+
+  // Validate redirect is a safe relative path (prevent open redirect)
+  const SAFE_PATH_RE = /^\/[a-zA-Z0-9\-._~:/?#[\]@!$&'()*+,;=%]*$/;
+  const redirect =
+    rawRedirect.startsWith("/") &&
+    !rawRedirect.startsWith("//") &&
+    !rawRedirect.includes("\\") &&
+    SAFE_PATH_RE.test(rawRedirect)
+      ? rawRedirect
+      : "/dashboard";
 
   if (!code) {
     const errorUrl = new URL("/auth/error", request.url);

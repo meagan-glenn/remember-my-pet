@@ -169,11 +169,15 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
     process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
   const memorialUrl = `${siteUrl}/${memorial.slug}`;
 
+  // Sanitize user data for JSON-LD to prevent XSS via dangerouslySetInnerHTML
+  const safePetName = memorial.pet_name.replace(/[<>"]/g, "");
+  const safeDescription = (memorial.tribute?.slice(0, 160) || `A memorial for ${safePetName}.`).replace(/[<>"]/g, "");
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "WebPage",
-    name: `Memorial for ${memorial.pet_name}`,
-    description: memorial.tribute?.slice(0, 160) || `A memorial for ${memorial.pet_name}.`,
+    name: `Memorial for ${safePetName}`,
+    description: safeDescription,
     url: memorialUrl,
     ...(heroPhoto && { image: heroPhoto.url }),
   };
