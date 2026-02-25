@@ -325,13 +325,13 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
 
       {/* Memory Form (for published memorials with memories enabled) */}
       {memorial.is_published && memorial.allow_memories !== false && (
-        <section className="mx-auto max-w-6xl px-4 pb-16 sm:px-6">
+        <section className="mx-auto max-w-6xl px-4 pb-8 sm:px-6">
           <ExpandableMemoryForm memorialId={memorial.id} petName={memorial.pet_name} />
         </section>
       )}
 
       {/* Memorial page nav */}
-      <div className="mx-auto max-w-6xl px-4 pb-10 pt-4 text-center print:hidden sm:px-6">
+      <div className="mx-auto max-w-6xl px-4 pb-10 pt-2 text-center print:hidden sm:px-6">
         <a
           href="/"
           className="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-amber-600 dark:text-gray-500 dark:hover:text-amber-400 transition-colors"

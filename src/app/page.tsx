@@ -504,11 +504,6 @@ export default function Home() {
                     key={feature.title}
                     className="relative rounded-2xl border border-amber-100 bg-white/60 p-6 dark:border-amber-900/30 dark:bg-gray-900/40"
                   >
-                    {feature.comingSoon && (
-                      <span className="absolute top-4 right-4 rounded-full bg-amber-100 px-2 py-0.5 text-xs text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">
-                        Coming soon
-                      </span>
-                    )}
                     <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-amber-50 dark:bg-amber-900/20">
                       <feature.icon className="h-5 w-5 text-amber-600" />
                     </div>
