@@ -25,7 +25,7 @@ const playfair = Playfair_Display({
 export const metadata: Metadata = {
   title: "RememberMyPet.ai — Create a Lasting Memorial for Your Pet",
   description:
-    "Create a beautiful memorial for your pet. AI-written tributes, photo galleries, collaborative memory walls, video reels, and printed keepsakes.",
+    "Create a beautiful memorial for your pet. AI-written tributes, photo galleries, collaborative memory walls, and video reels.",
 };
 
 export default function RootLayout({

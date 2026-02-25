@@ -13,7 +13,7 @@ export default function TermsPage() {
           Terms of Service
         </h1>
         <p className="mt-2 text-sm text-gray-400">
-          Last updated: January 31, 2026
+          Last updated: February 25, 2026
         </p>
 
         <div className="mt-10 space-y-8 text-base leading-relaxed text-gray-600 dark:text-gray-300">
@@ -35,8 +35,9 @@ export default function TermsPage() {
             <p className="mt-3">
               RememberMyPet.ai provides a platform for creating digital pet
               memorials, including AI-generated tributes, photo galleries,
-              memory walls, video reels, and printed keepsakes. The Service is
-              available via web browser.
+              memory walls, and video reels. The Service uses session replay
+              analytics (FullStory) to improve the user experience. The Service
+              is available via web browser.
             </p>
           </section>
 

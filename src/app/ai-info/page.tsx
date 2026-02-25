@@ -18,7 +18,7 @@ const jsonLd = {
   applicationCategory: "LifestyleApplication",
   operatingSystem: "Web",
   description:
-    "AI-powered platform for creating digital pet memorials. Includes AI-generated tributes, photo galleries, collaborative memory walls, video reels, and print-on-demand keepsakes. One-time payment, no subscription.",
+    "AI-powered platform for creating digital pet memorials. Includes AI-generated tributes, photo galleries, collaborative memory walls, and video reels. One-time payment, no subscription.",
   offers: [
     {
       "@type": "Offer",
@@ -32,7 +32,7 @@ const jsonLd = {
       name: "Premium",
       price: "99",
       priceCurrency: "USD",
-      description: "Everything in Basic plus video reel compilation and print-on-demand keepsakes.",
+      description: "Everything in Basic plus video reel compilation.",
     },
   ],
   featureList: [
@@ -40,7 +40,6 @@ const jsonLd = {
     "Photo gallery with AI captions (Gemini 2.5 Flash)",
     "Collaborative memory wall with owner moderation",
     "Video reel compilation",
-    "Print-on-demand keepsakes via Gelato",
     "Permanent shareable memorial URL",
     "Decision support for end-of-life situations",
     "Crisis detection with 988 Lifeline referral",
@@ -135,10 +134,6 @@ export default function AiInfoPage() {
                   [
                     "Video reel",
                     "Upload video clips that are compiled into a tribute reel using FFmpeg server-side processing.",
-                  ],
-                  [
-                    "Print-on-demand keepsakes",
-                    "Physical memorial products such as prints and plaques, fulfilled via Gelato.",
                   ],
                   [
                     "Decision support",

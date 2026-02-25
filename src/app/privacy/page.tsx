@@ -13,7 +13,7 @@ export default function PrivacyPage() {
           Privacy Policy
         </h1>
         <p className="mt-2 text-sm text-gray-400">
-          Last updated: January 31, 2026
+          Last updated: February 25, 2026
         </p>
 
         <div className="mt-10 space-y-8 text-base leading-relaxed text-gray-600 dark:text-gray-300">
@@ -26,7 +26,10 @@ export default function PrivacyPage() {
               directly: your email address (for authentication), pet details
               (name, species, dates), photos, videos, tribute text, and memory
               wall contributions. We also collect standard usage data such as IP
-              address, browser type, and pages visited.
+              address, browser type, and pages visited. We also use FullStory
+              to record session replays (clicks, scrolls, and page navigation)
+              to understand how people use the site and improve the experience.
+              FullStory automatically masks sensitive input fields.
             </p>
           </section>
 
@@ -77,7 +80,8 @@ export default function PrivacyPage() {
             <p className="mt-3">
               We do not sell your personal information. We share data only with
               service providers necessary to operate the platform (Supabase,
-              Vercel, Stripe, Anthropic, Google, Resend for email). Published
+              Vercel, Stripe, Anthropic, Google, Resend for email, FullStory
+              for analytics). Published
               memorials are publicly accessible via their unique URL — you
               control when and if a memorial is published.
             </p>
@@ -107,7 +111,8 @@ export default function PrivacyPage() {
             </h2>
             <p className="mt-3">
               We use essential cookies for authentication and session
-              management. We do not use advertising or tracking cookies.
+              management. FullStory uses cookies and local storage to power
+              session replay analytics. We do not use advertising cookies.
             </p>
           </section>
 

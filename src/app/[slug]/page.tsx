@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { createServerSupabase } from "@/lib/supabase-server";
 import type { Metadata } from "next";
 import Image from "next/image";
-import { PawPrint, Gift } from "lucide-react";
+import { PawPrint } from "lucide-react";
 import { getPronouns } from "@/lib/pronouns";
 import { ShareButton } from "./share-button";
 import { MasonryWall } from "@/components/memorial-wall/masonry-wall";
@@ -300,28 +300,6 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
             videoPosterUrl={heroPhoto?.url}
             petName={memorial.pet_name}
           />
-        </section>
-      )}
-
-      {/* Keepsake CTA (owner only) */}
-      {isOwner && (
-        <section className="mx-auto max-w-6xl px-4 pb-8 sm:px-6 print:hidden">
-          <a
-            href={`/${memorial.slug}/shop`}
-            className="flex items-center gap-4 rounded-2xl border border-amber-100 dark:border-amber-900/30 bg-white/80 dark:bg-gray-900/40 p-6 shadow-sm backdrop-blur-sm hover:border-amber-200 dark:hover:border-amber-800/50 transition-colors"
-          >
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-900/30">
-              <Gift className="h-6 w-6 text-amber-600 dark:text-amber-400" />
-            </div>
-            <div>
-              <h3 className="font-serif text-lg font-medium text-gray-900 dark:text-amber-50">
-                Create a Keepsake
-              </h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                Turn this memorial into a memory book or canvas print.
-              </p>
-            </div>
-          </a>
         </section>
       )}
 
