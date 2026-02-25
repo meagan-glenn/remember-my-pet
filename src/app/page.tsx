@@ -75,7 +75,6 @@ const FEATURES = [
     title: "Memory Wall",
     description:
       "A place for everyone who loved them to share what they remember.",
-    comingSoon: true,
   },
 ];
 
