@@ -8,6 +8,13 @@ export const metadata: Metadata = {
 
 const posts = [
   {
+    slug: "shes-live",
+    title: "She's live",
+    date: "February 25, 2026",
+    excerpt:
+      "I published Skylar's memorial today. After weeks of building this platform, I finally hit the button. Here's what it felt like to turn grief into something that might help other people.",
+  },
+  {
     slug: "some-days-are-harder",
     title: "Some days are just harder — and that's okay",
     date: "February 23, 2026",
