@@ -125,8 +125,12 @@ export function StepPreview({
   );
 
   const handlePointerUp = useCallback(() => {
+    if (dragRef.current && onUpdateCropY) {
+      // Sync crop position to parent on each drag end so it's always persisted
+      onUpdateCropY(cropY);
+    }
     dragRef.current = null;
-  }, []);
+  }, [cropY, onUpdateCropY]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -171,6 +175,7 @@ export function StepPreview({
   const handleSaveMemorial = async () => {
     setSaving(true);
     setError("");
+    setRepositioning(false);
     try {
       await onSave();
     } catch (err) {

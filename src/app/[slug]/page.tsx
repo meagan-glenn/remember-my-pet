@@ -242,16 +242,38 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
         </p>
       </section>
 
-      {/* Tribute */}
+      {/* Tribute + Side Photos */}
       {memorial.tribute ? (
         <section className="mx-auto max-w-6xl px-4 pb-3 sm:px-6">
-          <div className="rounded-2xl border-l-4 border-l-amber-700 dark:border-l-amber-500 border border-amber-100 dark:border-amber-900/30 bg-amber-50/50 dark:bg-amber-950/30 p-6 shadow-sm backdrop-blur-sm sm:p-8">
-            <h2 className="mb-4 font-serif text-2xl font-medium text-gray-900 dark:text-amber-50">
-              A Tribute
-            </h2>
-            <div className="whitespace-pre-line text-base leading-relaxed text-gray-700 dark:text-gray-300">
-              {memorial.tribute}
+          <div className="flex flex-col gap-3 md:flex-row md:items-stretch md:gap-4">
+            <div className="flex-1 rounded-2xl border-l-4 border-l-amber-700 dark:border-l-amber-500 border border-amber-100 dark:border-amber-900/30 bg-amber-50/50 dark:bg-amber-950/30 p-6 shadow-sm backdrop-blur-sm sm:p-8">
+              <h2 className="mb-4 font-serif text-2xl font-medium text-gray-900 dark:text-amber-50">
+                A Tribute
+              </h2>
+              <div className="whitespace-pre-line text-base leading-relaxed text-gray-700 dark:text-gray-300">
+                {memorial.tribute}
+              </div>
             </div>
+            {galleryPhotos.length > 0 && (
+              <div className="flex gap-3 md:w-80 md:shrink-0 md:flex-col">
+                {galleryPhotos.slice(0, 2).map((photo) => (
+                  <div key={photo.id} className="overflow-hidden rounded-2xl border border-amber-100 dark:border-amber-900/30 bg-white/80 dark:bg-gray-900/40 shadow-sm">
+                    <div className="relative aspect-square">
+                      <Image
+                        src={photo.url}
+                        alt={photo.caption || memorial.pet_name}
+                        fill
+                        sizes="(min-width: 768px) 320px, 50vw"
+                        className="object-cover"
+                      />
+                    </div>
+                    {photo.caption && (
+                      <p className="px-3 py-2 text-xs italic text-gray-500 dark:text-gray-400">{photo.caption}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </section>
       ) : isOwner ? (
@@ -268,11 +290,11 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
         </section>
       ) : null}
 
-      {/* Masonry Wall */}
-      {(galleryPhotos.length > 0 || memorial.memories.length > 0 || memorial.compilation_url) && (
+      {/* Masonry Wall (remaining photos + memories) */}
+      {(galleryPhotos.length > 2 || memorial.memories.length > 0 || memorial.compilation_url) && (
         <section className="mx-auto max-w-6xl px-4 pb-8 sm:px-6">
           <MasonryWall
-            photos={galleryPhotos}
+            photos={galleryPhotos.slice(2)}
             memories={memorial.memories}
             videoUrl={memorial.compilation_url ?? undefined}
             videoPosterUrl={heroPhoto?.url}

@@ -3,7 +3,7 @@
 import { useMemorialContext } from "@/contexts/memorial-state-context";
 import { StepPreview } from "@/components/wizard/step-preview";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Check } from "lucide-react";
+import { ArrowLeft, Check, Share2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
@@ -200,14 +200,28 @@ function PreviewContent() {
             Share it with the people who loved {getPronouns(ctx.petDetails.gender).object}.
           </p>
           <div className="space-y-3">
+            <Button
+              className="w-full h-12 bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-400 dark:text-gray-900"
+              onClick={async () => {
+                const url = `${window.location.origin}/${savedMemorial.slug}`;
+                if (navigator.share) {
+                  try {
+                    await navigator.share({ title: `${ctx.petDetails.petName}'s Memorial`, url });
+                  } catch {
+                    // User cancelled share — ignore
+                  }
+                } else {
+                  await navigator.clipboard.writeText(url);
+                  toast.success("Link copied to clipboard", { duration: 4000 });
+                }
+              }}
+            >
+              <Share2 className="h-4 w-4 mr-2" />
+              Share memorial
+            </Button>
             <Link href={`/${savedMemorial.slug}`}>
-              <Button className="w-full h-12 bg-amber-600 hover:bg-amber-700 dark:bg-amber-500 dark:hover:bg-amber-400 dark:text-gray-900">
-                View memorial
-              </Button>
-            </Link>
-            <Link href="/dashboard" onClick={() => ctx.reset()}>
               <Button variant="outline" className="w-full h-12 mt-3">
-                Go to dashboard
+                View memorial
               </Button>
             </Link>
           </div>
