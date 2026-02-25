@@ -4,7 +4,6 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { PawPrint } from "lucide-react";
 import { getPronouns } from "@/lib/pronouns";
-import { ShareButton } from "./share-button";
 import { MasonryWall } from "@/components/memorial-wall/masonry-wall";
 import { ExpandableMemoryForm } from "@/components/memory-wall/expandable-memory-form";
 import { InviteDialog } from "@/components/memory-wall/invite-dialog";
@@ -253,8 +252,7 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
         {isOwner && memorial.allow_memories !== false && (
           <InviteDialog petName={memorial.pet_name} memorialUrl={memorialUrl} />
         )}
-        <LightCandle memorialId={memorial.id} />
-        <ShareButton url={memorialUrl} petName={memorial.pet_name} />
+        {!isOwner && <LightCandle memorialId={memorial.id} />}
       </div>
 
       {/* Wall intro */}
