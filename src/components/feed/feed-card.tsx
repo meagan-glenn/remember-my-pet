@@ -85,21 +85,21 @@ export function FeedCard({
   return (
     <Link
       href={`/${slug}`}
-      className="block rounded-2xl border border-amber-100 bg-white/80 shadow-sm overflow-hidden hover:shadow-md transition-shadow dark:border-amber-900/30 dark:bg-gray-900/40"
+      className="flex rounded-2xl border border-amber-100 bg-white/80 shadow-sm overflow-hidden hover:shadow-md transition-shadow dark:border-amber-900/30 dark:bg-gray-900/40"
     >
       {heroPhotoUrl && (
-        <div className="relative aspect-[4/3] w-full">
+        <div className="relative w-28 shrink-0 sm:w-36">
           <Image
             src={heroPhotoUrl}
             alt={petName}
             fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            sizes="144px"
             className="object-cover"
           />
         </div>
       )}
 
-      <div className="p-4 space-y-2">
+      <div className="flex-1 p-4 space-y-2 min-w-0">
         <div className="flex items-baseline justify-between">
           <h3 className="font-serif text-lg font-medium text-gray-900 truncate dark:text-amber-50">
             {petName}
@@ -112,7 +112,7 @@ export function FeedCard({
         </div>
 
         {tributeSnippet && (
-          <p className="text-sm text-gray-500 line-clamp-2 leading-relaxed dark:text-gray-400">
+          <p className="text-sm text-gray-500 line-clamp-3 leading-relaxed dark:text-gray-400">
             {tributeSnippet}
           </p>
         )}

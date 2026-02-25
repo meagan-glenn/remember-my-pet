@@ -35,6 +35,11 @@ export function Footer() {
                   See an Example
                 </Link>
               </li>
+              <li>
+                <Link href="/community" className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors">
+                  Community
+                </Link>
+              </li>
             </ul>
           </div>
 

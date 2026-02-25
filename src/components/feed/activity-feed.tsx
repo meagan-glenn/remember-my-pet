@@ -63,14 +63,14 @@ export function ActivityFeed() {
           <p className="mt-4 text-center text-gray-500 dark:text-gray-400">
             Pets loved and honored by our community
           </p>
-          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-8 grid gap-4 sm:grid-cols-2">
             {[...Array(3)].map((_, i) => (
               <div
                 key={i}
-                className="rounded-2xl border border-amber-100 bg-white/80 overflow-hidden animate-pulse dark:border-amber-900/30 dark:bg-gray-900/40"
+                className="flex rounded-2xl border border-amber-100 bg-white/80 overflow-hidden animate-pulse dark:border-amber-900/30 dark:bg-gray-900/40"
               >
-                <div className="aspect-[4/3] bg-gray-200 dark:bg-gray-700" />
-                <div className="p-4 space-y-2">
+                <div className="w-28 sm:w-36 shrink-0 bg-gray-200 dark:bg-gray-700" />
+                <div className="flex-1 p-4 space-y-2">
                   <div className="h-5 w-24 bg-gray-200 rounded dark:bg-gray-700" />
                   <div className="h-4 w-full bg-gray-100 rounded dark:bg-gray-800" />
                   <div className="h-4 w-2/3 bg-gray-100 rounded dark:bg-gray-800" />
@@ -93,7 +93,7 @@ export function ActivityFeed() {
           Pets loved and honored by our community
         </p>
 
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-8 grid gap-4 sm:grid-cols-2">
           {items.map((item, i) => (
             <motion.div
               key={item.id}
