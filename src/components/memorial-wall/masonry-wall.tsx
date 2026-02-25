@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { interleaveWallContent } from "@/lib/interleave-wall-content";
 import { PhotoCard } from "./photo-card";
@@ -37,6 +38,21 @@ function WallCardRenderer({ card, index, petName }: { card: WallCard; index: num
           <p className="whitespace-pre-line text-base leading-relaxed text-gray-700 dark:text-gray-300">
             {card.content}
           </p>
+          {card.photoUrls && card.photoUrls.length > 0 && (
+            <div className={`mt-3 grid gap-2 ${card.photoUrls.length === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
+              {card.photoUrls.map((url, i) => (
+                <div key={i} className="relative aspect-square overflow-hidden rounded-lg">
+                  <Image
+                    src={url}
+                    alt={`Photo shared by ${card.contributorName}`}
+                    fill
+                    sizes="(max-width: 640px) 45vw, 200px"
+                    className="object-cover"
+                  />
+                </div>
+              ))}
+            </div>
+          )}
           <p className="mt-3 text-sm font-medium text-gray-500 dark:text-gray-400">
             &mdash; {card.contributorName}
           </p>
