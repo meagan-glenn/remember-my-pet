@@ -39,14 +39,14 @@ function WallCardRenderer({ card, index, petName }: { card: WallCard; index: num
             {card.content}
           </p>
           {card.photoUrls && card.photoUrls.length > 0 && (
-            <div className={`mt-3 grid gap-2 ${card.photoUrls.length === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
+            <div className="mt-3 flex gap-2">
               {card.photoUrls.map((url, i) => (
-                <div key={i} className="relative aspect-square overflow-hidden rounded-lg">
+                <div key={i} className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg">
                   <Image
                     src={url}
                     alt={`Photo shared by ${card.contributorName}`}
                     fill
-                    sizes="(max-width: 640px) 45vw, 200px"
+                    sizes="80px"
                     className="object-cover"
                   />
                 </div>
