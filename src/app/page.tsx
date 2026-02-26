@@ -468,7 +468,7 @@ export default function Home() {
                 )}
 
                 <Link
-                  href="/demo"
+                  href="/skylar-glenn-2026"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="mt-4 block text-center text-sm text-amber-600 hover:text-amber-700 transition-colors dark:text-amber-400 dark:hover:text-amber-300"
@@ -531,7 +531,7 @@ export default function Home() {
                 Browse a sample memorial to see what you&apos;ll create.
               </p>
               <Link
-                href="/demo"
+                href="/skylar-glenn-2026"
                 className="mt-8 inline-flex items-center gap-2 rounded-full bg-amber-600 px-8 py-3 text-base font-medium text-white hover:bg-amber-700 transition-colors dark:bg-amber-500 dark:hover:bg-amber-400 dark:text-gray-900"
               >
                 View example memorial

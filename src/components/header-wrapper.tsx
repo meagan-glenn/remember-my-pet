@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 
 // Known top-level routes that should show the site header
 const ROUTES_WITH_HEADER = new Set([
-  "/", "/create", "/demo", "/support", "/community",
+  "/", "/create", "/support", "/community",
   "/privacy", "/terms", "/ai-info", "/sign-in", "/sign-up",
 ]);
 

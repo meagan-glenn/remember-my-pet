@@ -467,7 +467,7 @@ function Dashboard() {
           <p className="text-sm text-gray-400 dark:text-gray-500">
             Most people start with photos — but there&apos;s no wrong place to begin.
           </p>
-          <Link href="/demo" className="text-sm text-amber-600 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-300 underline underline-offset-2">
+          <Link href="/skylar-glenn-2026" className="text-sm text-amber-600 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-300 underline underline-offset-2">
             See what a finished memorial looks like
           </Link>
         </div>
