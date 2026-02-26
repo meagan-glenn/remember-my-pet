@@ -6,7 +6,7 @@ import { PawPrint } from "lucide-react";
 
 // Known top-level routes that should show the footer
 const ROUTES_WITH_FOOTER = new Set([
-  "/", "/create", "/dashboard", "/demo", "/support", "/community",
+  "/", "/create", "/demo", "/support", "/community",
   "/privacy", "/terms", "/ai-info", "/sign-in", "/sign-up",
 ]);
 

@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/card";
 import Image from "next/image";
 import Link from "next/link";
-import { Eye, Pencil, Flame, MessageCircle, ImageIcon, PawPrint, Users, Share2, HeartHandshake } from "lucide-react";
+import { Eye, Pencil, Flame, MessageCircle, ImageIcon, PawPrint, Users, HeartHandshake } from "lucide-react";
 import { SignOutButton } from "./sign-out-button";
 import { DashboardTabs } from "./dashboard-tabs";
 import { FeedToggle } from "@/components/dashboard/feed-toggle";
@@ -115,26 +115,6 @@ export default async function Dashboard() {
               >
                 Share feedback
               </a>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Decision support nudge */}
-        {hasMemorials && (
-          <Card className="border-amber-100 bg-amber-50/50 dark:border-amber-900/30 dark:bg-amber-950/20">
-            <CardContent className="flex items-center justify-between py-4">
-              <div className="flex items-center gap-3">
-                <HeartHandshake className="h-5 w-5 shrink-0 text-amber-500 dark:text-amber-400" />
-                <p className="text-sm text-gray-600 dark:text-gray-300">
-                  Carrying guilt or &lsquo;what-ifs&rsquo;? You&apos;re not alone.
-                </p>
-              </div>
-              <Link
-                href="/support"
-                className="shrink-0 text-sm font-medium text-amber-600 hover:underline dark:text-amber-400"
-              >
-                Talk it through
-              </Link>
             </CardContent>
           </Card>
         )}
@@ -278,21 +258,25 @@ export default async function Dashboard() {
         </DashboardTabs>
 
         {/* What's next section */}
-        {hasPublished && mostRecentPublished && (
+        {hasMemorials && (
           <div className="space-y-3">
             <h2 className="text-sm font-medium text-gray-400 dark:text-gray-500">What&apos;s next</h2>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-              <Link href={`/${mostRecentPublished.slug}`}>
-                <Card className="group cursor-pointer border-amber-100 dark:border-amber-900/30 transition-colors hover:bg-amber-50/50 dark:hover:bg-amber-950/20">
-                  <CardContent className="flex items-center gap-3 py-4">
-                    <Users className="h-5 w-5 shrink-0 text-amber-500 dark:text-amber-400" />
-                    <p className="text-sm text-gray-600 dark:text-gray-300">Invite friends to share memories</p>
-                  </CardContent>
-                </Card>
-              </Link>
-              <ShareCard url={`${siteUrl}/${mostRecentPublished.slug}`} />
+              {hasPublished && mostRecentPublished && (
+                <Link href={`/${mostRecentPublished.slug}`}>
+                  <Card className="h-full cursor-pointer border-amber-100 dark:border-amber-900/30 transition-colors hover:bg-amber-50/50 dark:hover:bg-amber-950/20">
+                    <CardContent className="flex items-center gap-3 py-4">
+                      <Users className="h-5 w-5 shrink-0 text-amber-500 dark:text-amber-400" />
+                      <p className="text-sm text-gray-600 dark:text-gray-300">Invite friends &amp; family to share memories</p>
+                    </CardContent>
+                  </Card>
+                </Link>
+              )}
+              {hasPublished && mostRecentPublished && (
+                <ShareCard url={`${siteUrl}/${mostRecentPublished.slug}`} />
+              )}
               <Link href="/support">
-                <Card className="group cursor-pointer border-amber-100 dark:border-amber-900/30 transition-colors hover:bg-amber-50/50 dark:hover:bg-amber-950/20">
+                <Card className="h-full cursor-pointer border-amber-100 dark:border-amber-900/30 transition-colors hover:bg-amber-50/50 dark:hover:bg-amber-950/20">
                   <CardContent className="flex items-center gap-3 py-4">
                     <HeartHandshake className="h-5 w-5 shrink-0 text-amber-500 dark:text-amber-400" />
                     <p className="text-sm text-gray-600 dark:text-gray-300">Talk through guilt or regret</p>
