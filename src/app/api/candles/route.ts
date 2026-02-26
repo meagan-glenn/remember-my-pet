@@ -3,6 +3,22 @@ import { createServerSupabase } from "@/lib/supabase-server";
 import { createServiceClient } from "@/lib/supabase";
 import { rateLimit } from "@/lib/rate-limit";
 import { apiError } from "@/lib/error-messages";
+import { getClientIp } from "@/lib/request-utils";
+
+async function getTotalCount(serviceClient: ReturnType<typeof createServiceClient>, memorialId: string) {
+  const [{ count }, { data: memorial }] = await Promise.all([
+    serviceClient
+      .from("candles")
+      .select("*", { count: "exact", head: true })
+      .eq("memorial_id", memorialId),
+    serviceClient
+      .from("memorials")
+      .select("anonymous_candle_count")
+      .eq("id", memorialId)
+      .single(),
+  ]);
+  return (count ?? 0) + (memorial?.anonymous_candle_count ?? 0);
+}
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -12,18 +28,8 @@ export async function GET(request: Request) {
     return apiError("INVALID_INPUT", 400, "memorial_id is required.");
   }
 
-  // Service role needed: candle counts are public (no auth required for reads)
   const serviceClient = createServiceClient();
-
-  // Get count
-  const { count, error } = await serviceClient
-    .from("candles")
-    .select("*", { count: "exact", head: true })
-    .eq("memorial_id", memorialId);
-
-  if (error) {
-    return apiError("CANDLE_FAILED", 500);
-  }
+  const totalCount = await getTotalCount(serviceClient, memorialId);
 
   // Check if current user has lit a candle
   let userLit = false;
@@ -44,13 +50,58 @@ export async function GET(request: Request) {
       userLit = !!data;
     }
   } catch {
-    // Not authenticated — userLit stays false
+    // Not authenticated — userLit stays false (client checks localStorage for anonymous)
   }
 
-  return NextResponse.json({ count: count ?? 0, userLit });
+  return NextResponse.json({ count: totalCount, userLit });
 }
 
 export async function POST(request: Request) {
+  const body = await request.json();
+  const { memorial_id, anonymous } = body;
+
+  if (!memorial_id || typeof memorial_id !== "string") {
+    return apiError("INVALID_INPUT", 400, "memorial_id is required.");
+  }
+
+  const serviceClient = createServiceClient();
+
+  // Anonymous candle lighting
+  if (anonymous) {
+    const ip = getClientIp(request);
+
+    // 1 anonymous candle per IP per memorial (rate limit window = 1 minute, effectively one-time)
+    if (!rateLimit(`anon-candle:${ip}:${memorial_id}`, 1)) {
+      // Already lit — just return current count without error
+      const totalCount = await getTotalCount(serviceClient, memorial_id);
+      return NextResponse.json({ lit: true, count: totalCount });
+    }
+
+    // Increment anonymous_candle_count atomically
+    const { data: memorial } = await serviceClient
+      .from("memorials")
+      .select("anonymous_candle_count")
+      .eq("id", memorial_id)
+      .single();
+
+    if (!memorial) {
+      return apiError("MEMORIAL_NOT_FOUND", 404);
+    }
+
+    const { error } = await serviceClient
+      .from("memorials")
+      .update({ anonymous_candle_count: (memorial.anonymous_candle_count ?? 0) + 1 })
+      .eq("id", memorial_id);
+
+    if (error) {
+      return apiError("CANDLE_FAILED", 500);
+    }
+
+    const totalCount = await getTotalCount(serviceClient, memorial_id);
+    return NextResponse.json({ lit: true, count: totalCount });
+  }
+
+  // Authenticated candle toggle
   const supabase = await createServerSupabase();
   const {
     data: { user },
@@ -64,14 +115,6 @@ export async function POST(request: Request) {
     return apiError("RATE_LIMITED", 429);
   }
 
-  const body = await request.json();
-  const { memorial_id } = body;
-
-  if (!memorial_id || typeof memorial_id !== "string") {
-    return apiError("INVALID_INPUT", 400, "memorial_id is required.");
-  }
-
-  // Check if candle already exists (uses auth-aware client — RLS enforces user_id)
   const { data: existing } = await supabase
     .from("candles")
     .select("id")
@@ -80,10 +123,8 @@ export async function POST(request: Request) {
     .maybeSingle();
 
   if (existing) {
-    // Unlight
     await supabase.from("candles").delete().eq("id", existing.id);
   } else {
-    // Light
     const { error } = await supabase.from("candles").insert({
       memorial_id,
       user_id: user.id,
@@ -94,12 +135,6 @@ export async function POST(request: Request) {
     }
   }
 
-  // Get updated count (service role for public count across all users)
-  const serviceClient = createServiceClient();
-  const { count } = await serviceClient
-    .from("candles")
-    .select("*", { count: "exact", head: true })
-    .eq("memorial_id", memorial_id);
-
-  return NextResponse.json({ lit: !existing, count: count ?? 0 });
+  const totalCount = await getTotalCount(serviceClient, memorial_id);
+  return NextResponse.json({ lit: !existing, count: totalCount });
 }

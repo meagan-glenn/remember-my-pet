@@ -20,6 +20,7 @@ export async function GET(request: Request) {
       custom_species,
       slug,
       tribute,
+      anonymous_candle_count,
       created_at,
       photos(url, sort_order)
     `)
@@ -96,7 +97,7 @@ export async function GET(request: Request) {
         ? m.tribute.slice(0, 120) + (m.tribute.length > 120 ? "..." : "")
         : null,
       heroPhotoUrl: heroPhoto?.url || null,
-      candleCount: candleCounts[m.id] || 0,
+      candleCount: (candleCounts[m.id] || 0) + (m.anonymous_candle_count ?? 0),
       userLit: userLitSet.has(m.id),
       createdAt: m.created_at,
     };

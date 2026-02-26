@@ -21,6 +21,10 @@ export function useCandleState() {
   return ctx;
 }
 
+function getAnonKey(memorialId: string) {
+  return `candle-lit:${memorialId}`;
+}
+
 export function CandleProvider({ memorialId, children }: { memorialId: string; children: ReactNode }) {
   const [count, setCount] = useState(0);
   const [userLit, setUserLit] = useState(false);
@@ -36,11 +40,17 @@ export function CandleProvider({ memorialId, children }: { memorialId: string; c
           supabase.auth.getUser(),
           fetch(`/api/candles?memorial_id=${memorialId}`),
         ]);
-        setIsAuthenticated(!!authResult.data.user);
+        const authed = !!authResult.data.user;
+        setIsAuthenticated(authed);
         if (res.ok) {
           const data = await res.json();
           setCount(data.count);
-          setUserLit(data.userLit);
+          // For authenticated users, trust the server. For anonymous, check localStorage.
+          if (authed) {
+            setUserLit(data.userLit);
+          } else {
+            setUserLit(localStorage.getItem(getAnonKey(memorialId)) === "1");
+          }
         }
       } catch {
         // Silently fail — candle count is non-critical
@@ -54,10 +64,8 @@ export function CandleProvider({ memorialId, children }: { memorialId: string; c
   const toggle = useCallback(async () => {
     if (toggling) return;
 
-    if (!isAuthenticated) {
-      window.location.href = `/sign-in?redirect=${encodeURIComponent(window.location.pathname)}`;
-      return;
-    }
+    // Anonymous users can only light, not unlight
+    if (!isAuthenticated && userLit) return;
 
     const wasLit = userLit;
     setToggling(true);
@@ -68,12 +76,19 @@ export function CandleProvider({ memorialId, children }: { memorialId: string; c
       const res = await fetch("/api/candles", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ memorial_id: memorialId }),
+        body: JSON.stringify({
+          memorial_id: memorialId,
+          ...(isAuthenticated ? {} : { anonymous: true }),
+        }),
       });
       if (res.ok) {
         const data = await res.json();
         setUserLit(data.lit);
         setCount(data.count);
+        // Persist anonymous candle in localStorage
+        if (!isAuthenticated) {
+          localStorage.setItem(getAnonKey(memorialId), "1");
+        }
       } else {
         setUserLit(wasLit);
         setCount((c) => (wasLit ? c + 1 : c - 1));

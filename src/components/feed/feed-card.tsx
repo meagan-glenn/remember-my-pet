@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Flame } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { createBrowserSupabase } from "@/lib/supabase";
@@ -19,6 +19,10 @@ interface FeedCardProps {
   userLit: boolean;
 }
 
+function getAnonKey(memorialId: string) {
+  return `candle-lit:${memorialId}`;
+}
+
 export function FeedCard({
   id,
   petName,
@@ -32,6 +36,20 @@ export function FeedCard({
   const [count, setCount] = useState(initialCount);
   const [userLit, setUserLit] = useState(initialUserLit);
   const [toggling, setToggling] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // Check auth + localStorage on mount
+  useEffect(() => {
+    createBrowserSupabase()
+      .auth.getUser()
+      .then(({ data: { user } }) => {
+        setIsAuthenticated(!!user);
+        if (!user && localStorage.getItem(getAnonKey(id)) === "1") {
+          setUserLit(true);
+        }
+      })
+      .catch(() => {});
+  }, [id]);
 
   const handleCandleClick = useCallback(
     async (e: React.MouseEvent) => {
@@ -39,16 +57,8 @@ export function FeedCard({
       e.stopPropagation();
       if (toggling) return;
 
-      // Check auth
-      const supabase = createBrowserSupabase();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user) {
-        window.location.href = `/sign-in?redirect=${encodeURIComponent("/")}`;
-        return;
-      }
+      // Anonymous users can only light, not unlight
+      if (!isAuthenticated && userLit) return;
 
       // Optimistic toggle
       setToggling(true);
@@ -60,12 +70,18 @@ export function FeedCard({
         const res = await fetch("/api/candles", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ memorial_id: id }),
+          body: JSON.stringify({
+            memorial_id: id,
+            ...(isAuthenticated ? {} : { anonymous: true }),
+          }),
         });
         if (res.ok) {
           const data = await res.json();
           setUserLit(data.lit);
           setCount(data.count);
+          if (!isAuthenticated) {
+            localStorage.setItem(getAnonKey(id), "1");
+          }
         } else {
           setUserLit(wasLit);
           setCount((c) => (wasLit ? c + 1 : c - 1));
@@ -79,7 +95,7 @@ export function FeedCard({
         setToggling(false);
       }
     },
-    [toggling, userLit, id]
+    [toggling, userLit, isAuthenticated, id]
   );
 
   return (
