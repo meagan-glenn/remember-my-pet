@@ -46,12 +46,16 @@ function PreviewContent() {
       .catch(() => {});
   }, [ctx.memorialId, ctx.hydrated]);
 
-  const uploadFile = useCallback(async (file: File): Promise<string> => {
+  const uploadFile = useCallback(async (file: File, retries = 2): Promise<string> => {
     const compressed = await compressImage(file);
     const formData = new FormData();
     formData.append("file", compressed);
     const res = await fetch("/api/upload", { method: "POST", body: formData });
     if (res.status === 401) throw new Error("__AUTH_REQUIRED__");
+    if (res.status === 429 && retries > 0) {
+      await new Promise((r) => setTimeout(r, 2000));
+      return uploadFile(file, retries - 1);
+    }
     if (!res.ok) {
       if (res.status === 413) throw new Error("This photo is too large. Please use a photo under 10MB.");
       const data = await res.json().catch(() => ({}));
@@ -72,20 +76,30 @@ function PreviewContent() {
         photos.push({ url: heroUrl });
       }
 
-      // Upload gallery photos in parallel
-      const galleryResults = await Promise.all(
-        ctx.photos
-          .map((p) => {
-            const file = ctx.photoFilesRef.current.get(p.id);
-            if (!file) return null;
-            return uploadFile(file).then((url) => ({
+      // Upload gallery photos in batches of 5 to avoid rate limits
+      const galleryItems = ctx.photos
+        .map((p) => {
+          const file = ctx.photoFilesRef.current.get(p.id);
+          if (!file) return null;
+          return { file, caption: p.caption, aiDetectedTags: p.aiDetectedTags };
+        })
+        .filter((p) => p !== null);
+
+      const galleryResults: { url: string; caption?: string; aiDetectedTags?: string[] }[] = [];
+      const BATCH_SIZE = 5;
+      for (let i = 0; i < galleryItems.length; i += BATCH_SIZE) {
+        const batch = galleryItems.slice(i, i + BATCH_SIZE);
+        const batchResults = await Promise.all(
+          batch.map((item) =>
+            uploadFile(item.file).then((url) => ({
               url,
-              caption: p.caption || undefined,
-              aiDetectedTags: p.aiDetectedTags?.length ? p.aiDetectedTags : undefined,
-            }));
-          })
-          .filter((p) => p !== null)
-      );
+              caption: item.caption || undefined,
+              aiDetectedTags: item.aiDetectedTags?.length ? item.aiDetectedTags : undefined,
+            }))
+          )
+        );
+        galleryResults.push(...batchResults);
+      }
 
       photos.push(...galleryResults);
     } catch (err) {

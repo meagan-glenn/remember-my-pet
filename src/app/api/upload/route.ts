@@ -24,7 +24,7 @@ export async function POST(request: Request) {
     return apiError("AUTH_REQUIRED", 401);
   }
 
-  if (!rateLimit(`upload:${user.id}`, 20)) {
+  if (!rateLimit(`upload:${user.id}`, 60)) {
     return apiError("RATE_LIMITED", 429);
   }
 
