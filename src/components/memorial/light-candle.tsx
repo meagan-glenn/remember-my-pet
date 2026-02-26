@@ -6,7 +6,7 @@ import { useCandleState } from "./candle-provider";
 
 interface LightCandleProps {
   petName?: string;
-  variant?: "inline" | "section";
+  variant?: "inline" | "section" | "hero";
 }
 
 function FlameIcon({ lit, size }: { lit: boolean; size: "sm" | "lg" }) {
@@ -46,6 +46,31 @@ function FlameIcon({ lit, size }: { lit: boolean; size: "sm" | "lg" }) {
 
 export function LightCandle({ petName, variant = "inline" }: LightCandleProps) {
   const { count, userLit, loading, toggle } = useCandleState();
+
+  if (variant === "hero") {
+    if (loading) {
+      return (
+        <div className="flex items-center gap-1.5 text-sm text-white/60">
+          <Flame className="h-4 w-4" />
+        </div>
+      );
+    }
+
+    return (
+      <button
+        onClick={toggle}
+        className="flex items-center gap-1.5 rounded-full bg-black/30 px-3 py-1.5 text-sm backdrop-blur-sm transition-colors hover:bg-black/50 active:scale-95"
+        aria-label={userLit ? "Unlight your candle" : "Light a candle"}
+      >
+        <FlameIcon lit={userLit} size="sm" />
+        <span className={userLit ? "text-amber-300" : "text-white/70"}>
+          {count > 0
+            ? `${count} candle${count === 1 ? "" : "s"} lit`
+            : "Light a candle"}
+        </span>
+      </button>
+    );
+  }
 
   if (variant === "section") {
     if (loading) {

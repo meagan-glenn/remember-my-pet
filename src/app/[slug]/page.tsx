@@ -202,26 +202,52 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      {/* Hero Section */}
-      <section className="relative">
-        {heroPhoto ? (
-          <div className="relative h-[35vh] min-h-[280px] max-h-[500px] w-full sm:h-[50vh]">
-            <Image
-              src={heroPhoto.url}
-              alt={memorial.pet_name}
-              fill
-              priority
-              sizes="100vw"
-              className="object-cover"
-              style={{ objectPosition: `center ${heroCropY}%` }}
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-            <div className="absolute inset-x-0 bottom-0 p-6 text-white sm:p-10">
-              <h1 className="font-serif text-4xl font-medium tracking-tight sm:text-5xl">
+      <CandleProvider memorialId={memorial.id}>
+        {/* Hero Section */}
+        <section className="relative">
+          {heroPhoto ? (
+            <div className="relative h-[35vh] min-h-[280px] max-h-[500px] w-full sm:h-[50vh]">
+              <Image
+                src={heroPhoto.url}
+                alt={memorial.pet_name}
+                fill
+                priority
+                sizes="100vw"
+                className="object-cover"
+                style={{ objectPosition: `center ${heroCropY}%` }}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+              <div className="absolute inset-x-0 bottom-0 p-6 text-white sm:p-10">
+                <h1 className="font-serif text-4xl font-medium tracking-tight sm:text-5xl">
+                  {memorial.pet_name}
+                </h1>
+                {(birthFormatted || deathFormatted) && (
+                  <p className="mt-2 text-lg text-white/80">
+                    {birthFormatted && deathFormatted
+                      ? `${birthFormatted} — ${deathFormatted}`
+                      : deathFormatted
+                        ? `Passed ${deathFormatted}`
+                        : `Born ${birthFormatted}`}
+                  </p>
+                )}
+              </div>
+              {/* Candle overlay on hero photo */}
+              {!isOwner && (
+                <div className="absolute bottom-4 right-4 z-10 print:hidden sm:bottom-6 sm:right-6">
+                  <LightCandle variant="hero" />
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="relative flex h-[35vh] min-h-[280px] w-full flex-col items-center justify-center bg-gradient-to-b from-amber-100 to-amber-50 dark:from-gray-900 dark:to-gray-950">
+              <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-amber-200/60 dark:bg-amber-900/30">
+                <PawPrint className="h-10 w-10 text-amber-600 dark:text-amber-400" />
+              </div>
+              <h1 className="font-serif text-4xl font-medium tracking-tight text-gray-900 dark:text-amber-50 sm:text-5xl">
                 {memorial.pet_name}
               </h1>
               {(birthFormatted || deathFormatted) && (
-                <p className="mt-2 text-lg text-white/80">
+                <p className="mt-3 text-lg text-gray-500 dark:text-gray-400">
                   {birthFormatted && deathFormatted
                     ? `${birthFormatted} — ${deathFormatted}`
                     : deathFormatted
@@ -229,30 +255,16 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
                       : `Born ${birthFormatted}`}
                 </p>
               )}
+              {/* Candle overlay on no-photo hero */}
+              {!isOwner && (
+                <div className="absolute bottom-4 right-4 z-10 print:hidden sm:bottom-6 sm:right-6">
+                  <LightCandle variant="hero" />
+                </div>
+              )}
             </div>
-          </div>
-        ) : (
-          <div className="flex h-[35vh] min-h-[280px] w-full flex-col items-center justify-center bg-gradient-to-b from-amber-100 to-amber-50 dark:from-gray-900 dark:to-gray-950">
-            <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-amber-200/60 dark:bg-amber-900/30">
-              <PawPrint className="h-10 w-10 text-amber-600 dark:text-amber-400" />
-            </div>
-            <h1 className="font-serif text-4xl font-medium tracking-tight text-gray-900 dark:text-amber-50 sm:text-5xl">
-              {memorial.pet_name}
-            </h1>
-            {(birthFormatted || deathFormatted) && (
-              <p className="mt-3 text-lg text-gray-500 dark:text-gray-400">
-                {birthFormatted && deathFormatted
-                  ? `${birthFormatted} — ${deathFormatted}`
-                  : deathFormatted
-                    ? `Passed ${deathFormatted}`
-                    : `Born ${birthFormatted}`}
-              </p>
-            )}
-          </div>
-        )}
-      </section>
+          )}
+        </section>
 
-      <CandleProvider memorialId={memorial.id}>
         {/* Actions bar */}
         <div className="mx-auto flex max-w-6xl items-center justify-end gap-3 px-4 pt-4 print:hidden sm:px-6">
           {isOwner && (
@@ -266,7 +278,6 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
           {isOwner && memorial.allow_memories !== false && (
             <InviteDialog petName={memorial.pet_name} memorialUrl={memorialUrl} />
           )}
-          {!isOwner && <LightCandle />}
         </div>
 
         {/* Wall intro */}
