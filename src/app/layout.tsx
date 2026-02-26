@@ -8,6 +8,18 @@ import { Footer } from "@/components/footer";
 import { OfflineBanner } from "@/components/offline-banner";
 import "./globals.css";
 
+const organizationJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "RememberMyPet.ai",
+  url: "https://remembermypet.ai",
+  description:
+    "Create beautiful digital pet memorials with AI-powered tributes, photo galleries, and collaborative memory walls.",
+  sameAs: [
+    "https://www.linkedin.com/company/remembermypet-ai",
+  ],
+};
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -60,6 +72,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+        />
         <Script id="fullstory" strategy="afterInteractive">{`
 window['_fs_host'] = 'fullstory.com';
 window['_fs_script'] = 'edge.fullstory.com/s/fs.js';

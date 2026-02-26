@@ -127,6 +127,13 @@ function formatDate(dateStr: string | null): string | null {
   });
 }
 
+function getSpeciesLabel(species?: string | null, customSpecies?: string | null): string | null {
+  if (customSpecies) return customSpecies;
+  if (!species || species === "other") return null;
+  // Capitalize first letter
+  return species.charAt(0).toUpperCase() + species.slice(1);
+}
+
 export async function generateMetadata({
   params,
 }: MemorialPageProps): Promise<Metadata> {
@@ -139,24 +146,47 @@ export async function generateMetadata({
 
   const { memorial } = result;
   const heroPhoto = memorial.photos?.[0];
+  const speciesLabel = getSpeciesLabel(memorial.species, memorial.custom_species);
+  const petDescription = speciesLabel
+    ? `${memorial.pet_name} the ${speciesLabel}`
+    : memorial.pet_name;
   const description = memorial.tribute
     ? memorial.tribute.slice(0, 155) + (memorial.tribute.length > 155 ? "…" : "")
-    : `A memorial for ${memorial.pet_name}. Forever loved, forever remembered.`;
+    : `A memorial for ${petDescription}. Forever loved, forever remembered.`;
+
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://remembermypet.ai";
+  const memorialUrl = `${siteUrl}/${memorial.slug}`;
+
+  const title = speciesLabel
+    ? `Remembering ${memorial.pet_name} the ${speciesLabel} — Pet Memorial | RememberMyPet.ai`
+    : `Remembering ${memorial.pet_name} — Pet Memorial | RememberMyPet.ai`;
+
+  const ogTitle = speciesLabel
+    ? `Remembering ${memorial.pet_name} the ${speciesLabel}`
+    : `Remembering ${memorial.pet_name}`;
+
+  const heroAlt = heroPhoto?.caption
+    || (speciesLabel ? `Photo of ${memorial.pet_name} the ${speciesLabel}` : `Photo of ${memorial.pet_name}`);
 
   return {
-    title: `Remembering ${memorial.pet_name} — RememberMyPet.ai`,
+    title,
     description,
+    alternates: {
+      canonical: memorialUrl,
+    },
     openGraph: {
-      title: `Remembering ${memorial.pet_name}`,
+      title: ogTitle,
       description,
       type: "article",
+      url: memorialUrl,
+      siteName: "RememberMyPet.ai",
       ...(heroPhoto && {
-        images: [{ url: heroPhoto.url, alt: memorial.pet_name }],
+        images: [{ url: heroPhoto.url, alt: heroAlt }],
       }),
     },
     twitter: {
       card: heroPhoto ? "summary_large_image" : "summary",
-      title: `Remembering ${memorial.pet_name}`,
+      title: ogTitle,
       description,
       ...(heroPhoto && { images: [heroPhoto.url] }),
     },
@@ -180,20 +210,68 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
   const pronouns = getPronouns(memorial.gender as "male" | "female" | "neutral" | null | undefined);
 
   const siteUrl =
-    process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+    process.env.NEXT_PUBLIC_SITE_URL || "https://remembermypet.ai";
   const memorialUrl = `${siteUrl}/${memorial.slug}`;
+  const speciesLabel = getSpeciesLabel(memorial.species, memorial.custom_species);
 
   // Sanitize user data for JSON-LD to prevent XSS via dangerouslySetInnerHTML
   const safePetName = memorial.pet_name.replace(/[<>"]/g, "");
+  const safeSpecies = speciesLabel?.replace(/[<>"]/g, "") ?? null;
   const safeDescription = (memorial.tribute?.slice(0, 160) || `A memorial for ${safePetName}.`).replace(/[<>"]/g, "");
 
+  // Build descriptive alt text for hero image
+  const heroAlt = heroPhoto?.caption
+    || (safeSpecies ? `Photo of ${safePetName} the ${safeSpecies}` : `Photo of ${safePetName}`);
+
+  // Rich JSON-LD structured data
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "WebPage",
-    name: `Memorial for ${safePetName}`,
+    name: `Memorial for ${safePetName}${safeSpecies ? ` the ${safeSpecies}` : ""}`,
     description: safeDescription,
     url: memorialUrl,
-    ...(heroPhoto && { image: heroPhoto.url }),
+    ...(heroPhoto && {
+      image: {
+        "@type": "ImageObject",
+        url: heroPhoto.url,
+        caption: heroAlt,
+      },
+    }),
+    ...(memorial.birth_date && { dateCreated: memorial.birth_date }),
+    mainEntity: {
+      "@type": "Thing",
+      name: safePetName,
+      ...(safeSpecies && { description: `A beloved ${safeSpecies}` }),
+      ...(memorial.birth_date && memorial.death_date && {
+        additionalProperty: [
+          { "@type": "PropertyValue", name: "born", value: memorial.birth_date },
+          { "@type": "PropertyValue", name: "passed", value: memorial.death_date },
+        ],
+      }),
+    },
+    breadcrumb: {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "Home",
+          item: siteUrl,
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "Memorials",
+          item: `${siteUrl}/community`,
+        },
+        {
+          "@type": "ListItem",
+          position: 3,
+          name: safePetName,
+          item: memorialUrl,
+        },
+      ],
+    },
   };
 
   return (
@@ -209,7 +287,7 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
             <div className="relative h-[35vh] min-h-[280px] max-h-[500px] w-full sm:h-[50vh]">
               <Image
                 src={heroPhoto.url}
-                alt={memorial.pet_name}
+                alt={heroAlt}
                 fill
                 priority
                 sizes="100vw"
@@ -265,19 +343,30 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
           )}
         </section>
 
-        {/* Actions bar */}
-        <div className="mx-auto flex max-w-6xl items-center justify-end gap-3 px-4 pt-4 print:hidden sm:px-6">
-          {isOwner && (
-            <a
-              href={`/create?edit=${memorial.id}`}
-              className="text-sm text-amber-600 hover:text-amber-700 hover:underline dark:text-amber-400 dark:hover:text-amber-300"
-            >
-              Edit memorial
-            </a>
-          )}
-          {isOwner && memorial.allow_memories !== false && (
-            <InviteDialog petName={memorial.pet_name} memorialUrl={memorialUrl} />
-          )}
+        {/* Breadcrumb + Actions bar */}
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 pt-4 print:hidden sm:px-6">
+          <nav aria-label="Breadcrumb" className="text-sm text-gray-400 dark:text-gray-500">
+            <ol className="flex items-center gap-1.5">
+              <li><a href="/" className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors">Home</a></li>
+              <li aria-hidden="true" className="text-gray-300 dark:text-gray-700">/</li>
+              <li><a href="/community" className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors">Memorials</a></li>
+              <li aria-hidden="true" className="text-gray-300 dark:text-gray-700">/</li>
+              <li aria-current="page" className="text-gray-600 dark:text-gray-300 truncate max-w-[150px] sm:max-w-none">{memorial.pet_name}</li>
+            </ol>
+          </nav>
+          <div className="flex items-center gap-3">
+            {isOwner && (
+              <a
+                href={`/create?edit=${memorial.id}`}
+                className="text-sm text-amber-600 hover:text-amber-700 hover:underline dark:text-amber-400 dark:hover:text-amber-300"
+              >
+                Edit memorial
+              </a>
+            )}
+            {isOwner && memorial.allow_memories !== false && (
+              <InviteDialog petName={memorial.pet_name} memorialUrl={memorialUrl} />
+            )}
+          </div>
         </div>
 
         {/* Wall intro */}
