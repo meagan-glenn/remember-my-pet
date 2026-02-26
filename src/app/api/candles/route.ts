@@ -77,23 +77,15 @@ export async function POST(request: Request) {
       return NextResponse.json({ lit: true, count: totalCount });
     }
 
-    // Increment anonymous_candle_count atomically
-    const { data: memorial } = await serviceClient
-      .from("memorials")
-      .select("anonymous_candle_count")
-      .eq("id", memorial_id)
-      .single();
-
-    if (!memorial) {
-      return apiError("MEMORIAL_NOT_FOUND", 404);
-    }
-
-    const { error } = await serviceClient
-      .from("memorials")
-      .update({ anonymous_candle_count: (memorial.anonymous_candle_count ?? 0) + 1 })
-      .eq("id", memorial_id);
+    // Increment anonymous_candle_count atomically via database function
+    const { data: newAnonCount, error } = await serviceClient
+      .rpc("increment_anonymous_candle_count", { p_memorial_id: memorial_id });
 
     if (error) {
+      // If memorial doesn't exist, the RPC returns no rows
+      if (newAnonCount === null) {
+        return apiError("MEMORIAL_NOT_FOUND", 404);
+      }
       return apiError("CANDLE_FAILED", 500);
     }
 
