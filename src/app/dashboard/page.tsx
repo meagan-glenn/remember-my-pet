@@ -263,7 +263,7 @@ export default async function Dashboard() {
             <h2 className="text-sm font-medium text-gray-400 dark:text-gray-500">What&apos;s next</h2>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
               {hasPublished && mostRecentPublished && (
-                <Link href={`/${mostRecentPublished.slug}`}>
+                <Link href={`/${mostRecentPublished.slug}`} className="h-full">
                   <Card className="h-full cursor-pointer border-amber-100 dark:border-amber-900/30 transition-colors hover:bg-amber-50/50 dark:hover:bg-amber-950/20">
                     <CardContent className="flex items-center gap-3 py-4">
                       <Users className="h-5 w-5 shrink-0 text-amber-500 dark:text-amber-400" />
@@ -275,7 +275,7 @@ export default async function Dashboard() {
               {hasPublished && mostRecentPublished && (
                 <ShareCard url={`${siteUrl}/${mostRecentPublished.slug}`} />
               )}
-              <Link href="/support">
+              <Link href="/support" className="h-full">
                 <Card className="h-full cursor-pointer border-amber-100 dark:border-amber-900/30 transition-colors hover:bg-amber-50/50 dark:hover:bg-amber-950/20">
                   <CardContent className="flex items-center gap-3 py-4">
                     <HeartHandshake className="h-5 w-5 shrink-0 text-amber-500 dark:text-amber-400" />

@@ -29,8 +29,8 @@ export function ShareCard({ url }: ShareCardProps) {
   }
 
   return (
-    <button onClick={handleClick} className="w-full text-left">
-      <Card className="group cursor-pointer border-amber-100 dark:border-amber-900/30 transition-colors hover:bg-amber-50/50 dark:hover:bg-amber-950/20">
+    <button onClick={handleClick} className="h-full w-full text-left">
+      <Card className="group h-full cursor-pointer border-amber-100 dark:border-amber-900/30 transition-colors hover:bg-amber-50/50 dark:hover:bg-amber-950/20">
         <CardContent className="flex items-center gap-3 py-4">
           {copied ? (
             <Check className="h-5 w-5 shrink-0 text-green-500" />

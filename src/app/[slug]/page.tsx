@@ -5,10 +5,12 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { PawPrint } from "lucide-react";
 import { getPronouns } from "@/lib/pronouns";
-import { MasonryWall } from "@/components/memorial-wall/masonry-wall";
 import { ExpandableMemoryForm } from "@/components/memory-wall/expandable-memory-form";
 import { InviteDialog } from "@/components/memory-wall/invite-dialog";
 import { LightCandle } from "@/components/memorial/light-candle";
+import { CandleProvider } from "@/components/memorial/candle-provider";
+import { MemorialPhotos } from "@/components/memorial/memorial-photos";
+import { createServiceClient } from "@/lib/supabase";
 
 interface MemorialPageProps {
   params: Promise<{ slug: string }>;
@@ -98,13 +100,21 @@ const getMemorial = cache(async (slug: string) => {
       .order("created_at", { ascending: false }),
   ]);
 
+  // Fetch creator display name via service client (bypasses RLS)
+  const serviceClient = createServiceClient();
+  const { data: creator } = await serviceClient
+    .from("users")
+    .select("display_name")
+    .eq("id", memorial.user_id)
+    .single();
+
   const memorialData: Memorial = {
     ...(memorial as Memorial),
     compilation_url: compilation?.url ?? null,
     memories: (memories as MemoryRow[]) || [],
   };
 
-  return { memorial: memorialData, isOwner };
+  return { memorial: memorialData, isOwner, creatorName: creator?.display_name ?? null };
 });
 
 function formatDate(dateStr: string | null): string | null {
@@ -159,9 +169,11 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
 
   if (!result) notFound();
 
-  const { memorial, isOwner } = result;
+  const { memorial, isOwner, creatorName } = result;
   const heroPhoto = memorial.photos?.[0];
   const galleryPhotos = memorial.photos?.slice(1) ?? [];
+  const sidePhotos = galleryPhotos.slice(0, 2);
+  const masonryPhotos = galleryPhotos.slice(2);
   const heroCropY = memorial.hero_photo_crop_y ?? 50;
   const birthFormatted = formatDate(memorial.birth_date);
   const deathFormatted = formatDate(memorial.death_date);
@@ -240,99 +252,66 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
         )}
       </section>
 
-      {/* Actions bar */}
-      <div className="mx-auto flex max-w-6xl items-center justify-end gap-3 px-4 pt-6 print:hidden sm:px-6">
-        {isOwner && (
-          <a
-            href={`/create?edit=${memorial.id}`}
-            className="text-sm text-amber-600 hover:text-amber-700 hover:underline dark:text-amber-400 dark:hover:text-amber-300"
-          >
-            Edit memorial
-          </a>
-        )}
-        {isOwner && memorial.allow_memories !== false && (
-          <InviteDialog petName={memorial.pet_name} memorialUrl={memorialUrl} />
-        )}
-        {!isOwner && <LightCandle memorialId={memorial.id} />}
-      </div>
-
-      {/* Wall intro */}
-      <section className="mx-auto max-w-6xl px-4 pt-8 sm:px-6">
-        <p className="mb-6 text-center text-sm text-gray-400 dark:text-gray-500 italic">
-          {memorial.pet_name}&apos;s life, through the eyes of those who loved {pronouns.object}
-        </p>
-      </section>
-
-      {/* Tribute + Side Photos */}
-      {memorial.tribute ? (
-        <section className="mx-auto max-w-6xl px-4 pb-3 sm:px-6">
-          <div className="flex flex-col gap-3 md:flex-row md:items-stretch md:gap-4">
-            <div className="flex-1 rounded-2xl border-l-4 border-l-amber-700 dark:border-l-amber-500 border border-amber-100 dark:border-amber-900/30 bg-amber-50/50 dark:bg-amber-950/30 p-6 shadow-sm backdrop-blur-sm sm:p-8">
-              <h2 className="mb-4 font-serif text-2xl font-medium text-gray-900 dark:text-amber-50">
-                A Tribute
-              </h2>
-              <div className="whitespace-pre-line text-base leading-relaxed text-gray-700 dark:text-gray-300">
-                {memorial.tribute}
-              </div>
-            </div>
-            {galleryPhotos.length > 0 && (
-              <div className="flex gap-3 md:w-80 md:shrink-0 md:flex-col">
-                {galleryPhotos.slice(0, 2).map((photo) => (
-                  <div key={photo.id} className="overflow-hidden rounded-2xl border border-amber-100 dark:border-amber-900/30 bg-white/80 dark:bg-gray-900/40 shadow-sm">
-                    <div className="relative aspect-square">
-                      <Image
-                        src={photo.url}
-                        alt={photo.caption || memorial.pet_name}
-                        fill
-                        sizes="(min-width: 768px) 320px, 50vw"
-                        className="object-cover"
-                      />
-                    </div>
-                    {photo.caption && (
-                      <p className="px-3 py-2 text-xs italic text-gray-500 dark:text-gray-400">{photo.caption}</p>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </section>
-      ) : isOwner ? (
-        <section className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-          <div className="rounded-2xl border border-dashed border-amber-200 dark:border-amber-900/30 bg-amber-50/50 dark:bg-amber-950/30 p-6 text-center">
-            <p className="text-gray-500 dark:text-gray-400">No tribute yet.</p>
+      <CandleProvider memorialId={memorial.id}>
+        {/* Actions bar */}
+        <div className="mx-auto flex max-w-6xl items-center justify-end gap-3 px-4 pt-4 print:hidden sm:px-6">
+          {isOwner && (
             <a
               href={`/create?edit=${memorial.id}`}
-              className="mt-2 inline-block text-sm text-amber-600 dark:text-amber-400 hover:underline"
+              className="text-sm text-amber-600 hover:text-amber-700 hover:underline dark:text-amber-400 dark:hover:text-amber-300"
             >
-              Add a tribute
+              Edit memorial
             </a>
-          </div>
-        </section>
-      ) : null}
+          )}
+          {isOwner && memorial.allow_memories !== false && (
+            <InviteDialog petName={memorial.pet_name} memorialUrl={memorialUrl} />
+          )}
+          {!isOwner && <LightCandle />}
+        </div>
 
-      {/* Masonry Wall (remaining photos + memories) */}
-      {(galleryPhotos.length > 2 || memorial.memories.length > 0 || memorial.compilation_url) && (
-        <section className="mx-auto max-w-6xl px-4 pb-8 sm:px-6">
-          <MasonryWall
-            photos={galleryPhotos.slice(2)}
-            memories={memorial.memories}
-            videoUrl={memorial.compilation_url ?? undefined}
-            videoPosterUrl={heroPhoto?.url}
-            petName={memorial.pet_name}
-          />
+        {/* Wall intro */}
+        <section className="mx-auto max-w-6xl px-4 pt-10 sm:px-6">
+          <p className="mb-8 text-center text-sm text-gray-400 dark:text-gray-500 italic">
+            {memorial.pet_name}&apos;s life, through the eyes of those who loved {pronouns.object}
+          </p>
         </section>
-      )}
+
+        {/* Tribute + Side Photos + Masonry Wall (unified lightbox) */}
+        <MemorialPhotos
+          sidePhotos={sidePhotos}
+          masonryPhotos={masonryPhotos}
+          memories={memorial.memories}
+          videoUrl={memorial.compilation_url ?? undefined}
+          videoPosterUrl={heroPhoto?.url}
+          petName={memorial.pet_name}
+          tribute={memorial.tribute}
+          isOwner={isOwner}
+          editUrl={`/create?edit=${memorial.id}`}
+        />
+
+        {/* Candle section */}
+        <section className="mx-auto max-w-6xl px-4 pb-10 sm:px-6">
+          <LightCandle petName={memorial.pet_name} variant="section" />
+        </section>
+      </CandleProvider>
 
       {/* Memory Form (for published memorials with memories enabled) */}
       {memorial.is_published && memorial.allow_memories !== false && (
-        <section className="mx-auto max-w-6xl px-4 pb-8 sm:px-6">
+        <section className="mx-auto max-w-6xl px-4 pb-10 sm:px-6">
           <ExpandableMemoryForm memorialId={memorial.id} petName={memorial.pet_name} />
         </section>
       )}
 
       {/* Memorial page nav */}
-      <div className="mx-auto max-w-6xl px-4 pb-10 pt-2 text-center print:hidden sm:px-6">
+      <div className="mx-auto max-w-6xl px-4 pb-12 pt-6 text-center print:hidden sm:px-6">
+        {creatorName && (
+          <>
+            <span className="text-sm text-gray-400 dark:text-gray-500">
+              Created by {creatorName}
+            </span>
+            <span className="mx-2 text-gray-300 dark:text-gray-700">&middot;</span>
+          </>
+        )}
         <a
           href="/"
           className="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-amber-600 dark:text-gray-500 dark:hover:text-amber-400 transition-colors"
@@ -340,7 +319,7 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
           <PawPrint className="h-3.5 w-3.5" />
           RememberMyPet.ai
         </a>
-        <span className="mx-2 text-gray-300 dark:text-gray-700">·</span>
+        <span className="mx-2 text-gray-300 dark:text-gray-700">&middot;</span>
         <a
           href="/create"
           className="text-sm text-gray-400 hover:text-amber-600 dark:text-gray-500 dark:hover:text-amber-400 transition-colors"
@@ -351,7 +330,7 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
 
       {/* Print footer */}
       <div className="hidden print:block print:py-8 print:text-center print:text-sm print:text-gray-400">
-        Created with PetMemorial.ai
+        Created with RememberMyPet.ai
       </div>
     </div>
   );

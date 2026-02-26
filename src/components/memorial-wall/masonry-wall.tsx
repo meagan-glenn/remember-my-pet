@@ -20,9 +20,21 @@ interface MasonryWallProps {
   videoUrl?: string;
   videoPosterUrl?: string;
   petName: string;
+  onPhotoClick?: (index: number) => void;
+  photoIndexOffset?: number;
 }
 
-function WallCardRenderer({ card, index, petName }: { card: WallCard; index: number; petName: string }) {
+function WallCardRenderer({
+  card,
+  index,
+  petName,
+  onPhotoClick,
+}: {
+  card: WallCard;
+  index: number;
+  petName: string;
+  onPhotoClick?: () => void;
+}) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 16 }}
@@ -30,7 +42,7 @@ function WallCardRenderer({ card, index, petName }: { card: WallCard; index: num
       transition={{ duration: 0.35, delay: index * 0.04 }}
     >
       {card.type === "photo" && (
-        <PhotoCard url={card.url} caption={card.caption} petName={petName} />
+        <PhotoCard url={card.url} caption={card.caption} petName={petName} onClick={onPhotoClick} />
       )}
       {card.type === "memory" && (
         <div className="rounded-2xl border border-amber-100 dark:border-amber-900/30 bg-stone-50/80 dark:bg-gray-900/40 p-5 shadow-sm backdrop-blur-sm">
@@ -71,44 +83,63 @@ export function MasonryWall({
   videoUrl,
   videoPosterUrl,
   petName,
+  onPhotoClick,
+  photoIndexOffset = 0,
 }: MasonryWallProps) {
   const cards = interleaveWallContent({ photos, memories, videoUrl, videoPosterUrl });
+
+  if (cards.length === 0) return null;
 
   const mediaCards = cards.filter((c) => c.type === "photo" || c.type === "video");
   const memoryCards = cards.filter((c) => c.type === "memory");
 
-  if (mediaCards.length === 0 && memoryCards.length === 0) return null;
+  // Track photo index for lightbox navigation
+  let photoCounter = 0;
 
   return (
-    <div className="space-y-0">
-      {/* Photos & Video */}
+    <>
       {mediaCards.length > 0 && (
         <div className="columns-2 gap-3 md:columns-4 md:gap-4 [&>*]:mb-3 [&>*]:break-inside-avoid md:[&>*]:mb-4">
-          {mediaCards.map((card, i) => (
-            <WallCardRenderer key={card.id} card={card} index={i} petName={petName} />
-          ))}
+          {mediaCards.map((card, i) => {
+            const currentPhotoIndex = card.type === "photo" ? photoCounter++ : -1;
+            return (
+              <WallCardRenderer
+                key={card.id}
+                card={card}
+                index={i}
+                petName={petName}
+                onPhotoClick={
+                  card.type === "photo" && onPhotoClick
+                    ? () => onPhotoClick(photoIndexOffset + currentPhotoIndex)
+                    : undefined
+                }
+              />
+            );
+          })}
         </div>
       )}
 
-      {/* Divider */}
-      {mediaCards.length > 0 && memoryCards.length > 0 && (
-        <div className="flex items-center gap-4 py-10">
-          <div className="h-px flex-1 bg-amber-200/60 dark:bg-amber-800/30" />
-          <h3 className="text-sm font-medium text-gray-400 dark:text-gray-500 tracking-wide">
-            Memories &amp; Stories
-          </h3>
-          <div className="h-px flex-1 bg-amber-200/60 dark:bg-amber-800/30" />
-        </div>
-      )}
-
-      {/* Memories */}
       {memoryCards.length > 0 && (
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-4">
-          {memoryCards.map((card, i) => (
-            <WallCardRenderer key={card.id} card={card} index={mediaCards.length + i} petName={petName} />
-          ))}
-        </div>
+        <>
+          <div className="flex items-center gap-4 py-8">
+            <div className="h-px flex-1 bg-amber-200/60 dark:bg-amber-900/30" />
+            <span className="text-sm font-medium text-gray-400 dark:text-gray-500">
+              Memories &amp; Stories
+            </span>
+            <div className="h-px flex-1 bg-amber-200/60 dark:bg-amber-900/30" />
+          </div>
+          <div className="columns-1 gap-3 md:columns-2 md:gap-4 [&>*]:mb-3 [&>*]:break-inside-avoid md:[&>*]:mb-4">
+            {memoryCards.map((card, i) => (
+              <WallCardRenderer
+                key={card.id}
+                card={card}
+                index={i}
+                petName={petName}
+              />
+            ))}
+          </div>
+        </>
       )}
-    </div>
+    </>
   );
 }
