@@ -36,8 +36,7 @@ export async function sendWelcomeEmail({
         <div style="font-family: Georgia, serif; max-width: 520px; margin: 0 auto; color: #1a1a1a; line-height: 1.7;">
           <p style="font-size: 16px;">Hi ${safeName},</p>
           <p style="font-size: 16px;">
-            I built Remember My Pet after losing my dog Skylar. She had osteosarcoma, lost a leg,
-            went through chemo, and was my best friend for 13 years. When she died, I couldn't find
+            I built Remember My Pet after losing my dog Skylar to osteosarcoma. When she died, I couldn't find
             anything that actually felt right for what I was going through — so I built it myself.
           </p>
           <p style="font-size: 16px;">
