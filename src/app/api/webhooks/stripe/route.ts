@@ -94,7 +94,7 @@ export async function POST(request: Request) {
     }
 
     default:
-      console.log(`Unhandled Stripe event: ${event.type}`);
+      console.warn(`Unhandled Stripe event: ${event.type}`);
   }
 
   return NextResponse.json({ received: true });
