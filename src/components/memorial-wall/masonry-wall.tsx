@@ -121,7 +121,7 @@ export function MasonryWall({
 
       {memoryCards.length > 0 && (
         <>
-          <div className="flex items-center gap-4 py-8">
+          <div className="flex items-center gap-4 py-5 sm:py-8">
             <div className="h-px flex-1 bg-amber-200/60 dark:bg-amber-900/30" />
             <span className="text-sm font-medium text-gray-400 dark:text-gray-500">
               Memories &amp; Stories

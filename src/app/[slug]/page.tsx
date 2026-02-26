@@ -301,20 +301,20 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
         />
 
         {/* Candle section */}
-        <section className="mx-auto max-w-6xl px-4 pb-10 sm:px-6">
+        <section className="mx-auto max-w-6xl px-4 pb-6 sm:px-6 sm:pb-10">
           <LightCandle petName={memorial.pet_name} variant="section" />
         </section>
       </CandleProvider>
 
       {/* Memory Form (for published memorials with memories enabled) */}
       {memorial.is_published && memorial.allow_memories !== false && (
-        <section className="mx-auto max-w-6xl px-4 pb-10 sm:px-6">
+        <section className="mx-auto max-w-6xl px-4 pb-6 sm:px-6 sm:pb-10">
           <ExpandableMemoryForm memorialId={memorial.id} petName={memorial.pet_name} />
         </section>
       )}
 
       {/* Memorial page nav */}
-      <div className="mx-auto max-w-6xl px-4 pb-12 pt-6 text-center print:hidden sm:px-6">
+      <div className="mx-auto max-w-6xl px-4 pb-8 pt-4 text-center print:hidden sm:px-6 sm:pb-12 sm:pt-6">
         {creatorName && (
           <>
             <span className="text-sm text-gray-400 dark:text-gray-500">
