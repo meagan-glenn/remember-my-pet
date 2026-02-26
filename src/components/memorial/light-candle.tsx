@@ -20,15 +20,15 @@ export function LightCandle({ memorialId }: LightCandleProps) {
   useEffect(() => {
     async function fetchState() {
       try {
-        // Check auth status
         const supabase = createBrowserSupabase();
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-        setIsAuthenticated(!!user);
 
-        // Fetch candle state
-        const res = await fetch(`/api/candles?memorial_id=${memorialId}`);
+        // Check auth and fetch candle state in parallel
+        const [authResult, res] = await Promise.all([
+          supabase.auth.getUser(),
+          fetch(`/api/candles?memorial_id=${memorialId}`),
+        ]);
+        setIsAuthenticated(!!authResult.data.user);
+
         if (res.ok) {
           const data = await res.json();
           setCount(data.count);

@@ -60,7 +60,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <Script id="fullstory" strategy="beforeInteractive">{`
+        <Script id="fullstory" strategy="afterInteractive">{`
 window['_fs_host'] = 'fullstory.com';
 window['_fs_script'] = 'edge.fullstory.com/s/fs.js';
 window['_fs_org'] = 'o-24EJF7-na1';

@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { notFound } from "next/navigation";
 import { createServerSupabase } from "@/lib/supabase-server";
 import type { Metadata } from "next";
@@ -52,7 +53,7 @@ interface Memorial {
   memories: MemoryRow[];
 }
 
-async function getMemorial(slug: string) {
+const getMemorial = cache(async (slug: string) => {
   const supabase = await createServerSupabase();
 
   const {
@@ -79,23 +80,23 @@ async function getMemorial(slug: string) {
     );
   }
 
-  // Fetch latest completed video compilation
-  const { data: compilation } = await supabase
-    .from("video_compilations")
-    .select("url")
-    .eq("memorial_id", memorial.id)
-    .eq("status", "complete")
-    .order("completed_at", { ascending: false })
-    .limit(1)
-    .single();
-
-  // Fetch approved memories
-  const { data: memories } = await supabase
-    .from("memories")
-    .select("*")
-    .eq("memorial_id", memorial.id)
-    .eq("is_approved", true)
-    .order("created_at", { ascending: false });
+  // Fetch video compilation and approved memories in parallel
+  const [{ data: compilation }, { data: memories }] = await Promise.all([
+    supabase
+      .from("video_compilations")
+      .select("url")
+      .eq("memorial_id", memorial.id)
+      .eq("status", "complete")
+      .order("completed_at", { ascending: false })
+      .limit(1)
+      .single(),
+    supabase
+      .from("memories")
+      .select("*")
+      .eq("memorial_id", memorial.id)
+      .eq("is_approved", true)
+      .order("created_at", { ascending: false }),
+  ]);
 
   const memorialData: Memorial = {
     ...(memorial as Memorial),
@@ -104,7 +105,7 @@ async function getMemorial(slug: string) {
   };
 
   return { memorial: memorialData, isOwner };
-}
+});
 
 function formatDate(dateStr: string | null): string | null {
   if (!dateStr) return null;
