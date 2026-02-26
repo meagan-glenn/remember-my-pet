@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { createServiceClient } from "@/lib/supabase";
+import { sendWelcomeEmail } from "@/lib/email";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -57,6 +59,36 @@ export async function GET(request: NextRequest) {
     errorUrl.searchParams.set("error", "unexpected");
     errorUrl.searchParams.set("redirect", redirect);
     return NextResponse.redirect(errorUrl);
+  }
+
+  // Send welcome email on first sign-in (fire-and-forget, never blocks redirect)
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const serviceClient = createServiceClient();
+      const { data: profile } = await serviceClient
+        .from("users")
+        .select("display_name, welcome_email_sent")
+        .eq("id", user.id)
+        .single();
+
+      if (profile && !profile.welcome_email_sent) {
+        const firstName = profile.display_name?.split(" ")[0] || user.email?.split("@")[0] || "there";
+
+        // Don't await — send in background so we don't delay the redirect
+        sendWelcomeEmail({ email: user.email!, firstName }).then(() => {
+          serviceClient
+            .from("users")
+            .update({ welcome_email_sent: true })
+            .eq("id", user.id)
+            .then(({ error }) => {
+              if (error) console.error("Failed to mark welcome email sent:", error.message);
+            });
+        });
+      }
+    }
+  } catch (err) {
+    console.error("Welcome email check failed:", err instanceof Error ? err.message : "Unknown error");
   }
 
   return NextResponse.redirect(new URL(redirect, request.url));

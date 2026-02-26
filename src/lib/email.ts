@@ -1,6 +1,7 @@
 import { Resend } from "resend";
 
 const FROM_EMAIL = "Remember My Pet <noreply@remembermypet.ai>";
+const FROM_WELCOME = "Meagan from Remember My Pet <team@remembermypet.ai>";
 
 function getResend() {
   return new Resend(process.env.RESEND_API_KEY);
@@ -12,6 +13,56 @@ function escapeHtml(str: string): string {
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
+}
+
+export async function sendWelcomeEmail({
+  email,
+  firstName,
+}: {
+  email: string;
+  firstName: string;
+}) {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  const createUrl = `${siteUrl}/create`;
+
+  const safeName = escapeHtml(firstName);
+
+  try {
+    await getResend().emails.send({
+      from: FROM_WELCOME,
+      to: email,
+      subject: "I'm glad you're here. I'm sorry you need it.",
+      html: `
+        <div style="font-family: Georgia, serif; max-width: 520px; margin: 0 auto; color: #1a1a1a; line-height: 1.7;">
+          <p style="font-size: 16px;">Hi ${safeName},</p>
+          <p style="font-size: 16px;">
+            I built Remember My Pet after losing my dog Skylar. She had osteosarcoma, lost a leg,
+            went through chemo, and was my best friend for 13 years. When she died, I couldn't find
+            anything that actually felt right for what I was going through — so I built it myself.
+          </p>
+          <p style="font-size: 16px;">
+            I made this for people like you. People who know that what they lost was real,
+            even if the world doesn't always treat it that way.
+          </p>
+          <p style="font-size: 16px;">
+            You don't have to do anything right now. If you're ready to start a memorial,
+            it's waiting for you. If you just need a minute, that's okay too.
+          </p>
+          <p style="margin: 32px 0;">
+            <a href="${createUrl}" style="display: inline-block; background: #d97706; color: white; padding: 12px 28px; border-radius: 8px; text-decoration: none; font-size: 16px;">
+              When you're ready
+            </a>
+          </p>
+          <p style="font-size: 16px;">Take care of yourself.</p>
+          <p style="font-size: 16px; margin-top: 24px;">
+            — Meagan, founder
+          </p>
+        </div>
+      `,
+    });
+  } catch (error) {
+    console.error("Failed to send welcome email:", error instanceof Error ? error.message : "Unknown error");
+  }
 }
 
 export async function sendMemoryNotification({
