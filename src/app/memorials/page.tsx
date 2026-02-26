@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { ActivityFeed } from "@/components/feed/activity-feed";
 
 export const metadata: Metadata = {
-  title: "Community Memorials | RememberMyPet.ai",
+  title: "Memorials | RememberMyPet.ai",
   description:
     "Browse memorials created by our community. See how people are honoring the pets who changed their lives.",
 };

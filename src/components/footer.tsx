@@ -6,7 +6,7 @@ import { PawPrint } from "lucide-react";
 
 // Known top-level routes that should show the footer
 const ROUTES_WITH_FOOTER = new Set([
-  "/", "/create", "/support", "/community",
+  "/", "/create", "/support", "/memorials",
   "/privacy", "/terms", "/ai-info", "/sign-in", "/sign-up",
 ]);
 
@@ -56,7 +56,7 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/community" className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors">
+                <Link href="/memorials" className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors">
                   Community
                 </Link>
               </li>

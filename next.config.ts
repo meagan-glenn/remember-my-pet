@@ -12,6 +12,13 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  redirects: async () => [
+    {
+      source: "/community",
+      destination: "/memorials",
+      permanent: true,
+    },
+  ],
   headers: async () => [
     {
       source: "/(.*)",

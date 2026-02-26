@@ -262,7 +262,7 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
           "@type": "ListItem",
           position: 2,
           name: "Memorials",
-          item: `${siteUrl}/community`,
+          item: `${siteUrl}/memorials`,
         },
         {
           "@type": "ListItem",
@@ -349,7 +349,7 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
             <ol className="flex items-center gap-1.5">
               <li><a href="/" className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors">Home</a></li>
               <li aria-hidden="true" className="text-gray-300 dark:text-gray-700">/</li>
-              <li><a href="/community" className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors">Memorials</a></li>
+              <li><a href="/memorials" className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors">Memorials</a></li>
               <li aria-hidden="true" className="text-gray-300 dark:text-gray-700">/</li>
               <li aria-current="page" className="text-gray-600 dark:text-gray-300 truncate max-w-[150px] sm:max-w-none">{memorial.pet_name}</li>
             </ol>
@@ -412,14 +412,6 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
             <span className="mx-2 text-gray-300 dark:text-gray-700">&middot;</span>
           </>
         )}
-        <a
-          href="/"
-          className="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-amber-600 dark:text-gray-500 dark:hover:text-amber-400 transition-colors"
-        >
-          <PawPrint className="h-3.5 w-3.5" />
-          RememberMyPet.ai
-        </a>
-        <span className="mx-2 text-gray-300 dark:text-gray-700">&middot;</span>
         <a
           href="/create"
           className="text-sm text-gray-400 hover:text-amber-600 dark:text-gray-500 dark:hover:text-amber-400 transition-colors"
