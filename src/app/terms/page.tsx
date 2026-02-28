@@ -35,7 +35,7 @@ export default function TermsPage() {
             <p className="mt-3">
               RememberMyPet.ai provides a platform for creating digital pet
               memorials, including AI-generated tributes, photo galleries,
-              memory walls, and video reels. The Service uses session replay
+              memory walls, and candle reactions. The Service uses session replay
               analytics (FullStory) to improve the user experience. The Service
               is available via web browser.
             </p>
@@ -81,25 +81,7 @@ export default function TermsPage() {
 
           <section>
             <h2 className="text-lg font-semibold text-gray-900 dark:text-amber-50">
-              6. Payments & Refunds
-            </h2>
-            <p className="mt-3">
-              Memorial plans are sold as one-time purchases. Payments are
-              processed securely via Stripe. If you are unsatisfied with your
-              purchase, contact us within 30 days at{" "}
-              <a
-                href="mailto:team@remembermypet.ai"
-                className="text-amber-600 hover:underline dark:text-amber-400"
-              >
-                team@remembermypet.ai
-              </a>{" "}
-              for a full refund.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-amber-50">
-              7. Memorial Hosting
+              6. Memorial Hosting
             </h2>
             <p className="mt-3">
               All memorials are preserved in your account. Paid memorials
@@ -113,7 +95,7 @@ export default function TermsPage() {
 
           <section>
             <h2 className="text-lg font-semibold text-gray-900 dark:text-amber-50">
-              8. Memory Wall Contributions
+              7. Memory Wall Contributions
             </h2>
             <p className="mt-3">
               Third-party contributions to a memorial&apos;s memory wall are
@@ -125,7 +107,7 @@ export default function TermsPage() {
 
           <section>
             <h2 className="text-lg font-semibold text-gray-900 dark:text-amber-50">
-              9. Limitation of Liability
+              8. Limitation of Liability
             </h2>
             <p className="mt-3">
               The Service is provided &quot;as is&quot; without warranties of
@@ -138,7 +120,7 @@ export default function TermsPage() {
 
           <section>
             <h2 className="text-lg font-semibold text-gray-900 dark:text-amber-50">
-              10. Changes to Terms
+              9. Changes to Terms
             </h2>
             <p className="mt-3">
               We may update these terms from time to time. Continued use of the
@@ -149,7 +131,7 @@ export default function TermsPage() {
 
           <section>
             <h2 className="text-lg font-semibold text-gray-900 dark:text-amber-50">
-              11. Contact
+              10. Contact
             </h2>
             <p className="mt-3">
               Questions about these terms? Email us at{" "}

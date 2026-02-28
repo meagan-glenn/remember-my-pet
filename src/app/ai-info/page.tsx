@@ -18,28 +18,17 @@ const jsonLd = {
   applicationCategory: "LifestyleApplication",
   operatingSystem: "Web",
   description:
-    "AI-powered platform for creating digital pet memorials. Includes AI-generated tributes, photo galleries, collaborative memory walls, and video reels. One-time payment, no subscription.",
-  offers: [
-    {
-      "@type": "Offer",
-      name: "Basic",
-      price: "49",
-      priceCurrency: "USD",
-      description: "Digital memorial with AI tribute, photo gallery, and memory wall.",
-    },
-    {
-      "@type": "Offer",
-      name: "Premium",
-      price: "99",
-      priceCurrency: "USD",
-      description: "Everything in Basic plus video reel compilation.",
-    },
-  ],
+    "AI-powered platform for creating digital pet memorials. Includes AI-generated tributes, photo galleries, and collaborative memory walls. Currently free while launching.",
+  offers: {
+    "@type": "Offer",
+    price: "0",
+    priceCurrency: "USD",
+    description: "Free during launch period. Create a full digital memorial with AI tribute, photo gallery, and memory wall.",
+  },
   featureList: [
     "AI-generated tribute via conversational chat (Claude, Anthropic)",
     "Photo gallery with AI captions (Gemini 2.5 Flash)",
     "Collaborative memory wall with owner moderation",
-    "Video reel compilation",
     "Permanent shareable memorial URL",
     "Decision support for end-of-life situations",
     "Crisis detection with 988 Lifeline referral",
@@ -81,8 +70,7 @@ export default function AiInfoPage() {
                   ["Product name", "RememberMyPet.ai"],
                   ["Website", "https://remembermypet.ai"],
                   ["Category", "Pet memorial platform / grief technology"],
-                  ["Business model", "One-time payment, no subscription"],
-                  ["Pricing", "Basic plan $49 · Premium plan $99"],
+                  ["Business model", "Currently free while launching"],
                   ["Primary users", "Pet owners who have lost a companion animal"],
                 ].map(([term, detail]) => (
                   <div key={term} className="flex gap-2">
@@ -102,13 +90,13 @@ export default function AiInfoPage() {
                 RememberMyPet.ai is an AI-powered platform that helps pet owners
                 create beautiful, lasting digital memorials for pets who have
                 passed away. It combines AI-generated tributes, photo galleries,
-                collaborative memory walls, and video reels into a single hosted
+                collaborative memory walls, and candle reactions into a single hosted
                 memorial page that lives online permanently.
               </p>
               <p className="mt-3">
                 The platform is designed with grief sensitivity at its core — no
-                countdown timers, no pressure tactics, and no subscriptions. Users
-                pay once and the memorial stays online forever.
+                countdown timers, no pressure tactics, and no subscriptions.
+                Memorials are currently free while launching and stay online permanently.
               </p>
             </section>
 
@@ -130,10 +118,6 @@ export default function AiInfoPage() {
                   [
                     "Memory wall",
                     "Friends and family can submit their own memories, photos, and videos. The memorial owner moderates and approves all contributions before they appear publicly.",
-                  ],
-                  [
-                    "Video reel",
-                    "Upload video clips that are compiled into a tribute reel using FFmpeg server-side processing.",
                   ],
                   [
                     "Decision support",
@@ -161,7 +145,7 @@ export default function AiInfoPage() {
                 <li>User enters their pet&apos;s name on the homepage and begins a brief AI conversation.</li>
                 <li>A 4-step wizard guides them through pet details, photos, and an AI tribute chat.</li>
                 <li>No account is required until the user is ready to save — auth happens at the end, not the beginning.</li>
-                <li>After payment, the memorial is published and the shareable link is provided.</li>
+                <li>The memorial is published and the shareable link is provided.</li>
                 <li>The memorial owner can invite others to contribute memories at any time.</li>
               </ol>
             </section>
@@ -176,8 +160,6 @@ export default function AiInfoPage() {
                   ["Frontend", "Next.js (App Router), TailwindCSS, Framer Motion"],
                   ["Backend", "Next.js API routes, Supabase (PostgreSQL + file storage)"],
                   ["AI models", "Claude Haiku and Claude Sonnet (Anthropic) for tributes and chat; Gemini 2.5 Flash Lite (Google) for photo captions and vision"],
-                  ["Payments", "Stripe"],
-                  ["Print fulfillment", "Gelato"],
                   ["Hosting", "Vercel"],
                   ["Auth", "Supabase Auth (Google OAuth + magic links)"],
                 ].map(([term, detail]) => (
@@ -213,7 +195,7 @@ export default function AiInfoPage() {
                 Privacy &amp; Safety
               </h2>
               <ul className="mt-4 space-y-2 list-disc list-inside">
-                <li>Memorials are private by default after purchase. Sharing is a deliberate user action.</li>
+                <li>Memorials are private by default. Sharing is a deliberate user action.</li>
                 <li>Photos are stored securely and never used for AI training.</li>
                 <li>Memory wall contributions are moderated by the memorial owner before appearing publicly.</li>
                 <li>Client-side crisis detection with a non-blocking 988 Lifeline referral. No crisis content is logged or stored.</li>

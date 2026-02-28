@@ -41,7 +41,6 @@ export default function PrivacyPage() {
             <ul className="mt-2 list-disc pl-6 space-y-1">
               <li>Create and host your pet memorial</li>
               <li>Generate AI-written tributes and photo captions</li>
-              <li>Process payments via Stripe</li>
               <li>Send transactional emails (sign-in links, memory wall notifications)</li>
               <li>Improve our service</li>
             </ul>
@@ -68,8 +67,7 @@ export default function PrivacyPage() {
               Your data is stored securely on Supabase (PostgreSQL database and
               file storage) and hosted on Vercel. Photos and videos are stored
               in encrypted cloud storage. We use HTTPS for all data
-              transmission. Payment information is handled entirely by Stripe
-              and never touches our servers.
+              transmission.
             </p>
           </section>
 
@@ -80,7 +78,7 @@ export default function PrivacyPage() {
             <p className="mt-3">
               We do not sell your personal information. We share data only with
               service providers necessary to operate the platform (Supabase,
-              Vercel, Stripe, Anthropic, Google, Resend for email, FullStory
+              Vercel, Anthropic, Google, Resend for email, FullStory
               for analytics). Published
               memorials are publicly accessible via their unique URL — you
               control when and if a memorial is published.
