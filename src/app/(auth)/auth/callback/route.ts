@@ -61,7 +61,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(errorUrl);
   }
 
-  // Send welcome email on first sign-in (fire-and-forget, never blocks redirect)
+  // Send welcome email on first sign-in (awaited so Vercel doesn't kill the process before the DB update)
   try {
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
@@ -75,16 +75,12 @@ export async function GET(request: NextRequest) {
       if (profile && !profile.welcome_email_sent) {
         const firstName = profile.display_name?.split(" ")[0] || user.email?.split("@")[0] || "there";
 
-        // Don't await — send in background so we don't delay the redirect
-        sendWelcomeEmail({ email: user.email!, firstName }).then(() => {
-          serviceClient
-            .from("users")
-            .update({ welcome_email_sent: true })
-            .eq("id", user.id)
-            .then(({ error }) => {
-              if (error) console.error("Failed to mark welcome email sent:", error.message);
-            });
-        });
+        await sendWelcomeEmail({ email: user.email!, firstName });
+        const { error: updateError } = await serviceClient
+          .from("users")
+          .update({ welcome_email_sent: true })
+          .eq("id", user.id);
+        if (updateError) console.error("Failed to mark welcome email sent:", updateError.message);
       }
     }
   } catch (err) {
