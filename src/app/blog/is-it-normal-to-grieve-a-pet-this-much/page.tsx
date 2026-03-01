@@ -30,8 +30,6 @@ export default function IsItNormalToGrieveAPetThisMuchPage() {
           <p>
             She told me she lost her dog in 2024. Not last month &mdash; 2024. And she
             said she still cries every day. That it still feels like it just happened.
-            That she was amazed something like this existed because she&apos;s still
-            carrying it around, and most people in her life have moved on.
           </p>
 
           <p>
@@ -79,7 +77,7 @@ export default function IsItNormalToGrieveAPetThisMuchPage() {
 
           <h2 className="text-xl font-semibold text-gray-900 dark:text-amber-50 pt-2">It&apos;s been months (or years) and I&apos;m still not over it</h2>
           <p>
-            Good. You don&apos;t have to be.
+            You don&apos;t have to be.
           </p>
           <p>
             There&apos;s no expiration date on grief. There&apos;s no point at which you&apos;re
