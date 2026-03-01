@@ -124,8 +124,17 @@ export default function StandaloneSupportPage() {
     router.push("/create");
   }, [petName, supportContext, router]);
 
-  const handleGoogleSignIn = () => {
-    toast("Google sign-in is coming soon! Use a magic link for now.", { duration: 4000 });
+  const handleGoogleSignIn = async () => {
+    const supabase = createBrowserSupabase();
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback?redirect=${encodeURIComponent("/support")}`,
+      },
+    });
+    if (error) {
+      toast(error.message, { duration: 4000 });
+    }
   };
 
   const handleDismissAuth = () => {

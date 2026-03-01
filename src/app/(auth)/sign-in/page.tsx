@@ -15,7 +15,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import Link from "next/link";
-import { toast } from "sonner";
+
 
 function SignInForm() {
   const searchParams = useSearchParams();
@@ -29,8 +29,17 @@ function SignInForm() {
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
 
-  const handleGoogleSignIn = () => {
-    toast("Google sign-in is coming soon! Use a magic link for now.", { duration: 4000 });
+  const handleGoogleSignIn = async () => {
+    const supabase = createBrowserSupabase();
+    const { error: authError } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback?redirect=${encodeURIComponent(redirect)}`,
+      },
+    });
+    if (authError) {
+      setError(authError.message);
+    }
   };
 
   const handleMagicLink = async (e: React.FormEvent) => {
