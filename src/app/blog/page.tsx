@@ -8,6 +8,13 @@ export const metadata: Metadata = {
 
 const posts = [
   {
+    slug: "is-it-normal-to-grieve-a-pet-this-much",
+    title: "Is it normal to grieve a pet this much?",
+    date: "February 28, 2026",
+    excerpt:
+      "If you're still crying over a pet you lost months or years ago, nothing is wrong with you. The intensity of the grief isn't a sign that something is broken — it's a sign of how real the relationship was.",
+  },
+  {
     slug: "shes-live",
     title: "She's live",
     date: "February 25, 2026",
