@@ -61,7 +61,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(errorUrl);
   }
 
-  // Send welcome email on first sign-in (awaited so Vercel doesn't kill the process before the DB update)
+  // Send welcome email on first sign-in only
+  // Flag is set BEFORE sending so that even if the email send is slow or the
+  // process is killed mid-send, the user won't receive duplicates on next login.
   try {
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
@@ -73,14 +75,18 @@ export async function GET(request: NextRequest) {
         .single();
 
       if (profile && !profile.welcome_email_sent) {
-        const firstName = profile.display_name?.split(" ")[0] || user.email?.split("@")[0] || "there";
-
-        await sendWelcomeEmail({ email: user.email!, firstName });
+        // Mark as sent FIRST to prevent duplicates on concurrent/subsequent logins
         const { error: updateError } = await serviceClient
           .from("users")
           .update({ welcome_email_sent: true })
           .eq("id", user.id);
-        if (updateError) console.error("Failed to mark welcome email sent:", updateError.message);
+
+        if (updateError) {
+          console.error("Failed to mark welcome email sent:", updateError.message);
+        } else {
+          const firstName = profile.display_name?.split(" ")[0] || user.email?.split("@")[0] || "there";
+          await sendWelcomeEmail({ email: user.email!, firstName });
+        }
       }
     }
   } catch (err) {
