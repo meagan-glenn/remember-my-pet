@@ -8,6 +8,13 @@ export const metadata: Metadata = {
 
 const posts = [
   {
+    slug: "did-i-make-the-right-decision",
+    title: "Did I make the right decision? On euthanasia guilt and the weight of choosing.",
+    date: "March 3, 2026",
+    excerpt:
+      "I knew putting Skylar down was the right call. I could see it in her. But the guilt came anyway — not about the decision, but about the days I worked too late, the hikes I took without her, the time I'll never get back.",
+  },
+  {
     slug: "is-it-normal-to-grieve-a-pet-this-much",
     title: "Is it normal to grieve a pet this much?",
     date: "February 28, 2026",
