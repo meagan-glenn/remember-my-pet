@@ -11,6 +11,7 @@ import { MemorialPhotos } from "@/components/memorial/memorial-photos";
 import { OwnerActionsMenu } from "@/components/memorial/owner-actions-menu";
 import { HeroMedia } from "@/components/memorial/hero-media";
 import { createServiceClient } from "@/lib/supabase";
+import { getPronouns, type Gender } from "@/lib/pronouns";
 
 interface MemorialPageProps {
   params: Promise<{ slug: string }>;
@@ -214,6 +215,7 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
   const masonryPhotos = memorial.photos?.slice(1) ?? [];
   const heroCropY = memorial.hero_photo_crop_y ?? 50;
   const yearRange = formatYearRange(memorial.birth_date, memorial.death_date);
+  const pronouns = getPronouns(memorial.gender as Gender);
 
   const siteUrl =
     process.env.NEXT_PUBLIC_SITE_URL || "https://remembermypet.ai";
@@ -381,6 +383,7 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
           masonryPhotos={masonryPhotos}
           memories={memorial.memories}
           petName={memorial.pet_name}
+          objectPronoun={pronouns.object}
           tribute={memorial.tribute}
           isOwner={isOwner}
           editUrl={`/create?edit=${memorial.id}`}

@@ -23,6 +23,8 @@ interface MemorialPhotosProps {
   masonryPhotos: Photo[];
   memories: MemoryRow[];
   petName: string;
+  /** Object pronoun (him / her / them) for the visitor empty state. */
+  objectPronoun: string;
   tribute: string | null;
   isOwner: boolean;
   editUrl: string;
@@ -32,6 +34,7 @@ export function MemorialPhotos({
   masonryPhotos,
   memories,
   petName,
+  objectPronoun,
   tribute,
   isOwner,
   editUrl,
@@ -86,25 +89,28 @@ export function MemorialPhotos({
             <p className="mb-6 text-xs uppercase tracking-[0.2em] text-amber-700/60 dark:text-amber-500/50">
               A Tribute
             </p>
-            <p className="text-gray-500 dark:text-gray-400">No tribute yet.</p>
+            <p className="font-serif text-lg text-gray-600 dark:text-gray-300">
+              {petName}&apos;s tribute is still being written.
+            </p>
             <a
               href={editUrl}
-              className="mt-2 inline-block text-sm text-amber-600 dark:text-amber-400 hover:underline"
+              className="mt-3 inline-block text-sm text-amber-600 dark:text-amber-400 hover:underline"
             >
               Add a tribute
             </a>
           </div>
         </section>
       ) : (
-        /* Visitor sees an empty state encouraging memory contribution */
+        /* Visitor, no tribute. Only show a framed empty state when there is
+           no wall content either — otherwise the wall carries the page. */
         !hasMasonryContent ? (
-          <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
-            <div className="rounded-2xl border border-amber-100 dark:border-amber-900/30 bg-amber-50/30 dark:bg-amber-950/20 p-8 text-center space-y-2">
-              <p className="text-gray-500 dark:text-gray-400">
-                {petName}&apos;s memorial is just getting started.
+          <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+            <div className="mx-auto max-w-xl space-y-3 text-center">
+              <p className="font-serif text-xl text-gray-600 dark:text-gray-300">
+                A place is being made for {petName}.
               </p>
               <p className="text-sm text-gray-400 dark:text-gray-500">
-                Be the first to share a memory below.
+                If you loved {objectPronoun}, share a memory below.
               </p>
             </div>
           </section>
