@@ -1,4 +1,5 @@
 import { cache } from "react";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createServerSupabase } from "@/lib/supabase-server";
 import type { Metadata } from "next";
@@ -398,22 +399,24 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
         </section>
       )}
 
-      {/* Memorial page nav */}
-      <div className="mx-auto max-w-6xl px-4 pb-8 pt-4 text-center print:hidden sm:px-6 sm:pb-12 sm:pt-6">
+      {/* Memorial page footer — end-of-visit, not conversion.
+          The acquisition CTA lives on the directory / visitor empty state,
+          not on a live memorial. */}
+      <div className="mx-auto max-w-6xl px-4 pb-10 pt-6 text-center print:hidden sm:px-6 sm:pb-16 sm:pt-10">
         {creatorName && (
-          <>
-            <span className="text-sm text-gray-400 dark:text-gray-500">
-              Created by {creatorName}
-            </span>
-            <span className="mx-2 text-gray-300 dark:text-gray-700">&middot;</span>
-          </>
+          <p className="text-sm text-gray-400 dark:text-gray-500">
+            Created by {creatorName}
+          </p>
         )}
-        <a
-          href="/create"
-          className="text-sm text-gray-400 hover:text-amber-600 dark:text-gray-500 dark:hover:text-amber-400 transition-colors"
-        >
-          Create your own memorial
-        </a>
+        <p className="mt-2 text-xs text-gray-400 dark:text-gray-500">
+          Made with love at{" "}
+          <Link
+            href="/"
+            className="underline-offset-2 hover:text-amber-600 hover:underline dark:hover:text-amber-400"
+          >
+            RememberMyPet.ai
+          </Link>
+        </p>
       </div>
 
       {/* Print footer */}
