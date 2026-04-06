@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { interleaveWallContent } from "@/lib/interleave-wall-content";
 import { PhotoCard } from "./photo-card";
 import { VideoCard } from "./video-card";
@@ -24,6 +24,15 @@ interface MasonryWallProps {
   photoIndexOffset?: number;
 }
 
+/** Extract a single uppercased initial for the contributor avatar. */
+function getInitial(name: string): string {
+  const trimmed = name.trim();
+  if (!trimmed) return "?";
+  // Use Array.from to handle multi-byte characters safely
+  const first = Array.from(trimmed)[0];
+  return first ? first.toUpperCase() : "?";
+}
+
 function WallCardRenderer({
   card,
   index,
@@ -35,39 +44,50 @@ function WallCardRenderer({
   petName: string;
   onPhotoClick?: () => void;
 }) {
+  const reduce = useReducedMotion();
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35, delay: index * 0.04 }}
+      initial={reduce ? false : { opacity: 0, y: 16 }}
+      animate={reduce ? undefined : { opacity: 1, y: 0 }}
+      transition={reduce ? { duration: 0 } : { duration: 0.35, delay: Math.min(index * 0.04, 0.6) }}
     >
       {card.type === "photo" && (
         <PhotoCard url={card.url} caption={card.caption} petName={petName} onClick={onPhotoClick} />
       )}
       {card.type === "memory" && (
-        <div className="rounded-2xl border border-amber-100 dark:border-amber-900/30 bg-stone-50/80 dark:bg-gray-900/40 p-5 shadow-sm backdrop-blur-sm">
-          <div className="mb-1 text-amber-400/60 text-2xl leading-none select-none">&ldquo;</div>
-          <p className="whitespace-pre-line text-base leading-relaxed text-gray-700 dark:text-gray-300">
-            {card.content}
-          </p>
-          {card.photoUrls && card.photoUrls.length > 0 && (
-            <div className="mt-3 flex gap-2">
-              {card.photoUrls.map((url, i) => (
-                <div key={i} className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg">
-                  <Image
-                    src={url}
-                    alt={`Photo shared by ${card.contributorName}`}
-                    fill
-                    sizes="80px"
-                    className="object-cover"
-                  />
-                </div>
-              ))}
+        <div className="rounded-2xl border border-amber-200/50 dark:border-amber-900/30 bg-amber-50/60 dark:bg-amber-950/20 p-5 shadow-sm backdrop-blur-sm">
+          <div className="flex items-start gap-3">
+            <div
+              aria-hidden="true"
+              className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-amber-200/70 text-sm font-medium text-amber-900 dark:bg-amber-900/40 dark:text-amber-200"
+            >
+              {getInitial(card.contributorName)}
             </div>
-          )}
-          <p className="mt-3 text-sm font-medium text-gray-500 dark:text-gray-400">
-            &mdash; {card.contributorName}
-          </p>
+            <div className="min-w-0 flex-1">
+              <p className="whitespace-pre-line font-serif text-[17px] leading-[1.7] text-gray-800 dark:text-gray-200">
+                {card.content}
+              </p>
+              {card.photoUrls && card.photoUrls.length > 0 && (
+                <div className="mt-3 flex gap-2">
+                  {card.photoUrls.map((url, i) => (
+                    <div key={i} className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg">
+                      <Image
+                        src={url}
+                        alt={`Photo shared by ${card.contributorName}`}
+                        fill
+                        sizes="80px"
+                        className="object-cover"
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+              <p className="mt-3 text-sm text-gray-500 dark:text-gray-400">
+                &mdash; {card.contributorName}
+              </p>
+            </div>
+          </div>
         </div>
       )}
       {card.type === "video" && (
@@ -90,56 +110,28 @@ export function MasonryWall({
 
   if (cards.length === 0) return null;
 
-  const mediaCards = cards.filter((c) => c.type === "photo" || c.type === "video");
-  const memoryCards = cards.filter((c) => c.type === "memory");
-
-  // Track photo index for lightbox navigation
+  // photoCounter is incremented during map iteration to assign lightbox
+  // indices to photos in visual order. Memories and videos do not affect it.
   let photoCounter = 0;
 
   return (
-    <>
-      {mediaCards.length > 0 && (
-        <div className="columns-2 gap-3 md:columns-4 md:gap-4 [&>*]:mb-3 [&>*]:break-inside-avoid md:[&>*]:mb-4">
-          {mediaCards.map((card, i) => {
-            const currentPhotoIndex = card.type === "photo" ? photoCounter++ : -1;
-            return (
-              <WallCardRenderer
-                key={card.id}
-                card={card}
-                index={i}
-                petName={petName}
-                onPhotoClick={
-                  card.type === "photo" && onPhotoClick
-                    ? () => onPhotoClick(photoIndexOffset + currentPhotoIndex)
-                    : undefined
-                }
-              />
-            );
-          })}
-        </div>
-      )}
-
-      {memoryCards.length > 0 && (
-        <>
-          <div className="flex items-center gap-4 py-5 sm:py-8">
-            <div className="h-px flex-1 bg-amber-200/60 dark:bg-amber-900/30" />
-            <span className="text-sm font-medium text-gray-400 dark:text-gray-500">
-              Memories &amp; Stories
-            </span>
-            <div className="h-px flex-1 bg-amber-200/60 dark:bg-amber-900/30" />
-          </div>
-          <div className="columns-1 gap-3 md:columns-2 md:gap-4 [&>*]:mb-3 [&>*]:break-inside-avoid md:[&>*]:mb-4">
-            {memoryCards.map((card, i) => (
-              <WallCardRenderer
-                key={card.id}
-                card={card}
-                index={i}
-                petName={petName}
-              />
-            ))}
-          </div>
-        </>
-      )}
-    </>
+    <div className="columns-1 gap-3 sm:columns-2 md:columns-3 md:gap-4 print:columns-1 print:block [&>*]:mb-3 [&>*]:break-inside-avoid md:[&>*]:mb-4">
+      {cards.map((card, i) => {
+        const currentPhotoIndex = card.type === "photo" ? photoCounter++ : -1;
+        return (
+          <WallCardRenderer
+            key={card.id}
+            card={card}
+            index={i}
+            petName={petName}
+            onPhotoClick={
+              card.type === "photo" && onPhotoClick
+                ? () => onPhotoClick(photoIndexOffset + currentPhotoIndex)
+                : undefined
+            }
+          />
+        );
+      })}
+    </div>
   );
 }

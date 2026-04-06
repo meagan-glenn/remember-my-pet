@@ -4,12 +4,11 @@ import { createServerSupabase } from "@/lib/supabase-server";
 import type { Metadata } from "next";
 import Image from "next/image";
 import { PawPrint } from "lucide-react";
-import { getPronouns } from "@/lib/pronouns";
 import { ExpandableMemoryForm } from "@/components/memory-wall/expandable-memory-form";
-import { InviteDialog } from "@/components/memory-wall/invite-dialog";
 import { LightCandle } from "@/components/memorial/light-candle";
 import { CandleProvider } from "@/components/memorial/candle-provider";
 import { MemorialPhotos } from "@/components/memorial/memorial-photos";
+import { OwnerActionsMenu } from "@/components/memorial/owner-actions-menu";
 import { createServiceClient } from "@/lib/supabase";
 
 interface MemorialPageProps {
@@ -201,13 +200,11 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
 
   const { memorial, isOwner, creatorName } = result;
   const heroPhoto = memorial.photos?.[0];
-  const galleryPhotos = memorial.photos?.slice(1) ?? [];
-  const sidePhotos = galleryPhotos.slice(0, 2);
-  const masonryPhotos = galleryPhotos.slice(2);
+  // All non-hero photos flow into the unified masonry wall (phase 4).
+  const masonryPhotos = memorial.photos?.slice(1) ?? [];
   const heroCropY = memorial.hero_photo_crop_y ?? 50;
   const birthFormatted = formatDate(memorial.birth_date);
   const deathFormatted = formatDate(memorial.death_date);
-  const pronouns = getPronouns(memorial.gender as "male" | "female" | "neutral" | null | undefined);
 
   const siteUrl =
     process.env.NEXT_PUBLIC_SITE_URL || "https://remembermypet.ai";
@@ -309,10 +306,21 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
                   </p>
                 )}
               </div>
-              {/* Candle overlay on hero photo */}
+              {/* Candle overlay on hero photo (visitors only) */}
               {!isOwner && (
                 <div className="absolute bottom-4 right-4 z-10 print:hidden sm:bottom-6 sm:right-6">
                   <LightCandle variant="hero" />
+                </div>
+              )}
+              {/* Owner actions ellipsis (owners only) */}
+              {isOwner && (
+                <div className="absolute top-4 right-4 z-20 print:hidden sm:top-6 sm:right-6">
+                  <OwnerActionsMenu
+                    editUrl={`/create?edit=${memorial.id}`}
+                    petName={memorial.pet_name}
+                    memorialUrl={memorialUrl}
+                    allowMemories={memorial.allow_memories !== false}
+                  />
                 </div>
               )}
             </div>
@@ -333,52 +341,30 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
                       : `Born ${birthFormatted}`}
                 </p>
               )}
-              {/* Candle overlay on no-photo hero */}
+              {/* Candle overlay on no-photo hero (visitors only) */}
               {!isOwner && (
                 <div className="absolute bottom-4 right-4 z-10 print:hidden sm:bottom-6 sm:right-6">
                   <LightCandle variant="hero" />
+                </div>
+              )}
+              {/* Owner actions ellipsis (owners only) — light background variant */}
+              {isOwner && (
+                <div className="absolute top-4 right-4 z-20 print:hidden sm:top-6 sm:right-6">
+                  <OwnerActionsMenu
+                    editUrl={`/create?edit=${memorial.id}`}
+                    petName={memorial.pet_name}
+                    memorialUrl={memorialUrl}
+                    allowMemories={memorial.allow_memories !== false}
+                    onLightBackground
+                  />
                 </div>
               )}
             </div>
           )}
         </section>
 
-        {/* Breadcrumb + Actions bar */}
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 pt-4 print:hidden sm:px-6">
-          <nav aria-label="Breadcrumb" className="text-sm text-gray-400 dark:text-gray-500">
-            <ol className="flex items-center gap-1.5">
-              <li><a href="/" className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors">Home</a></li>
-              <li aria-hidden="true" className="text-gray-300 dark:text-gray-700">/</li>
-              <li><a href="/memorials" className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors">Memorials</a></li>
-              <li aria-hidden="true" className="text-gray-300 dark:text-gray-700">/</li>
-              <li aria-current="page" className="text-gray-600 dark:text-gray-300 truncate max-w-[150px] sm:max-w-none">{memorial.pet_name}</li>
-            </ol>
-          </nav>
-          <div className="flex items-center gap-3">
-            {isOwner && (
-              <a
-                href={`/create?edit=${memorial.id}`}
-                className="text-sm text-amber-600 hover:text-amber-700 hover:underline dark:text-amber-400 dark:hover:text-amber-300"
-              >
-                Edit memorial
-              </a>
-            )}
-            {isOwner && memorial.allow_memories !== false && (
-              <InviteDialog petName={memorial.pet_name} memorialUrl={memorialUrl} />
-            )}
-          </div>
-        </div>
-
-        {/* Wall intro */}
-        <section className="mx-auto max-w-6xl px-4 pt-10 sm:px-6">
-          <p className="mb-8 text-center text-sm text-gray-400 dark:text-gray-500 italic">
-            {memorial.pet_name}&apos;s life, through the eyes of those who loved {pronouns.object}
-          </p>
-        </section>
-
-        {/* Tribute + Side Photos + Masonry Wall (unified lightbox) */}
+        {/* Wall + Tribute (unified lightbox). Wall renders first: sensory content before narrative. */}
         <MemorialPhotos
-          sidePhotos={sidePhotos}
           masonryPhotos={masonryPhotos}
           memories={memorial.memories}
           videoUrl={memorial.compilation_url ?? undefined}
