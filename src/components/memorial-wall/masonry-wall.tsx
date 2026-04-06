@@ -44,10 +44,16 @@ function WallCardRenderer({
 }) {
   const reduce = useReducedMotion();
 
+  // Note: we intentionally animate opacity only (not y-translate). CSS
+  // columns + a transformed direct child is a known layout-breaking combo
+  // in Chrome — children inside `break-inside-avoid` cards can fail to
+  // paint (especially aspect-ratio images) when the child has a transform.
+  // Opacity-only fade-in sidesteps the bug and is visually equivalent at
+  // the speeds we use.
   return (
     <motion.div
-      initial={reduce ? false : { opacity: 0, y: 16 }}
-      animate={reduce ? undefined : { opacity: 1, y: 0 }}
+      initial={reduce ? false : { opacity: 0 }}
+      animate={reduce ? undefined : { opacity: 1 }}
       transition={reduce ? { duration: 0 } : { duration: 0.35, delay: Math.min(index * 0.04, 0.6) }}
     >
       {card.type === "photo" && (

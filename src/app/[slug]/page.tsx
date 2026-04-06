@@ -116,14 +116,23 @@ const getMemorial = cache(async (slug: string) => {
   return { memorial: memorialData, isOwner, creatorName: creator?.display_name ?? null };
 });
 
-function formatDate(dateStr: string | null): string | null {
-  if (!dateStr) return null;
-  const [year, month, day] = dateStr.split("-").map(Number);
-  return new Date(year, month - 1, day).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+/**
+ * Format birth/death dates as a commemorative year range for the hero.
+ *   "2012 — 2024"  (both)
+ *   "Born 2012"    (birth only)
+ *   "2024"         (death only)
+ *   null           (neither)
+ */
+function formatYearRange(
+  birth: string | null,
+  death: string | null
+): string | null {
+  const birthYear = birth ? birth.split("-")[0] : null;
+  const deathYear = death ? death.split("-")[0] : null;
+  if (birthYear && deathYear) return `${birthYear} — ${deathYear}`;
+  if (birthYear) return `Born ${birthYear}`;
+  if (deathYear) return deathYear;
+  return null;
 }
 
 function getSpeciesLabel(species?: string | null, customSpecies?: string | null): string | null {
@@ -203,8 +212,7 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
   // All non-hero photos flow into the unified masonry wall (phase 4).
   const masonryPhotos = memorial.photos?.slice(1) ?? [];
   const heroCropY = memorial.hero_photo_crop_y ?? 50;
-  const birthFormatted = formatDate(memorial.birth_date);
-  const deathFormatted = formatDate(memorial.death_date);
+  const yearRange = formatYearRange(memorial.birth_date, memorial.death_date);
 
   const siteUrl =
     process.env.NEXT_PUBLIC_SITE_URL || "https://remembermypet.ai";
@@ -292,16 +300,12 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
               />
               <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/25 to-transparent" />
               <div className="absolute inset-x-0 bottom-0 p-6 text-white sm:p-10 md:p-14">
-                <h1 className="font-serif text-4xl font-medium tracking-tight sm:text-5xl">
+                <h1 className="font-serif text-5xl font-normal leading-[1.05] tracking-tight sm:text-6xl md:text-7xl">
                   {memorial.pet_name}
                 </h1>
-                {(birthFormatted || deathFormatted) && (
-                  <p className="mt-2 text-lg text-white/80">
-                    {birthFormatted && deathFormatted
-                      ? `${birthFormatted} — ${deathFormatted}`
-                      : deathFormatted
-                        ? `Passed ${deathFormatted}`
-                        : `Born ${birthFormatted}`}
+                {yearRange && (
+                  <p className="mt-3 font-serif text-base font-light tracking-[0.15em] text-white/75 sm:mt-4 sm:text-lg">
+                    {yearRange}
                   </p>
                 )}
               </div>
@@ -334,16 +338,12 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
               <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-amber-200/60 dark:bg-amber-900/30">
                 <PawPrint className="h-10 w-10 text-amber-600 dark:text-amber-400" />
               </div>
-              <h1 className="font-serif text-4xl font-medium tracking-tight text-gray-900 dark:text-amber-50 sm:text-5xl">
+              <h1 className="font-serif text-5xl font-normal leading-[1.05] tracking-tight text-gray-900 dark:text-amber-50 sm:text-6xl md:text-7xl">
                 {memorial.pet_name}
               </h1>
-              {(birthFormatted || deathFormatted) && (
-                <p className="mt-3 text-lg text-gray-500 dark:text-gray-400">
-                  {birthFormatted && deathFormatted
-                    ? `${birthFormatted} — ${deathFormatted}`
-                    : deathFormatted
-                      ? `Passed ${deathFormatted}`
-                      : `Born ${birthFormatted}`}
+              {yearRange && (
+                <p className="mt-3 font-serif text-base font-light tracking-[0.15em] text-gray-500 dark:text-gray-400 sm:mt-4 sm:text-lg">
+                  {yearRange}
                 </p>
               )}
               {/* Candle (visitors only, bottom-right) */}
