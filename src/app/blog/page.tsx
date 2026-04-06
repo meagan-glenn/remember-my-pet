@@ -8,6 +8,13 @@ export const metadata: Metadata = {
 
 const posts = [
   {
+    slug: "i-keep-wanting-to-talk-about-my-dog",
+    title: "I keep wanting to talk about my dog",
+    date: "April 5, 2026",
+    excerpt:
+      "After losing Skylar, I couldn't stop bringing her up — at dinner, on the phone, to strangers. I thought something was wrong with me. Turns out, talking about them and looking at their photos is one of the best things you can do.",
+  },
+  {
     slug: "did-i-make-the-right-decision",
     title: "Did I make the right decision? On euthanasia guilt and the weight of choosing.",
     date: "March 3, 2026",
