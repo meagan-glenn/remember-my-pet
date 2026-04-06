@@ -315,7 +315,7 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
                   className="absolute right-4 z-10 print:hidden sm:right-6"
                   style={{ bottom: "max(1rem, env(safe-area-inset-bottom))" }}
                 >
-                  <LightCandle variant="hero" />
+                  <LightCandle variant="hero" petName={memorial.pet_name} />
                 </div>
               )}
               {/* Owner actions ellipsis (owners only, top-right) */}
@@ -352,7 +352,7 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
                   className="absolute right-4 z-10 print:hidden sm:right-6"
                   style={{ bottom: "max(1rem, env(safe-area-inset-bottom))" }}
                 >
-                  <LightCandle variant="hero" />
+                  <LightCandle variant="hero" petName={memorial.pet_name} />
                 </div>
               )}
               {/* Owner actions ellipsis (owners only) — light background variant */}
