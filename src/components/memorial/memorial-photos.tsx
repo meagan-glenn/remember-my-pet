@@ -74,12 +74,12 @@ export function MemorialPhotos({
 
       {/* Tribute as editorial prose */}
       {tribute ? (
-        <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
+        <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28">
           <div className="mx-auto max-w-2xl">
             <p className="mb-6 text-center text-xs uppercase tracking-[0.2em] text-amber-700/80 dark:text-amber-500/70">
               A Tribute
             </p>
-            <div className="font-serif text-[18px] leading-[1.75] text-gray-800 dark:text-gray-200 sm:text-[19px]">
+            <div className="font-serif text-[20px] leading-[1.75] text-gray-800 dark:text-gray-200 sm:text-[22px]">
               {tribute.trim().split(/\n\n+/).map((para, i) => (
                 <p key={i} className="mb-5 last:mb-0 whitespace-pre-line">{para}</p>
               ))}
@@ -87,12 +87,12 @@ export function MemorialPhotos({
           </div>
         </section>
       ) : isOwner ? (
-        <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
+        <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28">
           <div className="mx-auto max-w-2xl text-center">
             <p className="mb-6 text-xs uppercase tracking-[0.2em] text-amber-700/60 dark:text-amber-500/50">
               A Tribute
             </p>
-            <p className="font-serif text-lg text-gray-600 dark:text-gray-300">
+            <p className="font-serif text-[20px] text-gray-600 dark:text-gray-300 sm:text-[22px]">
               {petName}&apos;s tribute is still being written.
             </p>
             <a

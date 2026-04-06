@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { LAUNCH_PRICE_DISPLAY } from "@/lib/pricing";
 
 export const metadata: Metadata = {
   title: "Terms of Service — RememberMyPet.ai",
@@ -91,7 +92,7 @@ export default function TermsPage() {
               free. Memorials created during this free period will remain free
               forever — even after we introduce paid pricing for new memorials.
               When paid pricing is introduced, it will be a one-time payment
-              (currently planned at $29) and never a subscription. Once
+              (currently planned at {LAUNCH_PRICE_DISPLAY}) and never a subscription. Once
               published, your memorial is hosted indefinitely at no additional
               cost. You can delete any memorial at any time from your
               dashboard.

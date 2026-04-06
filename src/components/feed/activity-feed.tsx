@@ -56,8 +56,8 @@ export function ActivityFeed() {
 
   if (loading) {
     return (
-      <section className="px-4 py-8 sm:py-12">
-        <div className="mx-auto max-w-4xl">
+      <section className="px-4 pt-6 pb-12 sm:pt-8 sm:pb-16">
+        <div className="mx-auto max-w-5xl">
           <h2 className="text-center font-serif text-3xl font-medium text-gray-900 md:text-4xl dark:text-amber-50">
             Recently remembered
           </h2>
@@ -85,8 +85,8 @@ export function ActivityFeed() {
   }
 
   return (
-    <section className="px-4 py-8 sm:py-12">
-      <div className="mx-auto max-w-4xl">
+    <section className="px-4 pt-6 pb-12 sm:pt-8 sm:pb-16">
+      <div className="mx-auto max-w-5xl">
         <h2 className="text-center font-serif text-3xl font-medium text-gray-900 md:text-4xl dark:text-amber-50">
           Recently remembered
         </h2>

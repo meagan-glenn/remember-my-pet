@@ -389,10 +389,6 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
           editUrl={`/create?edit=${memorial.id}`}
         />
 
-        {/* Candle section */}
-        <section className="mx-auto max-w-6xl px-4 pb-6 sm:px-6 sm:pb-10">
-          <LightCandle petName={memorial.pet_name} variant="section" />
-        </section>
       </CandleProvider>
 
       {/* Memory Form (for published memorials with memories enabled) */}
