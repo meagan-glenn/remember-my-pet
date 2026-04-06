@@ -2,13 +2,13 @@ import { cache } from "react";
 import { notFound } from "next/navigation";
 import { createServerSupabase } from "@/lib/supabase-server";
 import type { Metadata } from "next";
-import Image from "next/image";
 import { PawPrint } from "lucide-react";
 import { ExpandableMemoryForm } from "@/components/memory-wall/expandable-memory-form";
 import { LightCandle } from "@/components/memorial/light-candle";
 import { CandleProvider } from "@/components/memorial/candle-provider";
 import { MemorialPhotos } from "@/components/memorial/memorial-photos";
 import { OwnerActionsMenu } from "@/components/memorial/owner-actions-menu";
+import { HeroMedia } from "@/components/memorial/hero-media";
 import { createServiceClient } from "@/lib/supabase";
 
 interface MemorialPageProps {
@@ -278,21 +278,20 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <CandleProvider memorialId={memorial.id}>
-        {/* Hero Section */}
+        {/* Hero Section — presence-first. When a video compilation exists,
+            HeroMedia makes it the ambient hero. Otherwise a still image with
+            Ken Burns motion (disabled under prefers-reduced-motion). */}
         <section className="relative">
           {heroPhoto ? (
-            <div className="relative h-[35vh] min-h-[280px] max-h-[500px] w-full sm:h-[50vh]">
-              <Image
-                src={heroPhoto.url}
-                alt={heroAlt}
-                fill
-                priority
-                sizes="100vw"
-                className="object-cover"
-                style={{ objectPosition: `center ${heroCropY}%` }}
+            <div className="relative h-[65vh] min-h-[500px] max-h-[720px] w-full overflow-hidden sm:h-[70vh] sm:min-h-[560px] sm:max-h-[800px]">
+              <HeroMedia
+                videoUrl={memorial.compilation_url}
+                posterUrl={heroPhoto.url}
+                posterAlt={heroAlt}
+                cropY={heroCropY}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-              <div className="absolute inset-x-0 bottom-0 p-6 text-white sm:p-10">
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/25 to-transparent" />
+              <div className="absolute inset-x-0 bottom-0 p-6 text-white sm:p-10 md:p-14">
                 <h1 className="font-serif text-4xl font-medium tracking-tight sm:text-5xl">
                   {memorial.pet_name}
                 </h1>
@@ -306,15 +305,21 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
                   </p>
                 )}
               </div>
-              {/* Candle overlay on hero photo (visitors only) */}
+              {/* Candle (visitors only, bottom-right) */}
               {!isOwner && (
-                <div className="absolute bottom-4 right-4 z-10 print:hidden sm:bottom-6 sm:right-6">
+                <div
+                  className="absolute right-4 z-10 print:hidden sm:right-6"
+                  style={{ bottom: "max(1rem, env(safe-area-inset-bottom))" }}
+                >
                   <LightCandle variant="hero" />
                 </div>
               )}
-              {/* Owner actions ellipsis (owners only) */}
+              {/* Owner actions ellipsis (owners only, top-right) */}
               {isOwner && (
-                <div className="absolute top-4 right-4 z-20 print:hidden sm:top-6 sm:right-6">
+                <div
+                  className="absolute right-4 z-20 print:hidden sm:right-6"
+                  style={{ top: "max(1rem, env(safe-area-inset-top))" }}
+                >
                   <OwnerActionsMenu
                     editUrl={`/create?edit=${memorial.id}`}
                     petName={memorial.pet_name}
@@ -325,7 +330,7 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
               )}
             </div>
           ) : (
-            <div className="relative flex h-[35vh] min-h-[280px] w-full flex-col items-center justify-center bg-gradient-to-b from-amber-100 to-amber-50 dark:from-gray-900 dark:to-gray-950">
+            <div className="relative flex h-[65vh] min-h-[500px] w-full flex-col items-center justify-center bg-gradient-to-b from-amber-100 to-amber-50 dark:from-gray-900 dark:to-gray-950 sm:h-[70vh] sm:min-h-[560px]">
               <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-amber-200/60 dark:bg-amber-900/30">
                 <PawPrint className="h-10 w-10 text-amber-600 dark:text-amber-400" />
               </div>
@@ -341,15 +346,21 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
                       : `Born ${birthFormatted}`}
                 </p>
               )}
-              {/* Candle overlay on no-photo hero (visitors only) */}
+              {/* Candle (visitors only, bottom-right) */}
               {!isOwner && (
-                <div className="absolute bottom-4 right-4 z-10 print:hidden sm:bottom-6 sm:right-6">
+                <div
+                  className="absolute right-4 z-10 print:hidden sm:right-6"
+                  style={{ bottom: "max(1rem, env(safe-area-inset-bottom))" }}
+                >
                   <LightCandle variant="hero" />
                 </div>
               )}
               {/* Owner actions ellipsis (owners only) — light background variant */}
               {isOwner && (
-                <div className="absolute top-4 right-4 z-20 print:hidden sm:top-6 sm:right-6">
+                <div
+                  className="absolute right-4 z-20 print:hidden sm:right-6"
+                  style={{ top: "max(1rem, env(safe-area-inset-top))" }}
+                >
                   <OwnerActionsMenu
                     editUrl={`/create?edit=${memorial.id}`}
                     petName={memorial.pet_name}
@@ -363,12 +374,11 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
           )}
         </section>
 
-        {/* Wall + Tribute (unified lightbox). Wall renders first: sensory content before narrative. */}
+        {/* Wall + Tribute (unified lightbox). Wall renders first: sensory content before narrative.
+            The video compilation has been hoisted into HeroMedia above; don't pass it here. */}
         <MemorialPhotos
           masonryPhotos={masonryPhotos}
           memories={memorial.memories}
-          videoUrl={memorial.compilation_url ?? undefined}
-          videoPosterUrl={heroPhoto?.url}
           petName={memorial.pet_name}
           tribute={memorial.tribute}
           isOwner={isOwner}

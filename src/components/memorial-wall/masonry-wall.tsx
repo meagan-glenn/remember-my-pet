@@ -17,8 +17,6 @@ interface MasonryWallProps {
     photo_urls?: string[] | null;
     created_at?: string;
   }[];
-  videoUrl?: string;
-  videoPosterUrl?: string;
   petName: string;
   onPhotoClick?: (index: number) => void;
   photoIndexOffset?: number;
@@ -100,13 +98,12 @@ function WallCardRenderer({
 export function MasonryWall({
   photos,
   memories,
-  videoUrl,
-  videoPosterUrl,
   petName,
   onPhotoClick,
   photoIndexOffset = 0,
 }: MasonryWallProps) {
-  const cards = interleaveWallContent({ photos, memories, videoUrl, videoPosterUrl });
+  // Video compilation is now hoisted into HeroMedia; the wall never renders video.
+  const cards = interleaveWallContent({ photos, memories });
 
   if (cards.length === 0) return null;
 

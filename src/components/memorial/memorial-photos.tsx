@@ -22,8 +22,6 @@ interface MemoryRow {
 interface MemorialPhotosProps {
   masonryPhotos: Photo[];
   memories: MemoryRow[];
-  videoUrl?: string;
-  videoPosterUrl?: string;
   petName: string;
   tribute: string | null;
   isOwner: boolean;
@@ -33,8 +31,6 @@ interface MemorialPhotosProps {
 export function MemorialPhotos({
   masonryPhotos,
   memories,
-  videoUrl,
-  videoPosterUrl,
   petName,
   tribute,
   isOwner,
@@ -53,7 +49,7 @@ export function MemorialPhotos({
     setLightboxOpen(true);
   }
 
-  const hasMasonryContent = masonryPhotos.length > 0 || memories.length > 0 || !!videoUrl;
+  const hasMasonryContent = masonryPhotos.length > 0 || memories.length > 0;
 
   return (
     <>
@@ -63,8 +59,6 @@ export function MemorialPhotos({
           <MasonryWall
             photos={masonryPhotos}
             memories={memories}
-            videoUrl={videoUrl}
-            videoPosterUrl={videoPosterUrl}
             petName={petName}
             onPhotoClick={handlePhotoClick}
             photoIndexOffset={0}
