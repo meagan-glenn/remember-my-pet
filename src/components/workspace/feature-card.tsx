@@ -13,6 +13,7 @@ interface FeatureCardProps {
   href: string;
   icon: ReactNode;
   step?: number;
+  highlighted?: boolean;
 }
 
 const statusColors: Record<StatusType, string> = {
@@ -22,7 +23,7 @@ const statusColors: Record<StatusType, string> = {
   "disabled": "text-gray-400 bg-gray-100 dark:text-gray-500 dark:bg-gray-800",
 };
 
-export function FeatureCard({ title, description, status, statusType, href, icon, step }: FeatureCardProps) {
+export function FeatureCard({ title, description, status, statusType, href, icon, step, highlighted }: FeatureCardProps) {
   const isDisabled = statusType === "disabled";
 
   const content = (
@@ -30,7 +31,9 @@ export function FeatureCard({ title, description, status, statusType, href, icon
       className={`rounded-2xl border p-5 transition-all ${
         isDisabled
           ? "border-gray-100 bg-gray-50 opacity-60 cursor-default dark:border-gray-800 dark:bg-gray-900/50"
-          : "border-gray-200 bg-white hover:border-amber-300 hover:shadow-md cursor-pointer dark:border-amber-900/30 dark:bg-gray-900/40 dark:hover:border-amber-700"
+          : highlighted
+            ? "border-amber-300 bg-amber-50/50 hover:border-amber-400 hover:shadow-md cursor-pointer ring-1 ring-amber-200 dark:border-amber-700 dark:bg-amber-950/20 dark:ring-amber-800/40 dark:hover:border-amber-600"
+            : "border-gray-200 bg-white hover:border-amber-300 hover:shadow-md cursor-pointer dark:border-amber-900/30 dark:bg-gray-900/40 dark:hover:border-amber-700"
       }`}
     >
       <div className="flex items-start gap-4">

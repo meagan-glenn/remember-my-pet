@@ -111,7 +111,21 @@ export function MemorialPhotos({
             </a>
           </div>
         </section>
-      ) : null}
+      ) : (
+        /* Visitor sees an empty state encouraging memory contribution */
+        !hasMasonryContent ? (
+          <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+            <div className="rounded-2xl border border-amber-100 dark:border-amber-900/30 bg-amber-50/30 dark:bg-amber-950/20 p-8 text-center space-y-2">
+              <p className="text-gray-500 dark:text-gray-400">
+                {petName}&apos;s memorial is just getting started.
+              </p>
+              <p className="text-sm text-gray-400 dark:text-gray-500">
+                Be the first to share a memory below.
+              </p>
+            </div>
+          </section>
+        ) : null
+      )}
 
       {/* Masonry wall */}
       {hasMasonryContent && (
