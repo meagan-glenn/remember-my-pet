@@ -12,6 +12,8 @@ import {
   PawPrint,
   Camera,
   HeartHandshake,
+  Check,
+  Plus,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -538,6 +540,130 @@ export default function Home() {
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
+      </section>
+
+      {/* Pricing */}
+      <section className="px-4 py-12 sm:py-16">
+        <div className="mx-auto max-w-2xl text-center">
+          <h2 className="font-serif text-3xl font-medium text-gray-900 dark:text-amber-50 md:text-4xl">
+            One memorial. One price. Forever.
+          </h2>
+          <p className="mt-4 text-gray-500 dark:text-gray-400">
+            No subscription. No hidden fees. No renewal charges tied to your pet&apos;s memory.
+          </p>
+
+          <div className="mt-10 rounded-3xl border border-amber-200 bg-white/80 p-8 shadow-sm backdrop-blur-sm dark:border-amber-900/40 dark:bg-gray-900/60 sm:p-10">
+            <div className="flex items-baseline justify-center gap-3">
+              <span className="text-2xl text-gray-400 line-through dark:text-gray-500">$29</span>
+              <span className="font-serif text-5xl font-medium text-amber-600 dark:text-amber-400 sm:text-6xl">
+                Free
+              </span>
+            </div>
+            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+              While we&apos;re getting started
+            </p>
+
+            <ul className="mt-8 space-y-3 text-left">
+              {[
+                "Memorial page hosted forever",
+                "Unlimited photos with AI-written captions",
+                "AI-written tribute in your voice",
+                "Video reel with transitions",
+                "Memory wall for friends & family",
+                "Light a candle reactions",
+                "Shareable link + beautiful link previews",
+                "Decision support for guilt or regret",
+              ].map((feature) => (
+                <li key={feature} className="flex items-start gap-3">
+                  <Check className="mt-0.5 h-5 w-5 shrink-0 text-amber-600 dark:text-amber-400" />
+                  <span className="text-sm text-gray-700 dark:text-gray-300">{feature}</span>
+                </li>
+              ))}
+            </ul>
+
+            <Link
+              href="/create"
+              className="mt-8 inline-flex w-full items-center justify-center gap-2 rounded-full bg-amber-600 px-8 py-3 text-base font-medium text-white hover:bg-amber-700 transition-colors dark:bg-amber-500 dark:hover:bg-amber-400 dark:text-gray-900"
+            >
+              Start your memorial
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+            <p className="mt-4 text-xs text-gray-400 dark:text-gray-500">
+              Memorials created now stay free forever — even after pricing launches at $29.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="px-4 py-12 sm:py-16 bg-amber-50/40 dark:bg-gray-900/50">
+        <div className="mx-auto max-w-2xl">
+          <h2 className="text-center font-serif text-3xl font-medium text-gray-900 dark:text-amber-50 md:text-4xl">
+            Frequently asked questions
+          </h2>
+
+          <div className="mt-10 space-y-3">
+            {[
+              {
+                q: "Is it really free?",
+                a: "Yes. While we're getting started, creating a memorial is completely free. No credit card required, no trial that expires. Memorials you create now will stay free forever — even after we introduce the $29 price.",
+              },
+              {
+                q: "Is there a subscription?",
+                a: "No. When pricing launches, it will be a one-time $29 payment — never a subscription. We don't think a recurring charge belongs anywhere near your pet's memory. Pay once, it's yours.",
+              },
+              {
+                q: "How long will my memorial stay up?",
+                a: "Forever. That's the whole point. We'll host your memorial for as long as RememberMyPet exists, and if we ever had to shut down, we'd give you at least 90 days notice and a way to export everything.",
+              },
+              {
+                q: "Do I need to sign up before I start?",
+                a: "No. You can build your entire memorial — photos, tribute, video reel, everything — without creating an account. We only ask you to sign in when you're ready to save and publish it.",
+              },
+              {
+                q: "Who can see my memorial?",
+                a: "Only people you share the link with. Memorials are private by default. If you want, you can opt in to showing yours on the community feed, but that's always your choice and you can turn it off anytime.",
+              },
+              {
+                q: "Can others add photos and memories?",
+                a: "Yes. The memory wall lets friends and family share their own photos, stories, and memories. You review each one before it appears publicly, so you stay in control.",
+              },
+              {
+                q: "What about AI — is my data used to train models?",
+                a: "No. We use Claude (from Anthropic) to help you write tributes and caption photos, but none of your memorial content is used to train AI models. Your stories stay yours.",
+              },
+              {
+                q: "Can I delete my memorial?",
+                a: "Yes, any time. You can delete your memorial from your dashboard and everything — photos, memories, tribute — is permanently removed.",
+              },
+            ].map((item, i) => (
+              <details
+                key={i}
+                className="group rounded-2xl border border-amber-100 bg-white/80 p-5 open:shadow-sm dark:border-amber-900/30 dark:bg-gray-900/60"
+              >
+                <summary className="flex cursor-pointer items-center justify-between gap-4 text-left font-medium text-gray-900 dark:text-amber-50 list-none [&::-webkit-details-marker]:hidden">
+                  {item.q}
+                  <span className="shrink-0 text-amber-600 dark:text-amber-400 transition-transform group-open:rotate-45">
+                    <Plus className="h-5 w-5" />
+                  </span>
+                </summary>
+                <p className="mt-3 text-sm leading-relaxed text-gray-600 dark:text-gray-400">
+                  {item.a}
+                </p>
+              </details>
+            ))}
+          </div>
+
+          <p className="mt-8 text-center text-sm text-gray-500 dark:text-gray-400">
+            Have another question?{" "}
+            <a
+              href="mailto:team@remembermypet.ai"
+              className="text-amber-600 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-300 underline underline-offset-2"
+            >
+              Get in touch
+            </a>
+          </p>
+        </div>
       </section>
     </div>
   );

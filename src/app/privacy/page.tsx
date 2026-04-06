@@ -13,7 +13,7 @@ export default function PrivacyPage() {
           Privacy Policy
         </h1>
         <p className="mt-2 text-sm text-gray-400">
-          Last updated: February 25, 2026
+          Last updated: April 5, 2026
         </p>
 
         <div className="mt-10 space-y-8 text-base leading-relaxed text-gray-600 dark:text-gray-300">
@@ -24,12 +24,16 @@ export default function PrivacyPage() {
             <p className="mt-3">
               When you use RememberMyPet.ai, we collect information you provide
               directly: your email address (for authentication), pet details
-              (name, species, dates), photos, videos, tribute text, and memory
-              wall contributions. We also collect standard usage data such as IP
-              address, browser type, and pages visited. We also use FullStory
-              to record session replays (clicks, scrolls, and page navigation)
-              to understand how people use the site and improve the experience.
-              FullStory automatically masks sensitive input fields.
+              (name, species, dates), photos, videos, tribute text, memory wall
+              contributions, and any conversations you have with our decision
+              support feature. We also collect standard usage data such as IP
+              address (used for rate limiting to prevent abuse), browser type,
+              and pages visited. We use FullStory to record session replays
+              (clicks, scrolls, and page navigation) to understand how people
+              use the site and improve the experience. FullStory automatically
+              masks sensitive input fields. When you make a purchase, payment
+              information is collected and processed directly by Stripe — we
+              never see or store your full card details.
             </p>
           </section>
 
@@ -51,11 +55,13 @@ export default function PrivacyPage() {
               3. AI Processing
             </h2>
             <p className="mt-3">
-              We use AI services (Anthropic Claude for tribute generation,
-              Google Gemini for photo analysis) to create personalized content.
-              Your pet&apos;s details and memories are sent to these services
-              solely to generate your tribute and captions. We do not use your
-              content to train AI models.
+              We use Anthropic&apos;s Claude models to generate tributes, write
+              photo captions, analyze photos for visual tags, and power the
+              decision support conversations. Your pet&apos;s details, photos,
+              and any text you share with the AI are sent to Anthropic solely
+              to generate your content. Anthropic does not use data sent via
+              their API to train their models, and we do not sell or share
+              your content with any third party for training purposes.
             </p>
           </section>
 
@@ -77,11 +83,13 @@ export default function PrivacyPage() {
             </h2>
             <p className="mt-3">
               We do not sell your personal information. We share data only with
-              service providers necessary to operate the platform (Supabase,
-              Vercel, Anthropic, Google, Resend for email, FullStory
-              for analytics). Published
-              memorials are publicly accessible via their unique URL — you
-              control when and if a memorial is published.
+              service providers necessary to operate the platform: Supabase
+              (database and file storage), Vercel (hosting), Anthropic (AI for
+              tributes, captions, and decision support), Resend (transactional
+              email), Stripe (payment processing, when paid plans are enabled),
+              and FullStory (session replay analytics). Published memorials are
+              publicly accessible via their unique URL — you control when and
+              if a memorial is published.
             </p>
           </section>
 
@@ -90,9 +98,11 @@ export default function PrivacyPage() {
               6. Your Rights
             </h2>
             <p className="mt-3">
-              You can access, update, or delete your memorial and account data
-              at any time from your dashboard. To request full data deletion,
-              contact us at{" "}
+              You can access, update, or delete any memorial from your
+              dashboard at any time. Deleting a memorial permanently removes
+              its photos, memories, candles, and all associated content. To
+              request full account deletion or a copy of your data, contact us
+              at{" "}
               <a
                 href="mailto:team@remembermypet.ai"
                 className="text-amber-600 hover:underline dark:text-amber-400"
