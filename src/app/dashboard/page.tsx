@@ -17,6 +17,7 @@ import { DashboardTabs } from "./dashboard-tabs";
 import { FeedToggle } from "@/components/dashboard/feed-toggle";
 import { ShareLink } from "@/components/dashboard/share-link";
 import { ShareCard } from "@/components/dashboard/share-card";
+import { DeleteMemorialButton } from "@/components/dashboard/delete-memorial-button";
 
 export default async function Dashboard() {
   const supabase = await createServerSupabase();
@@ -232,6 +233,7 @@ export default async function Dashboard() {
                       {memorial.is_published && (
                         <ShareLink url={memorialUrl} />
                       )}
+                      <DeleteMemorialButton memorialId={memorial.id} petName={memorial.pet_name} />
 
                       <div className="flex-1" />
 

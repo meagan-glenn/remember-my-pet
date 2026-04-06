@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { FeedCard } from "./feed-card";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { motion } from "framer-motion";
 
 interface FeedItem {
@@ -55,8 +56,8 @@ export function ActivityFeed() {
 
   if (loading) {
     return (
-      <section className="px-4 py-8 sm:py-12">
-        <div className="mx-auto max-w-4xl">
+      <section className="px-4 pt-6 pb-12 sm:pt-8 sm:pb-16">
+        <div className="mx-auto max-w-5xl">
           <h2 className="text-center font-serif text-3xl font-medium text-gray-900 md:text-4xl dark:text-amber-50">
             Recently remembered
           </h2>
@@ -67,13 +68,13 @@ export function ActivityFeed() {
             {[...Array(3)].map((_, i) => (
               <div
                 key={i}
-                className="flex rounded-2xl border border-amber-100 bg-white/80 overflow-hidden animate-pulse dark:border-amber-900/30 dark:bg-gray-900/40"
+                className="flex rounded-2xl border border-amber-100 bg-white/80 overflow-hidden dark:border-amber-900/30 dark:bg-gray-900/40"
               >
-                <div className="w-28 sm:w-36 shrink-0 bg-gray-200 dark:bg-gray-700" />
+                <Skeleton className="w-28 sm:w-36 shrink-0 rounded-none" />
                 <div className="flex-1 p-4 space-y-2">
-                  <div className="h-5 w-24 bg-gray-200 rounded dark:bg-gray-700" />
-                  <div className="h-4 w-full bg-gray-100 rounded dark:bg-gray-800" />
-                  <div className="h-4 w-2/3 bg-gray-100 rounded dark:bg-gray-800" />
+                  <Skeleton className="h-5 w-24" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-2/3" />
                 </div>
               </div>
             ))}
@@ -84,8 +85,8 @@ export function ActivityFeed() {
   }
 
   return (
-    <section className="px-4 py-8 sm:py-12">
-      <div className="mx-auto max-w-4xl">
+    <section className="px-4 pt-6 pb-12 sm:pt-8 sm:pb-16">
+      <div className="mx-auto max-w-5xl">
         <h2 className="text-center font-serif text-3xl font-medium text-gray-900 md:text-4xl dark:text-amber-50">
           Recently remembered
         </h2>

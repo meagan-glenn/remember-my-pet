@@ -347,7 +347,9 @@ function Dashboard() {
               : <>You&apos;ve started {petDetails.petName}&apos;s memorial</>}
           </h1>
           <p className="text-gray-500 dark:text-gray-400">
-            Take it one step at a time.
+            {cameFromSeed
+              ? <>We saved your conversation about {petDetails.petName}. Take it one step at a time.</>
+              : "Take it one step at a time."}
           </p>
           {lastSaved !== null && (
             <div className={`flex items-center justify-center gap-1.5 text-xs transition-opacity duration-700 ${
@@ -377,6 +379,15 @@ function Dashboard() {
           />
         )}
 
+        {/* First-time guidance */}
+        {photoCount === 0 && tributeNotStarted && supportContext.length === 0 && videos.length === 0 && (
+          <div className="rounded-xl border border-amber-100 bg-amber-50/40 dark:border-amber-900/30 dark:bg-amber-950/20 p-4 text-center">
+            <p className="text-sm text-gray-600 dark:text-gray-300">
+              Most people start with <strong>photos</strong>, but there&apos;s no wrong place to begin.
+            </p>
+          </div>
+        )}
+
         {/* Steps */}
         <div className="flex flex-col gap-4">
           <FeatureCard
@@ -387,6 +398,7 @@ function Dashboard() {
             statusType={photoStatusType}
             href="/create/photos"
             icon={<Camera className="h-6 w-6" />}
+            highlighted={photoCount === 0 && tributeNotStarted && supportContext.length === 0}
           />
           <FeatureCard
             step={2}

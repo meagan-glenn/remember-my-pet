@@ -51,9 +51,12 @@ function SortablePhoto({ photo }: { photo: WizardPhoto }) {
           type="button"
           {...attributes}
           {...listeners}
-          className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-colors cursor-grab active:cursor-grabbing"
+          className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-colors cursor-grab active:cursor-grabbing touch-none"
         >
-          <GripVertical className="h-5 w-5 text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-lg" />
+          {/* Always-visible handle on mobile, hover-only on desktop */}
+          <div className="flex items-center justify-center rounded-full bg-black/40 p-1.5 opacity-60 sm:opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm">
+            <GripVertical className="h-5 w-5 text-white drop-shadow-lg" />
+          </div>
         </button>
       </div>
       {photo.caption && (
@@ -385,8 +388,25 @@ export function StepPreview({
               </div>
             </SortableContext>
           </DndContext>
-          <p className="mt-2 text-center text-xs text-gray-400 dark:text-gray-500">drag to reorder</p>
+          <p className="mt-2 text-center text-xs text-gray-400 dark:text-gray-500">
+            <span className="hidden sm:inline">Drag to reorder</span>
+            <span className="sm:hidden">Hold and drag to reorder</span>
+          </p>
         </section>
+      )}
+
+      {/* Gentle nudge if memorial is sparse */}
+      {!tribute && photos.length === 0 && !heroPhoto && (
+        <div className="mx-auto max-w-md px-4 pt-6 sm:px-6">
+          <div className="rounded-xl border border-amber-200 bg-amber-50/50 dark:border-amber-900/30 dark:bg-amber-950/20 p-4 text-center space-y-1">
+            <p className="text-sm font-medium text-amber-700 dark:text-amber-300">
+              Your memorial doesn&apos;t have photos or a tribute yet
+            </p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              You can still publish, but adding photos or a tribute will make it more meaningful for visitors.
+            </p>
+          </div>
+        </div>
       )}
 
       {/* Actions */}

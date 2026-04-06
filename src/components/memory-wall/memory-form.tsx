@@ -32,6 +32,7 @@ export function MemoryForm({ memorialId, petName, onSubmitted }: MemoryFormProps
   const [photos, setPhotos] = useState<{ file: File; preview: string; url?: string }[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const words = content.trim() ? wordCount(content) : 0;
@@ -94,10 +95,12 @@ export function MemoryForm({ memorialId, petName, onSubmitted }: MemoryFormProps
     try {
       // Upload photos first
       const photoUrls: string[] = [];
-      for (const photo of photos) {
-        const url = await uploadPhoto(photo.file);
+      for (let i = 0; i < photos.length; i++) {
+        setUploadProgress(`Uploading photo ${i + 1} of ${photos.length}...`);
+        const url = await uploadPhoto(photos[i].file);
         photoUrls.push(url);
       }
+      if (photos.length > 0) setUploadProgress("Submitting memory...");
 
       const res = await fetch("/api/memories", {
         method: "POST",
@@ -264,7 +267,7 @@ export function MemoryForm({ memorialId, petName, onSubmitted }: MemoryFormProps
             {submitting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Submitting…
+                {uploadProgress || "Submitting\u2026"}
               </>
             ) : (
               "Share Memory"

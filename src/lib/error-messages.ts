@@ -76,6 +76,12 @@ export const ERROR_MESSAGES: Record<string, ErrorMessage> = {
     message: "We couldn't find this memorial. It may have been removed.",
     recoverable: false,
   },
+  MEMORIAL_DELETE_FAILED: {
+    title: "Couldn't delete memorial",
+    message: "Couldn't delete this memorial right now. Please try again.",
+    action: "Try again",
+    recoverable: true,
+  },
 
   // AI / Tribute
   TRIBUTE_GENERATION_FAILED: {

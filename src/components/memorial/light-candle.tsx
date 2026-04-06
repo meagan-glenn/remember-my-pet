@@ -1,7 +1,7 @@
 "use client";
 
 import { Flame } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { useCandleState } from "./candle-provider";
 
 interface LightCandleProps {
@@ -9,7 +9,18 @@ interface LightCandleProps {
   variant?: "inline" | "section" | "hero";
 }
 
+/**
+ * Shared flame icon for inline + section variants. Hero variant has its own
+ * CSS-keyframe-driven flame (see below) so the flicker can be decoupled from
+ * the AnimatePresence swap.
+ *
+ * When prefers-reduced-motion is enabled, the infinite scale/rotate pulse is
+ * omitted — the colored flame stays put, but the fade-in/out between lit and
+ * unlit states is preserved (that swap is a discrete state change, not
+ * ambient motion, and is safe under reduced-motion guidelines).
+ */
 function FlameIcon({ lit, size }: { lit: boolean; size: "sm" | "lg" }) {
+  const reduce = useReducedMotion();
   const cls = size === "lg" ? "h-6 w-6" : "h-4 w-4";
 
   return (
@@ -22,12 +33,16 @@ function FlameIcon({ lit, size }: { lit: boolean; size: "sm" | "lg" }) {
           exit={{ scale: 0.8, opacity: 0 }}
           transition={{ duration: 0.2 }}
         >
-          <motion.div
-            animate={{ scale: [1, 1.1, 1], rotate: [0, -3, 3, 0] }}
-            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-          >
+          {reduce ? (
             <Flame className={`${cls} fill-amber-400 text-amber-500`} />
-          </motion.div>
+          ) : (
+            <motion.div
+              animate={{ scale: [1, 1.1, 1], rotate: [0, -3, 3, 0] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            >
+              <Flame className={`${cls} fill-amber-400 text-amber-500`} />
+            </motion.div>
+          )}
         </motion.div>
       ) : (
         <motion.div
@@ -50,23 +65,56 @@ export function LightCandle({ petName, variant = "inline" }: LightCandleProps) {
   if (variant === "hero") {
     if (loading) {
       return (
-        <div className="flex items-center gap-1.5 text-sm text-white/60">
-          <Flame className="h-4 w-4" />
+        <div className="flex flex-col items-center gap-1 text-white/60">
+          <Flame className="h-7 w-7" />
         </div>
       );
     }
 
+    const heroLabel = petName
+      ? userLit
+        ? `Unlight your candle for ${petName}`
+        : `Light a candle for ${petName}`
+      : userLit
+        ? "Unlight your candle"
+        : "Light a candle";
+
+    const countLabel =
+      count > 0 ? `${count} candle${count === 1 ? "" : "s"} lit` : "Light a candle";
+
     return (
       <button
         onClick={toggle}
-        className="flex items-center gap-1.5 rounded-full bg-black/30 px-3 py-1.5 text-sm backdrop-blur-sm transition-colors hover:bg-black/50 active:scale-95"
-        aria-label={userLit ? "Unlight your candle" : "Light a candle"}
+        aria-label={heroLabel}
+        className="group flex flex-col items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent active:scale-95"
       >
-        <FlameIcon lit={userLit} size="sm" />
-        <span className={userLit ? "text-amber-300" : "text-white/70"}>
-          {count > 0
-            ? `${count} candle${count === 1 ? "" : "s"} lit`
-            : "Light a candle"}
+        <span className="relative flex h-10 w-10 items-center justify-center">
+          {/* Ambient glow halo — behind the flame. Opacity drives visibility;
+              the pulse is purely motion-safe, so reduced-motion users see a
+              steady halo on the lit state. */}
+          <span
+            aria-hidden="true"
+            className={`pointer-events-none absolute inset-0 rounded-full bg-amber-400/50 blur-xl transition-opacity duration-500 ${
+              userLit
+                ? "opacity-90 motion-safe:animate-[candle-glow_3s_ease-in-out_infinite]"
+                : "opacity-0 group-hover:opacity-30"
+            }`}
+          />
+          {/* Flame itself — CSS flicker when lit, dim when unlit. */}
+          <Flame
+            className={`relative h-7 w-7 transition-colors duration-300 ${
+              userLit
+                ? "fill-amber-300 text-amber-400 motion-safe:animate-[candle-flicker_2.4s_ease-in-out_infinite]"
+                : "fill-transparent text-white/50 group-hover:text-white/80"
+            }`}
+          />
+        </span>
+        <span
+          className={`text-[11px] font-light tracking-wide transition-colors ${
+            userLit ? "text-amber-200" : "text-white/70 group-hover:text-white/90"
+          }`}
+        >
+          {countLabel}
         </span>
       </button>
     );

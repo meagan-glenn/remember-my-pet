@@ -9,10 +9,18 @@ import { toast } from "sonner";
 interface InviteDialogProps {
   petName: string;
   memorialUrl: string;
+  /**
+   * Optional controlled mode. When `open` is provided, the dialog is
+   * controlled by the parent and the default `DialogTrigger` button is
+   * not rendered. Used by OwnerActionsMenu to open from a dropdown item.
+   */
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
-export function InviteDialog({ petName, memorialUrl }: InviteDialogProps) {
+export function InviteDialog({ petName, memorialUrl, open, onOpenChange }: InviteDialogProps) {
   const [copied, setCopied] = useState(false);
+  const isControlled = open !== undefined;
 
   const message = `I created a memorial for ${petName}. If you have a favorite memory or photo, I'd love for you to share it.\n\n${memorialUrl}`;
 
@@ -38,17 +46,19 @@ export function InviteDialog({ petName, memorialUrl }: InviteDialogProps) {
   const hasNativeShare = typeof navigator !== "undefined" && !!navigator.share;
 
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button
-          variant="outline"
-          size="sm"
-          className="rounded-full border-amber-200 dark:border-amber-800/30 text-sm hover:bg-amber-50 dark:hover:bg-amber-900/20 dark:text-amber-200"
-        >
-          <Users className="mr-1.5 h-3.5 w-3.5" />
-          Invite others to share
-        </Button>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      {!isControlled && (
+        <DialogTrigger asChild>
+          <Button
+            variant="outline"
+            size="sm"
+            className="rounded-full border-amber-200 dark:border-amber-800/30 text-sm hover:bg-amber-50 dark:hover:bg-amber-900/20 dark:text-amber-200"
+          >
+            <Users className="mr-1.5 h-3.5 w-3.5" />
+            Invite others to share
+          </Button>
+        </DialogTrigger>
+      )}
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="font-serif text-lg">

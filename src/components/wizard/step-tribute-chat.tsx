@@ -248,6 +248,22 @@ export function StepTributeChat({
             </div>
           )}
 
+          {/* Support nudge when guilt/regret detected */}
+          {supportContext.length > 0 && (
+            <div className="rounded-lg border border-amber-200 bg-amber-50/50 px-4 py-3 text-sm dark:border-amber-900/30 dark:bg-amber-950/20">
+              <p className="text-gray-600 dark:text-gray-300">
+                It sounds like you&apos;re carrying something heavy.{" "}
+                <a
+                  href="/create/support"
+                  className="text-amber-600 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-300 underline underline-offset-2"
+                >
+                  Talk it through
+                </a>{" "}
+                in a safe space — your conversation here will be waiting.
+              </p>
+            </div>
+          )}
+
           {/* Chat messages */}
           <div className="space-y-4 max-h-[400px] overflow-y-auto px-1">
             {chatMessages.map((msg, i) => (
@@ -352,14 +368,26 @@ export function StepTributeChat({
                   Send
                 </Button>
               </div>
-              <button
-                type="button"
-                onClick={handleSkip}
-                disabled={isTyping || chatLoading}
-                className="text-sm text-gray-400 hover:text-gray-500 dark:text-gray-500 dark:hover:text-gray-400 disabled:opacity-50"
-              >
-                Skip this question
-              </button>
+              <div className="flex items-center justify-between">
+                <button
+                  type="button"
+                  onClick={handleSkip}
+                  disabled={isTyping || chatLoading}
+                  className="text-sm text-gray-400 hover:text-gray-500 dark:text-gray-500 dark:hover:text-gray-400 disabled:opacity-50"
+                >
+                  Skip this question
+                </button>
+                {chatMessages.filter((m) => m.role === "user" && m.content !== "(skipped)").length >= 2 && (
+                  <button
+                    type="button"
+                    onClick={() => handleGenerateTribute()}
+                    disabled={generating || isTyping || chatLoading}
+                    className="text-sm text-amber-600 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-300 disabled:opacity-50"
+                  >
+                    {generating ? "Writing..." : "I\u2019ve shared enough \u2014 write it"}
+                  </button>
+                )}
+              </div>
               {showSkipNote && (
                 <p className="text-xs text-gray-400 dark:text-gray-500 text-center mt-1">
                   The more you share, the more personal your tribute will be — but skip anything that&apos;s too much right now.

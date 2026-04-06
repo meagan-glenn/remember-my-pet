@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { MasonryWall } from "@/components/memorial-wall/masonry-wall";
 import { PhotoLightbox } from "./photo-lightbox";
 
@@ -21,24 +20,21 @@ interface MemoryRow {
 }
 
 interface MemorialPhotosProps {
-  sidePhotos: Photo[];
   masonryPhotos: Photo[];
   memories: MemoryRow[];
-  videoUrl?: string;
-  videoPosterUrl?: string;
   petName: string;
+  /** Object pronoun (him / her / them) for the visitor empty state. */
+  objectPronoun: string;
   tribute: string | null;
   isOwner: boolean;
   editUrl: string;
 }
 
 export function MemorialPhotos({
-  sidePhotos,
   masonryPhotos,
   memories,
-  videoUrl,
-  videoPosterUrl,
   petName,
+  objectPronoun,
   tribute,
   isOwner,
   editUrl,
@@ -46,8 +42,7 @@ export function MemorialPhotos({
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
 
-  // All photos in unified order: side photos first, then masonry photos
-  const allPhotos = [...sidePhotos, ...masonryPhotos].map((p) => ({
+  const allPhotos = masonryPhotos.map((p) => ({
     url: p.url,
     caption: p.caption,
   }));
@@ -57,75 +52,72 @@ export function MemorialPhotos({
     setLightboxOpen(true);
   }
 
-  const hasMasonryContent = masonryPhotos.length > 0 || memories.length > 0 || !!videoUrl;
+  const hasMasonryContent = masonryPhotos.length > 0 || memories.length > 0;
 
   return (
     <>
-      {/* Tribute + Side Photos */}
+      {/* Masonry wall (above tribute — sensory content first).
+          Wider than the tribute (max-w-7xl vs max-w-2xl) so three columns
+          of photos can breathe on desktop without the narrative prose
+          below becoming an unreadable measure. */}
+      {hasMasonryContent && (
+        <section className="mx-auto max-w-7xl px-4 pt-6 pb-6 sm:px-6 sm:pt-10 sm:pb-10">
+          <MasonryWall
+            photos={masonryPhotos}
+            memories={memories}
+            petName={petName}
+            onPhotoClick={handlePhotoClick}
+            photoIndexOffset={0}
+          />
+        </section>
+      )}
+
+      {/* Tribute as editorial prose */}
       {tribute ? (
-        <section className="mx-auto max-w-6xl px-4 sm:px-6">
-          <div className="flex flex-col gap-3 md:flex-row md:items-stretch md:gap-4">
-            <div className="flex-1 rounded-2xl border-l-4 border-l-amber-700 dark:border-l-amber-500 border border-amber-100 dark:border-amber-900/30 bg-amber-50/50 dark:bg-amber-950/30 p-6 shadow-sm backdrop-blur-sm sm:p-8">
-              <h2 className="mb-4 font-serif text-2xl font-medium text-gray-900 dark:text-amber-50">
-                A Tribute
-              </h2>
-              <div className="whitespace-pre-line text-base leading-relaxed text-gray-700 dark:text-gray-300">
-                {tribute}
-              </div>
+        <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28">
+          <div className="mx-auto max-w-2xl">
+            <p className="mb-6 text-center text-xs uppercase tracking-[0.2em] text-amber-700/80 dark:text-amber-500/70">
+              A Tribute
+            </p>
+            <div className="font-serif text-[20px] leading-[1.75] text-gray-800 dark:text-gray-200 sm:text-[22px]">
+              {tribute.trim().split(/\n\n+/).map((para, i) => (
+                <p key={i} className="mb-5 last:mb-0 whitespace-pre-line">{para}</p>
+              ))}
             </div>
-            {sidePhotos.length > 0 && (
-              <div className="flex gap-3 md:w-80 md:shrink-0 md:flex-col">
-                {sidePhotos.map((photo, i) => (
-                  <button
-                    key={photo.id}
-                    onClick={() => handlePhotoClick(i)}
-                    className="cursor-pointer overflow-hidden rounded-2xl border border-amber-100 dark:border-amber-900/30 bg-white/80 dark:bg-gray-900/40 shadow-sm transition-opacity hover:opacity-90"
-                  >
-                    <div className="relative aspect-square">
-                      <Image
-                        src={photo.url}
-                        alt={photo.caption || petName}
-                        fill
-                        sizes="(min-width: 768px) 320px, 50vw"
-                        className="object-cover"
-                      />
-                    </div>
-                    {photo.caption && (
-                      <p className="px-3 py-2 text-left text-xs italic text-gray-500 dark:text-gray-400">{photo.caption}</p>
-                    )}
-                  </button>
-                ))}
-              </div>
-            )}
           </div>
         </section>
       ) : isOwner ? (
-        <section className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-          <div className="rounded-2xl border border-dashed border-amber-200 dark:border-amber-900/30 bg-amber-50/50 dark:bg-amber-950/30 p-6 text-center">
-            <p className="text-gray-500 dark:text-gray-400">No tribute yet.</p>
+        <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-28">
+          <div className="mx-auto max-w-2xl text-center">
+            <p className="mb-6 text-xs uppercase tracking-[0.2em] text-amber-700/60 dark:text-amber-500/50">
+              A Tribute
+            </p>
+            <p className="font-serif text-[20px] text-gray-600 dark:text-gray-300 sm:text-[22px]">
+              {petName}&apos;s tribute is still being written.
+            </p>
             <a
               href={editUrl}
-              className="mt-2 inline-block text-sm text-amber-600 dark:text-amber-400 hover:underline"
+              className="mt-3 inline-block text-sm text-amber-600 dark:text-amber-400 hover:underline"
             >
               Add a tribute
             </a>
           </div>
         </section>
-      ) : null}
-
-      {/* Masonry wall */}
-      {hasMasonryContent && (
-        <section className="mx-auto max-w-6xl px-4 pt-6 pb-6 sm:px-6 sm:pt-10 sm:pb-10">
-          <MasonryWall
-            photos={masonryPhotos}
-            memories={memories}
-            videoUrl={videoUrl}
-            videoPosterUrl={videoPosterUrl}
-            petName={petName}
-            onPhotoClick={handlePhotoClick}
-            photoIndexOffset={sidePhotos.length}
-          />
-        </section>
+      ) : (
+        /* Visitor, no tribute. Only show a framed empty state when there is
+           no wall content either — otherwise the wall carries the page. */
+        !hasMasonryContent ? (
+          <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+            <div className="mx-auto max-w-xl space-y-3 text-center">
+              <p className="font-serif text-xl text-gray-600 dark:text-gray-300">
+                A place is being made for {petName}.
+              </p>
+              <p className="text-sm text-gray-400 dark:text-gray-500">
+                If you loved {objectPronoun}, share a memory below.
+              </p>
+            </div>
+          </section>
+        ) : null
       )}
 
       {/* Unified lightbox for all photos */}

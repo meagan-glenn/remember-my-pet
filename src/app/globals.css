@@ -130,3 +130,48 @@
 body.hide-footer footer {
   display: none;
 }
+
+/* Memorial page ambient animations (phase 5+). All are motion-safe only;
+   Tailwind's motion-reduce: variants disable them automatically. */
+@keyframes ken-burns {
+  0%,
+  100% {
+    transform: scale(1) translate(0, 0);
+  }
+  50% {
+    transform: scale(1.06) translate(-0.5%, -0.5%);
+  }
+}
+
+/* Candle hero variant (phase 7). Tiny deltas — must feel ambient, not strobing. */
+@keyframes candle-flicker {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  25% {
+    opacity: 0.92;
+    transform: scale(1.02) translateY(-0.5px);
+  }
+  50% {
+    opacity: 0.98;
+    transform: scale(0.99) translateY(0);
+  }
+  75% {
+    opacity: 0.9;
+    transform: scale(1.01) translateY(-0.3px);
+  }
+}
+
+@keyframes candle-glow {
+  0%,
+  100% {
+    opacity: 0.85;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}

@@ -1,16 +1,17 @@
 import { cache } from "react";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createServerSupabase } from "@/lib/supabase-server";
 import type { Metadata } from "next";
-import Image from "next/image";
 import { PawPrint } from "lucide-react";
-import { getPronouns } from "@/lib/pronouns";
 import { ExpandableMemoryForm } from "@/components/memory-wall/expandable-memory-form";
-import { InviteDialog } from "@/components/memory-wall/invite-dialog";
 import { LightCandle } from "@/components/memorial/light-candle";
 import { CandleProvider } from "@/components/memorial/candle-provider";
 import { MemorialPhotos } from "@/components/memorial/memorial-photos";
+import { OwnerActionsMenu } from "@/components/memorial/owner-actions-menu";
+import { HeroMedia } from "@/components/memorial/hero-media";
 import { createServiceClient } from "@/lib/supabase";
+import { getPronouns, type Gender } from "@/lib/pronouns";
 
 interface MemorialPageProps {
   params: Promise<{ slug: string }>;
@@ -117,14 +118,23 @@ const getMemorial = cache(async (slug: string) => {
   return { memorial: memorialData, isOwner, creatorName: creator?.display_name ?? null };
 });
 
-function formatDate(dateStr: string | null): string | null {
-  if (!dateStr) return null;
-  const [year, month, day] = dateStr.split("-").map(Number);
-  return new Date(year, month - 1, day).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+/**
+ * Format birth/death dates as a commemorative year range for the hero.
+ *   "2012 — 2024"  (both)
+ *   "Born 2012"    (birth only)
+ *   "2024"         (death only)
+ *   null           (neither)
+ */
+function formatYearRange(
+  birth: string | null,
+  death: string | null
+): string | null {
+  const birthYear = birth ? birth.split("-")[0] : null;
+  const deathYear = death ? death.split("-")[0] : null;
+  if (birthYear && deathYear) return `${birthYear} — ${deathYear}`;
+  if (birthYear) return `Born ${birthYear}`;
+  if (deathYear) return deathYear;
+  return null;
 }
 
 function getSpeciesLabel(species?: string | null, customSpecies?: string | null): string | null {
@@ -201,13 +211,11 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
 
   const { memorial, isOwner, creatorName } = result;
   const heroPhoto = memorial.photos?.[0];
-  const galleryPhotos = memorial.photos?.slice(1) ?? [];
-  const sidePhotos = galleryPhotos.slice(0, 2);
-  const masonryPhotos = galleryPhotos.slice(2);
+  // All non-hero photos flow into the unified masonry wall (phase 4).
+  const masonryPhotos = memorial.photos?.slice(1) ?? [];
   const heroCropY = memorial.hero_photo_crop_y ?? 50;
-  const birthFormatted = formatDate(memorial.birth_date);
-  const deathFormatted = formatDate(memorial.death_date);
-  const pronouns = getPronouns(memorial.gender as "male" | "female" | "neutral" | null | undefined);
+  const yearRange = formatYearRange(memorial.birth_date, memorial.death_date);
+  const pronouns = getPronouns(memorial.gender as Gender);
 
   const siteUrl =
     process.env.NEXT_PUBLIC_SITE_URL || "https://remembermypet.ai";
@@ -281,118 +289,106 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <CandleProvider memorialId={memorial.id}>
-        {/* Hero Section */}
+        {/* Hero Section — presence-first. When a video compilation exists,
+            HeroMedia makes it the ambient hero. Otherwise a still image with
+            Ken Burns motion (disabled under prefers-reduced-motion). */}
         <section className="relative">
           {heroPhoto ? (
-            <div className="relative h-[35vh] min-h-[280px] max-h-[500px] w-full sm:h-[50vh]">
-              <Image
-                src={heroPhoto.url}
-                alt={heroAlt}
-                fill
-                priority
-                sizes="100vw"
-                className="object-cover"
-                style={{ objectPosition: `center ${heroCropY}%` }}
+            <div className="relative h-[65vh] min-h-[500px] max-h-[720px] w-full overflow-hidden sm:h-[70vh] sm:min-h-[560px] sm:max-h-[800px]">
+              <HeroMedia
+                videoUrl={memorial.compilation_url}
+                posterUrl={heroPhoto.url}
+                posterAlt={heroAlt}
+                cropY={heroCropY}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-              <div className="absolute inset-x-0 bottom-0 p-6 text-white sm:p-10">
-                <h1 className="font-serif text-4xl font-medium tracking-tight sm:text-5xl">
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/25 to-transparent" />
+              <div className="absolute inset-x-0 bottom-0 p-6 text-white sm:p-10 md:p-14">
+                <h1 className="font-serif text-5xl font-normal leading-[1.05] tracking-tight sm:text-6xl md:text-7xl">
                   {memorial.pet_name}
                 </h1>
-                {(birthFormatted || deathFormatted) && (
-                  <p className="mt-2 text-lg text-white/80">
-                    {birthFormatted && deathFormatted
-                      ? `${birthFormatted} — ${deathFormatted}`
-                      : deathFormatted
-                        ? `Passed ${deathFormatted}`
-                        : `Born ${birthFormatted}`}
+                {yearRange && (
+                  <p className="mt-3 font-serif text-base font-light tracking-[0.15em] text-white/75 sm:mt-4 sm:text-lg">
+                    {yearRange}
                   </p>
                 )}
               </div>
-              {/* Candle overlay on hero photo */}
+              {/* Candle (visitors only, bottom-right) */}
               {!isOwner && (
-                <div className="absolute bottom-4 right-4 z-10 print:hidden sm:bottom-6 sm:right-6">
-                  <LightCandle variant="hero" />
+                <div
+                  className="absolute right-4 z-10 print:hidden sm:right-6"
+                  style={{ bottom: "max(1rem, env(safe-area-inset-bottom))" }}
+                >
+                  <LightCandle variant="hero" petName={memorial.pet_name} />
+                </div>
+              )}
+              {/* Owner actions ellipsis (owners only, top-right) */}
+              {isOwner && (
+                <div
+                  className="absolute right-4 z-20 print:hidden sm:right-6"
+                  style={{ top: "max(1rem, env(safe-area-inset-top))" }}
+                >
+                  <OwnerActionsMenu
+                    editUrl={`/create?edit=${memorial.id}`}
+                    petName={memorial.pet_name}
+                    memorialUrl={memorialUrl}
+                    allowMemories={memorial.allow_memories !== false}
+                  />
                 </div>
               )}
             </div>
           ) : (
-            <div className="relative flex h-[35vh] min-h-[280px] w-full flex-col items-center justify-center bg-gradient-to-b from-amber-100 to-amber-50 dark:from-gray-900 dark:to-gray-950">
+            <div className="relative flex h-[65vh] min-h-[500px] w-full flex-col items-center justify-center bg-gradient-to-b from-amber-100 to-amber-50 dark:from-gray-900 dark:to-gray-950 sm:h-[70vh] sm:min-h-[560px]">
               <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-amber-200/60 dark:bg-amber-900/30">
                 <PawPrint className="h-10 w-10 text-amber-600 dark:text-amber-400" />
               </div>
-              <h1 className="font-serif text-4xl font-medium tracking-tight text-gray-900 dark:text-amber-50 sm:text-5xl">
+              <h1 className="font-serif text-5xl font-normal leading-[1.05] tracking-tight text-gray-900 dark:text-amber-50 sm:text-6xl md:text-7xl">
                 {memorial.pet_name}
               </h1>
-              {(birthFormatted || deathFormatted) && (
-                <p className="mt-3 text-lg text-gray-500 dark:text-gray-400">
-                  {birthFormatted && deathFormatted
-                    ? `${birthFormatted} — ${deathFormatted}`
-                    : deathFormatted
-                      ? `Passed ${deathFormatted}`
-                      : `Born ${birthFormatted}`}
+              {yearRange && (
+                <p className="mt-3 font-serif text-base font-light tracking-[0.15em] text-gray-500 dark:text-gray-400 sm:mt-4 sm:text-lg">
+                  {yearRange}
                 </p>
               )}
-              {/* Candle overlay on no-photo hero */}
+              {/* Candle (visitors only, bottom-right) */}
               {!isOwner && (
-                <div className="absolute bottom-4 right-4 z-10 print:hidden sm:bottom-6 sm:right-6">
-                  <LightCandle variant="hero" />
+                <div
+                  className="absolute right-4 z-10 print:hidden sm:right-6"
+                  style={{ bottom: "max(1rem, env(safe-area-inset-bottom))" }}
+                >
+                  <LightCandle variant="hero" petName={memorial.pet_name} />
+                </div>
+              )}
+              {/* Owner actions ellipsis (owners only) — light background variant */}
+              {isOwner && (
+                <div
+                  className="absolute right-4 z-20 print:hidden sm:right-6"
+                  style={{ top: "max(1rem, env(safe-area-inset-top))" }}
+                >
+                  <OwnerActionsMenu
+                    editUrl={`/create?edit=${memorial.id}`}
+                    petName={memorial.pet_name}
+                    memorialUrl={memorialUrl}
+                    allowMemories={memorial.allow_memories !== false}
+                    onLightBackground
+                  />
                 </div>
               )}
             </div>
           )}
         </section>
 
-        {/* Breadcrumb + Actions bar */}
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 pt-4 print:hidden sm:px-6">
-          <nav aria-label="Breadcrumb" className="text-sm text-gray-400 dark:text-gray-500">
-            <ol className="flex items-center gap-1.5">
-              <li><a href="/" className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors">Home</a></li>
-              <li aria-hidden="true" className="text-gray-300 dark:text-gray-700">/</li>
-              <li><a href="/memorials" className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors">Memorials</a></li>
-              <li aria-hidden="true" className="text-gray-300 dark:text-gray-700">/</li>
-              <li aria-current="page" className="text-gray-600 dark:text-gray-300 truncate max-w-[150px] sm:max-w-none">{memorial.pet_name}</li>
-            </ol>
-          </nav>
-          <div className="flex items-center gap-3">
-            {isOwner && (
-              <a
-                href={`/create?edit=${memorial.id}`}
-                className="text-sm text-amber-600 hover:text-amber-700 hover:underline dark:text-amber-400 dark:hover:text-amber-300"
-              >
-                Edit memorial
-              </a>
-            )}
-            {isOwner && memorial.allow_memories !== false && (
-              <InviteDialog petName={memorial.pet_name} memorialUrl={memorialUrl} />
-            )}
-          </div>
-        </div>
-
-        {/* Wall intro */}
-        <section className="mx-auto max-w-6xl px-4 pt-10 sm:px-6">
-          <p className="mb-8 text-center text-sm text-gray-400 dark:text-gray-500 italic">
-            {memorial.pet_name}&apos;s life, through the eyes of those who loved {pronouns.object}
-          </p>
-        </section>
-
-        {/* Tribute + Side Photos + Masonry Wall (unified lightbox) */}
+        {/* Wall + Tribute (unified lightbox). Wall renders first: sensory content before narrative.
+            The video compilation has been hoisted into HeroMedia above; don't pass it here. */}
         <MemorialPhotos
-          sidePhotos={sidePhotos}
           masonryPhotos={masonryPhotos}
           memories={memorial.memories}
-          videoUrl={memorial.compilation_url ?? undefined}
-          videoPosterUrl={heroPhoto?.url}
           petName={memorial.pet_name}
+          objectPronoun={pronouns.object}
           tribute={memorial.tribute}
           isOwner={isOwner}
           editUrl={`/create?edit=${memorial.id}`}
         />
 
-        {/* Candle section */}
-        <section className="mx-auto max-w-6xl px-4 pb-6 sm:px-6 sm:pb-10">
-          <LightCandle petName={memorial.pet_name} variant="section" />
-        </section>
       </CandleProvider>
 
       {/* Memory Form (for published memorials with memories enabled) */}
@@ -402,22 +398,24 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
         </section>
       )}
 
-      {/* Memorial page nav */}
-      <div className="mx-auto max-w-6xl px-4 pb-8 pt-4 text-center print:hidden sm:px-6 sm:pb-12 sm:pt-6">
+      {/* Memorial page footer — end-of-visit, not conversion.
+          The acquisition CTA lives on the directory / visitor empty state,
+          not on a live memorial. */}
+      <div className="mx-auto max-w-6xl px-4 pb-10 pt-6 text-center print:hidden sm:px-6 sm:pb-16 sm:pt-10">
         {creatorName && (
-          <>
-            <span className="text-sm text-gray-400 dark:text-gray-500">
-              Created by {creatorName}
-            </span>
-            <span className="mx-2 text-gray-300 dark:text-gray-700">&middot;</span>
-          </>
+          <p className="text-sm text-gray-400 dark:text-gray-500">
+            Created by {creatorName}
+          </p>
         )}
-        <a
-          href="/create"
-          className="text-sm text-gray-400 hover:text-amber-600 dark:text-gray-500 dark:hover:text-amber-400 transition-colors"
-        >
-          Create your own memorial
-        </a>
+        <p className="mt-2 text-xs text-gray-400 dark:text-gray-500">
+          Made with love at{" "}
+          <Link
+            href="/"
+            className="underline-offset-2 hover:text-amber-600 hover:underline dark:hover:text-amber-400"
+          >
+            RememberMyPet.ai
+          </Link>
+        </p>
       </div>
 
       {/* Print footer */}
