@@ -56,9 +56,12 @@ export function MemorialPhotos({
 
   return (
     <>
-      {/* Masonry wall (above tribute — sensory content first) */}
+      {/* Masonry wall (above tribute — sensory content first).
+          Wider than the tribute (max-w-7xl vs max-w-2xl) so three columns
+          of photos can breathe on desktop without the narrative prose
+          below becoming an unreadable measure. */}
       {hasMasonryContent && (
-        <section className="mx-auto max-w-6xl px-4 pt-6 pb-6 sm:px-6 sm:pt-10 sm:pb-10">
+        <section className="mx-auto max-w-7xl px-4 pt-6 pb-6 sm:px-6 sm:pt-10 sm:pb-10">
           <MasonryWall
             photos={masonryPhotos}
             memories={memories}
