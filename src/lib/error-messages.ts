@@ -119,22 +119,6 @@ export const ERROR_MESSAGES: Record<string, ErrorMessage> = {
     recoverable: true,
   },
 
-  // Checkout & payments
-  CHECKOUT_FAILED: {
-    title: "Payment didn't go through",
-    message: "Payment didn't go through. You haven't been charged.",
-    action: "Try again",
-    recoverable: true,
-  },
-
-  // Shop / Gelato
-  SHOP_ORDER_FAILED: {
-    title: "Couldn't place order",
-    message: "We couldn't place your order. No payment was taken.",
-    action: "Try again",
-    recoverable: true,
-  },
-
   // Video
   VIDEO_COMPILATION_FAILED: {
     title: "Video couldn't compile",

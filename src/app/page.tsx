@@ -16,7 +16,6 @@ import {
   Plus,
 } from "lucide-react";
 import Link from "next/link";
-import { LAUNCH_PRICE_DISPLAY } from "@/lib/pricing";
 import { ActivityFeed } from "@/components/feed/activity-feed";
 
 /**
@@ -543,25 +542,24 @@ export default function Home() {
             </div>
       </section>
 
-      {/* Pricing */}
+      {/* Free forever */}
       <section className="border-t border-amber-200/50 px-4 py-12 sm:py-16 dark:border-amber-900/30">
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="font-serif text-3xl font-medium text-gray-900 dark:text-amber-50 md:text-4xl">
-            One Time Price.
+            Free. For every pet.
           </h2>
           <p className="mt-4 text-gray-500 dark:text-gray-400">
-            No subscription or hidden fees.
+            No subscription, no hidden fees, no catch.
           </p>
 
           <div className="mt-10 rounded-3xl border border-amber-200 bg-white/80 p-8 shadow-sm backdrop-blur-sm dark:border-amber-900/40 dark:bg-gray-900/60 sm:p-10">
             <div className="flex items-baseline justify-center gap-3">
-              <span className="text-2xl text-gray-400 line-through dark:text-gray-500">{LAUNCH_PRICE_DISPLAY}</span>
               <span className="font-serif text-5xl font-medium text-amber-600 dark:text-amber-400 sm:text-6xl">
                 Free
               </span>
             </div>
             <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-              While we&apos;re getting started
+              Everything included
             </p>
 
             <ul className="mt-8 space-y-3 text-left">
@@ -590,7 +588,7 @@ export default function Home() {
               <ArrowRight className="h-4 w-4" />
             </Link>
             <p className="mt-4 text-xs text-gray-400 dark:text-gray-500">
-              Once it&apos;s yours, it stays free. Even after pricing launches.
+              Once it&apos;s yours, it&apos;s yours forever.
             </p>
           </div>
         </div>
@@ -607,7 +605,7 @@ export default function Home() {
             {[
               {
                 q: "Can I create memorials for more than one pet?",
-                a: "Yes, as many as you'd like. Each pet gets their own memorial page, their own memory wall, their own tribute. From your dashboard you can start a new one anytime. The price (currently free) is per memorial, not per account.",
+                a: "Yes, as many as you'd like. Each pet gets their own memorial page, their own memory wall, their own tribute. From your dashboard you can start a new one anytime, and every memorial is free.",
               },
               {
                 q: "How long will my memorial stay up?",
