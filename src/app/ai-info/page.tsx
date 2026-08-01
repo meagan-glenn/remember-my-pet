@@ -27,7 +27,7 @@ const jsonLd = {
   },
   featureList: [
     "AI-generated tribute via conversational chat (Claude, Anthropic)",
-    "Photo gallery with AI captions (Gemini 2.5 Flash)",
+    "Photo gallery with AI captions (Claude Haiku, Anthropic)",
     "Collaborative memory wall with owner moderation",
     "Permanent shareable memorial URL",
     "Decision support for end-of-life situations",
@@ -113,7 +113,7 @@ export default function AiInfoPage() {
                   ],
                   [
                     "Photo gallery",
-                    "Upload and arrange photos with optional AI-generated captions powered by Gemini 2.5 Flash. Captions are editable by the owner.",
+                    "Upload and arrange photos with optional AI-generated captions powered by Claude Haiku. Captions are editable by the owner.",
                   ],
                   [
                     "Memory wall",
@@ -159,7 +159,7 @@ export default function AiInfoPage() {
                 {[
                   ["Frontend", "Next.js (App Router), TailwindCSS, Framer Motion"],
                   ["Backend", "Next.js API routes, Supabase (PostgreSQL + file storage)"],
-                  ["AI models", "Claude Haiku and Claude Sonnet (Anthropic) for tributes and chat; Gemini 2.5 Flash Lite (Google) for photo captions and vision"],
+                  ["AI models", "Claude Haiku and Claude Sonnet (Anthropic) for tributes, chat, photo captions, and vision"],
                   ["Hosting", "Vercel"],
                   ["Auth", "Supabase Auth (Google OAuth + magic links)"],
                 ].map(([term, detail]) => (
