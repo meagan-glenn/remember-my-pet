@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { rateLimit } from "@/lib/rate-limit";
 import { apiError } from "@/lib/error-messages";
-import { generatePhotoMetadata } from "@/lib/gemini";
+import { generatePhotoMetadata } from "@/lib/photo-metadata";
 import { sanitizeForPrompt } from "@/lib/sanitize-prompt";
 
 // Client-side compression targets 4MB, which is ~5.5M base64 chars; anything
