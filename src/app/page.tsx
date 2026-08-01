@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -61,13 +61,14 @@ const CONVERSATION_STEPS = [
 ];
 
 function TypingIndicator() {
+  const reducedMotion = useReducedMotion();
   return (
     <div className="flex items-center gap-1 px-4 py-3">
       {[0, 1, 2].map((i) => (
         <motion.div
           key={i}
           className="h-2 w-2 rounded-full bg-amber-400"
-          animate={{ opacity: [0.3, 1, 0.3] }}
+          animate={reducedMotion ? undefined : { opacity: [0.3, 1, 0.3] }}
           transition={{ duration: 1, repeat: Infinity, delay: i * 0.2 }}
         />
       ))}

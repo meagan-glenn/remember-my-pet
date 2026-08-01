@@ -7,6 +7,14 @@
 const MAX_DIMENSION = 2048;
 const TARGET_SIZE = 4 * 1024 * 1024; // 4MB — safely under Vercel's 4.5MB limit
 
+function isHeic(file: File): boolean {
+  return (
+    file.type === "image/heic" ||
+    file.type === "image/heif" ||
+    /\.heic$|\.heif$/i.test(file.name)
+  );
+}
+
 export function compressImage(file: File): Promise<File> {
   // Skip if already small enough and is JPEG/WebP (no resize needed)
   if (file.size <= TARGET_SIZE) return Promise.resolve(file);
@@ -56,7 +64,18 @@ export function compressImage(file: File): Promise<File> {
       tryCompress();
     };
 
-    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("Image load failed")); };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      // Most browsers (all except Safari) can't decode HEIC, so large iPhone
+      // photos land here. The server accepts HEIC, so pass the original
+      // through instead of failing the whole upload — if it's over the body
+      // limit the server's 413 gives the user a clear "too large" message.
+      if (isHeic(file)) {
+        resolve(file);
+        return;
+      }
+      reject(new Error("Image load failed"));
+    };
     img.src = url;
   });
 }

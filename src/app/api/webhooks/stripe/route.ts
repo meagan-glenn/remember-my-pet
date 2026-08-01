@@ -56,7 +56,13 @@ export async function POST(request: Request) {
         .eq("is_paid", false); // idempotent
 
       if (error) {
+        // Return 5xx so Stripe retries delivery — swallowing this means a
+        // charged customer whose memorial never publishes.
         console.error("Failed to mark memorial as paid:", error.message);
+        return NextResponse.json(
+          { error: "Database update failed" },
+          { status: 500 }
+        );
       }
       break;
     }
@@ -89,6 +95,10 @@ export async function POST(request: Request) {
 
       if (error) {
         console.error("Failed to mark memorial as unpaid:", error.message);
+        return NextResponse.json(
+          { error: "Database update failed" },
+          { status: 500 }
+        );
       }
       break;
     }

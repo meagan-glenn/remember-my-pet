@@ -108,8 +108,8 @@ export function StepTributeChat({
       });
 
       if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Failed to get response");
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error?.message || "Failed to get response");
       }
 
       const { reply, readyForTribute: ready, supportEntries } = await res.json();
@@ -181,8 +181,8 @@ export function StepTributeChat({
       });
 
       if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Failed to generate tribute");
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error?.message || "Failed to generate tribute");
       }
 
       const { tribute } = await res.json();
@@ -286,15 +286,15 @@ export function StepTributeChat({
               <div className="flex justify-start">
                 <div className="rounded-2xl px-4 py-3 bg-amber-50/80 dark:bg-amber-950/30 flex items-center gap-1">
                   <span
-                    className="h-2 w-2 rounded-full bg-amber-400 animate-pulse"
+                    className="h-2 w-2 rounded-full bg-amber-400 motion-safe:animate-pulse"
                     style={{ animationDelay: "0ms" }}
                   />
                   <span
-                    className="h-2 w-2 rounded-full bg-amber-400 animate-pulse"
+                    className="h-2 w-2 rounded-full bg-amber-400 motion-safe:animate-pulse"
                     style={{ animationDelay: "200ms" }}
                   />
                   <span
-                    className="h-2 w-2 rounded-full bg-amber-400 animate-pulse"
+                    className="h-2 w-2 rounded-full bg-amber-400 motion-safe:animate-pulse"
                     style={{ animationDelay: "400ms" }}
                   />
                 </div>

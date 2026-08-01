@@ -5,6 +5,7 @@ import { apiError } from "@/lib/error-messages";
 import { validateMemoryContent, validateEmail } from "@/lib/validation";
 import { sendMemoryNotification } from "@/lib/email";
 import { getClientIp } from "@/lib/request-utils";
+import { isSupabaseStorageUrl } from "@/lib/url-validation";
 
 const MAX_NAME = 100;
 const MAX_PHOTOS = 3;
@@ -45,13 +46,12 @@ export async function POST(request: Request) {
   }
 
   // Validate photo URLs
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   if (photoUrls && Array.isArray(photoUrls)) {
     if (photoUrls.length > MAX_PHOTOS) {
       return apiError("INVALID_INPUT", 400, `Maximum ${MAX_PHOTOS} photos allowed.`);
     }
     for (const url of photoUrls) {
-      if (typeof url !== "string" || !supabaseUrl || !url.startsWith(supabaseUrl)) {
+      if (!isSupabaseStorageUrl(url)) {
         return apiError("INVALID_INPUT", 400, "Invalid photo URL.");
       }
     }

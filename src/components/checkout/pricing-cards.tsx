@@ -62,8 +62,8 @@ export function PricingCards({ memorialId, slug, onLeave }: PricingCardsProps) {
       });
 
       if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Checkout failed");
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error?.message || "Checkout failed");
       }
 
       const { url } = await res.json();
