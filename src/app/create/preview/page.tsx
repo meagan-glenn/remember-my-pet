@@ -68,20 +68,29 @@ function PreviewContent() {
   const handleSave = useCallback(async () => {
     const photos: { url: string; caption?: string; aiDetectedTags?: string[] }[] = [];
 
+    // The API replaces the full photo list on save, so photos loaded from an
+    // existing memorial (server URLs with no local File) must be re-sent or
+    // editing anything would silently delete them.
+    const isPersistedUrl = (url: string | undefined): url is string =>
+      !!url && /^https?:\/\//.test(url);
+
     try {
-      // Upload hero photo
+      // Upload hero photo, or keep the already-persisted one (sort_order 0)
       const heroFile = ctx.heroPhotoFileRef.current;
       if (heroFile) {
         const heroUrl = await uploadFile(heroFile);
         photos.push({ url: heroUrl });
+      } else if (isPersistedUrl(ctx.petDetails.heroPhoto)) {
+        photos.push({ url: ctx.petDetails.heroPhoto });
       }
 
-      // Upload gallery photos in batches of 5 to avoid rate limits
+      // Upload new gallery photos in batches of 5 to avoid rate limits;
+      // photos without a local file fall back to their stored URL.
       const galleryItems = ctx.photos
         .map((p) => {
           const file = ctx.photoFilesRef.current.get(p.id);
-          if (!file) return null;
-          return { file, caption: p.caption, aiDetectedTags: p.aiDetectedTags };
+          if (!file && !isPersistedUrl(p.url)) return null;
+          return { file, url: p.url, caption: p.caption, aiDetectedTags: p.aiDetectedTags };
         })
         .filter((p) => p !== null);
 
@@ -90,13 +99,11 @@ function PreviewContent() {
       for (let i = 0; i < galleryItems.length; i += BATCH_SIZE) {
         const batch = galleryItems.slice(i, i + BATCH_SIZE);
         const batchResults = await Promise.all(
-          batch.map((item) =>
-            uploadFile(item.file).then((url) => ({
-              url,
-              caption: item.caption || undefined,
-              aiDetectedTags: item.aiDetectedTags?.length ? item.aiDetectedTags : undefined,
-            }))
-          )
+          batch.map(async (item) => ({
+            url: item.file ? await uploadFile(item.file) : item.url,
+            caption: item.caption || undefined,
+            aiDetectedTags: item.aiDetectedTags?.length ? item.aiDetectedTags : undefined,
+          }))
         );
         galleryResults.push(...batchResults);
       }
@@ -141,6 +148,9 @@ function PreviewContent() {
     }
 
     const { memorialId, slug } = await res.json();
+    // Persist the id into wizard state so returning to /create updates this
+    // memorial instead of creating a duplicate.
+    ctx.setMemorialId(memorialId);
     setSavedMemorial({ id: memorialId, slug });
   }, [ctx, uploadFile, router, showInFeed, allowMemories]);
 

@@ -24,17 +24,14 @@ interface Photo {
   sort_order: number;
 }
 
+// Only the columns the public wall renders — contributor_email must never be
+// selected here, or it gets serialized into the RSC payload of every visitor.
 interface MemoryRow {
   id: string;
-  memorial_id: string;
   contributor_name: string;
-  contributor_email: string | null;
   content: string;
   photo_urls: string[] | null;
-  is_approved: boolean;
-  moderation_status: string;
   created_at: string;
-  approved_at: string | null;
 }
 
 interface Memorial {
@@ -95,7 +92,7 @@ const getMemorial = cache(async (slug: string) => {
       .single(),
     supabase
       .from("memories")
-      .select("*")
+      .select("id, contributor_name, content, photo_urls, created_at")
       .eq("memorial_id", memorial.id)
       .eq("is_approved", true)
       .order("created_at", { ascending: false }),
@@ -284,9 +281,15 @@ export default async function MemorialPage({ params }: MemorialPageProps) {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50/60 via-orange-50/30 to-white dark:from-gray-950 dark:via-gray-950 dark:to-gray-950 print:bg-white print:from-white print:via-white">
+      {/* Escape "<" at serialization time so no field (including photo
+          captions in heroAlt) can break out of the script tag with </script>.
+          < is valid JSON and parses back to "<", so structured data
+          still validates. */}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
+        }}
       />
       <CandleProvider memorialId={memorial.id}>
         {/* Hero Section — presence-first. When a video compilation exists,

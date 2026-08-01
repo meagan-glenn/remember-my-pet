@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase-server";
 import { rateLimit } from "@/lib/rate-limit";
 import { apiError } from "@/lib/error-messages";
+import { isSupabaseStorageUrl } from "@/lib/url-validation";
 import ffmpeg from "fluent-ffmpeg";
 import ffmpegPath from "ffmpeg-static";
 import { writeFile, unlink, mkdtemp } from "fs/promises";
@@ -204,10 +205,10 @@ export async function POST(request: Request) {
   }
 
   // Validate clip inputs
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   for (const clip of clips) {
-    // Prevent SSRF: only allow Supabase-hosted video URLs
-    if (!supabaseUrl || typeof clip.videoUrl !== "string" || !clip.videoUrl.startsWith(supabaseUrl)) {
+    // Prevent SSRF: only allow Supabase-hosted video URLs (origin comparison,
+    // not a prefix check, so lookalike hosts and userinfo tricks fail)
+    if (!isSupabaseStorageUrl(clip.videoUrl)) {
       return apiError("INVALID_INPUT", 400, "Invalid video URL.");
     }
     // Prevent command injection: enforce numeric types at runtime
@@ -251,7 +252,10 @@ export async function POST(request: Request) {
     const inputPaths: { path: string; startTime: number; endTime: number }[] = [];
     for (let i = 0; i < clips.length; i++) {
       const clip = clips[i];
-      const ext = clip.videoUrl.split(".").pop()?.split("?")[0] || "mp4";
+      // Whitelist the derived extension so odd URLs can't produce malformed
+      // filenames that make writeFile fail
+      const rawExt = clip.videoUrl.split(".").pop()?.split("?")[0] || "";
+      const ext = /^[a-z0-9]{1,4}$/i.test(rawExt) ? rawExt : "mp4";
       const filePath = join(workDir, `input_${i}.${ext}`);
       await downloadFile(clip.videoUrl, filePath);
       inputPaths.push({

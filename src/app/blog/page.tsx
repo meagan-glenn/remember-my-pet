@@ -8,6 +8,13 @@ export const metadata: Metadata = {
 
 const posts = [
   {
+    slug: "i-still-talk-to-my-dog-out-loud",
+    title: "I still talk to my dog out loud",
+    date: "April 14, 2026",
+    excerpt:
+      "She's been gone for months, but I still say good morning to her in the kitchen. I still ask the couch if she's comfortable. If you do this too, you're not broken — you're bonded, and the conversation doesn't stop the moment the other voice does.",
+  },
+  {
     slug: "i-keep-wanting-to-talk-about-my-dog",
     title: "I keep wanting to talk about my dog",
     date: "April 5, 2026",

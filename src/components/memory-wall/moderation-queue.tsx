@@ -88,8 +88,8 @@ export function ModerationQueue() {
       });
 
       if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Action failed");
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error?.message || "Action failed");
       }
 
       setMemories((prev) => prev.filter((m) => m.id !== memoryId));

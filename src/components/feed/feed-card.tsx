@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Flame } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { createBrowserSupabase } from "@/lib/supabase";
 import { toast } from "sonner";
 import Link from "next/link";
@@ -33,6 +33,7 @@ export function FeedCard({
   candleCount: initialCount,
   userLit: initialUserLit,
 }: FeedCardProps) {
+  const reducedMotion = useReducedMotion();
   const [count, setCount] = useState(initialCount);
   const [userLit, setUserLit] = useState(initialUserLit);
   const [toggling, setToggling] = useState(false);
@@ -147,11 +148,17 @@ export function FeedCard({
                 exit={{ scale: 0.8, opacity: 0 }}
                 transition={{ duration: 0.2 }}
               >
+                {/* Ambient flicker is gated on reduced motion (hard requirement);
+                    the discrete lit/unlit fade above is fine. */}
                 <motion.div
-                  animate={{
-                    scale: [1, 1.1, 1],
-                    rotate: [0, -3, 3, 0],
-                  }}
+                  animate={
+                    reducedMotion
+                      ? undefined
+                      : {
+                          scale: [1, 1.1, 1],
+                          rotate: [0, -3, 3, 0],
+                        }
+                  }
                   transition={{
                     duration: 2,
                     repeat: Infinity,

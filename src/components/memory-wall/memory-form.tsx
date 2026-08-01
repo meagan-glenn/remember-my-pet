@@ -47,7 +47,7 @@ export function MemoryForm({ memorialId, petName, onSubmitted }: MemoryFormProps
     if (!res.ok) {
       if (res.status === 413) throw new Error("This photo is too large. Please use a smaller photo.");
       const data = await res.json().catch(() => ({}));
-      throw new Error(data.error || "Upload failed");
+      throw new Error(data.error?.message || "Upload failed");
     }
     const data = await res.json();
     return data.url;
@@ -115,8 +115,8 @@ export function MemoryForm({ memorialId, petName, onSubmitted }: MemoryFormProps
       });
 
       if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Failed to submit");
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error?.message || "Failed to submit");
       }
 
       setSubmitted(true);

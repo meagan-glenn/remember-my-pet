@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase-server";
+import { createServiceClient } from "@/lib/supabase";
 import { rateLimit } from "@/lib/rate-limit";
 import { apiError } from "@/lib/error-messages";
+import { isSupabaseStorageUrl } from "@/lib/url-validation";
 
 const MAX_PET_NAME = 100;
 const MAX_TRIBUTE = 5000;
@@ -54,12 +56,11 @@ export async function POST(request: Request) {
   }
 
   // Validate photo URLs
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   if (photoItems.length > MAX_PHOTOS) {
     return apiError("INVALID_INPUT", 400, `Maximum ${MAX_PHOTOS} photos allowed.`);
   }
   for (const item of photoItems) {
-    if (typeof item.url !== "string" || !supabaseUrl || !item.url.startsWith(supabaseUrl)) {
+    if (!isSupabaseStorageUrl(item.url)) {
       return apiError("INVALID_INPUT", 400, "Invalid photo URL.");
     }
   }
@@ -123,30 +124,43 @@ export async function POST(request: Request) {
       return apiError("MEMORIAL_SAVE_FAILED", 500);
     }
 
-    // Replace photos: delete old, insert new
-    await supabase.from("photos").delete().eq("memorial_id", memorialId);
+    // Replace photos: delete old, insert new — but only when the request
+    // actually carried a photo list. A partial update that omits photos must
+    // never clear the gallery.
+    if (body.photos !== undefined || body.photoUrls !== undefined) {
+      await supabase.from("photos").delete().eq("memorial_id", memorialId);
 
-    if (photoItems.length > 0) {
-      const photosData = photoItems.slice(0, MAX_PHOTOS).map((item, index) => ({
-        memorial_id: memorialId,
-        url: item.url,
-        caption: item.caption?.slice(0, 200) || null,
-        ai_detected_tags: item.aiDetectedTags || [],
-        sort_order: index,
-        uploaded_by: user.id,
-      }));
-      await supabase.from("photos").insert(photosData);
+      if (photoItems.length > 0) {
+        const photosData = photoItems.slice(0, MAX_PHOTOS).map((item, index) => ({
+          memorial_id: memorialId,
+          url: item.url,
+          caption: item.caption?.slice(0, 200) || null,
+          ai_detected_tags: item.aiDetectedTags || [],
+          sort_order: index,
+          uploaded_by: user.id,
+        }));
+        const { error: photoError } = await supabase.from("photos").insert(photosData);
+        if (photoError) {
+          console.error("Photo re-insert error:", photoError.message);
+          return apiError("MEMORIAL_SAVE_FAILED", 500);
+        }
+      }
     }
 
     memorial = { id: existing.id, slug: existing.slug };
   } else {
     // ── Create new memorial ───────────────────────────────────────────────
+    // Slug probing must use the service client: RLS hides other users'
+    // unpublished memorials from the user-scoped client, but the unique
+    // constraint spans all rows — probing through RLS turns a collision with
+    // someone else's draft into an unexplained 500.
+    const serviceClient = createServiceClient();
     const baseSlug = generateSlug(petName, ownerLastName || "", deathDate);
     let slug = baseSlug;
     let found = false;
 
     for (let i = 2; i <= MAX_SLUG_ATTEMPTS + 1; i++) {
-      const { data } = await supabase
+      const { data } = await serviceClient
         .from("memorials")
         .select("id")
         .eq("slug", slug)
@@ -163,22 +177,32 @@ export async function POST(request: Request) {
       slug = `${baseSlug}-${crypto.randomUUID().slice(0, 6)}`;
     }
 
-    const { data: newMemorial, error: memError } = await supabase
-      .from("memorials")
-      .insert({
-        user_id: user.id,
-        ...memorialFields,
-        slug,
-        is_paid: !!publish,
-        is_published: !!publish,
-        show_in_feed: !!publish && !!showInFeed,
-        allow_memories: allowMemories !== false,
-      })
-      .select()
-      .single();
+    const insertMemorial = (slugToUse: string) =>
+      supabase
+        .from("memorials")
+        .insert({
+          user_id: user.id,
+          ...memorialFields,
+          slug: slugToUse,
+          is_paid: !!publish,
+          is_published: !!publish,
+          show_in_feed: !!publish && !!showInFeed,
+          allow_memories: allowMemories !== false,
+        })
+        .select()
+        .single();
 
-    if (memError) {
-      console.error("Memorial creation error:", memError.message);
+    let { data: newMemorial, error: memError } = await insertMemorial(slug);
+
+    // 23505 = unique_violation: someone claimed the slug between the probe and
+    // the insert. Retry once with a random suffix, which closes the TOCTOU window.
+    if (memError?.code === "23505") {
+      slug = `${baseSlug}-${crypto.randomUUID().slice(0, 6)}`;
+      ({ data: newMemorial, error: memError } = await insertMemorial(slug));
+    }
+
+    if (memError || !newMemorial) {
+      console.error("Memorial creation error:", memError?.message);
       return apiError("MEMORIAL_SAVE_FAILED", 500);
     }
 
@@ -191,7 +215,11 @@ export async function POST(request: Request) {
         sort_order: index,
         uploaded_by: user.id,
       }));
-      await supabase.from("photos").insert(photosData);
+      const { error: photoError } = await supabase.from("photos").insert(photosData);
+      if (photoError) {
+        console.error("Photo insert error:", photoError.message);
+        return apiError("MEMORIAL_SAVE_FAILED", 500);
+      }
     }
 
     memorial = { id: newMemorial.id, slug: newMemorial.slug };

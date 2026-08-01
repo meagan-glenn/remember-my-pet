@@ -10,7 +10,10 @@ export async function GET(request: Request) {
   // Service role needed: public feed reads across all published memorials
   const serviceClient = createServiceClient();
 
-  // Fetch published memorials opted into feed, with photos
+  // Fetch published memorials opted into feed, with photos. The inner join
+  // excludes photoless memorials in SQL, so .range() and hasMore operate on
+  // the same set the client sees — filtering after .range() made pages
+  // overlap and stranded rows.
   const { data: memorials, error } = await serviceClient
     .from("memorials")
     .select(`
@@ -22,7 +25,7 @@ export async function GET(request: Request) {
       tribute,
       anonymous_candle_count,
       created_at,
-      photos(url, sort_order)
+      photos!inner(url, sort_order)
     `)
     .eq("is_published", true)
     .eq("show_in_feed", true)
@@ -33,10 +36,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ items: [], hasMore: false }, { status: 500 });
   }
 
-  // Filter out memorials with no photos
-  const withPhotos = (memorials || []).filter(
-    (m) => Array.isArray(m.photos) && m.photos.length > 0
-  );
+  const withPhotos = memorials || [];
 
   const memorialIds = withPhotos.map((m) => m.id);
 

@@ -12,7 +12,7 @@ function TypingIndicator() {
       {[0, 1, 2].map((i) => (
         <div
           key={i}
-          className="h-2 w-2 rounded-full bg-amber-400 animate-pulse"
+          className="h-2 w-2 rounded-full bg-amber-400 motion-safe:animate-pulse"
           style={{ animationDelay: `${i * 200}ms` }}
         />
       ))}

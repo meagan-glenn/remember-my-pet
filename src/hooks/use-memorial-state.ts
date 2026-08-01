@@ -271,6 +271,11 @@ export function useMemorialState() {
     []
   );
 
+  const setMemorialId = useCallback(
+    (memorialId: string) => setState((prev) => ({ ...prev, memorialId })),
+    []
+  );
+
   const addPhoto = useCallback(
     (photo: WizardPhoto) => {
       if (photo.file) {
@@ -555,10 +560,11 @@ export function useMemorialState() {
       setOwnerLastName,
       setCompilationUrl,
       setIntroComplete,
+      setMemorialId,
       loadFromMemorial,
       reset,
     }),
-    [updatePetDetails, addPhoto, removePhoto, setPhotoCaption, setPhotoTags, reorderPhotos, addChatMessage, setTribute, setHeroPhotoFile, setHomepageConversation, setSupportContext, addVideo, removeVideo, reorderVideos, addClip, updateClip, removeClip, reorderClips, setOwnerLastName, setCompilationUrl, setIntroComplete, loadFromMemorial, reset]
+    [updatePetDetails, addPhoto, removePhoto, setPhotoCaption, setPhotoTags, reorderPhotos, addChatMessage, setTribute, setHeroPhotoFile, setHomepageConversation, setSupportContext, addVideo, removeVideo, reorderVideos, addClip, updateClip, removeClip, reorderClips, setOwnerLastName, setCompilationUrl, setIntroComplete, setMemorialId, loadFromMemorial, reset]
   );
 
   return useMemo(

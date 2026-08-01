@@ -232,7 +232,7 @@ export function StepPhotoUpload({
                   placeholder={captioning.has(photo.id) ? "Generating caption..." : "Add a caption..."}
                   value={photo.caption || ""}
                   onChange={(e) => onSetCaption(photo.id, e.target.value)}
-                  className={`w-full rounded-md border border-gray-200 dark:border-amber-900/30 px-2 py-1.5 text-xs text-gray-700 dark:text-gray-300 dark:bg-gray-900 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-400 dark:focus:border-amber-700/60 dark:focus:ring-amber-700/40 resize-none ${captioning.has(photo.id) ? "animate-pulse bg-amber-50 dark:bg-amber-950/30" : ""}`}
+                  className={`w-full rounded-md border border-gray-200 dark:border-amber-900/30 px-2 py-1.5 text-xs text-gray-700 dark:text-gray-300 dark:bg-gray-900 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-400 dark:focus:border-amber-700/60 dark:focus:ring-amber-700/40 resize-none ${captioning.has(photo.id) ? "motion-safe:animate-pulse bg-amber-50 dark:bg-amber-950/30" : ""}`}
                   maxLength={200}
                 />
               )}
