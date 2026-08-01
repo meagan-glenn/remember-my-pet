@@ -100,7 +100,6 @@ export async function POST(request: Request) {
 
     // Publish a draft memorial
     if (publish && !existing.is_published) {
-      updateFields.is_paid = true;
       updateFields.is_published = true;
     }
 
@@ -184,7 +183,6 @@ export async function POST(request: Request) {
           user_id: user.id,
           ...memorialFields,
           slug: slugToUse,
-          is_paid: !!publish,
           is_published: !!publish,
           show_in_feed: !!publish && !!showInFeed,
           allow_memories: allowMemories !== false,

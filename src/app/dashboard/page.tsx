@@ -31,7 +31,7 @@ export default async function Dashboard() {
 
   const { data: memorials } = await supabase
     .from("memorials")
-    .select("id, pet_name, slug, is_paid, is_published, show_in_feed, created_at, photos(url, sort_order)")
+    .select("id, pet_name, slug, is_published, show_in_feed, created_at, photos(url, sort_order)")
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
 
@@ -173,18 +173,10 @@ export default async function Dashboard() {
                             </CardTitle>
                             <Badge
                               variant={
-                                memorial.is_published
-                                  ? "default"
-                                  : memorial.is_paid
-                                    ? "default"
-                                    : "secondary"
+                                memorial.is_published ? "default" : "secondary"
                               }
                             >
-                              {memorial.is_published
-                                ? "Published"
-                                : memorial.is_paid
-                                  ? "Paid"
-                                  : "Draft"}
+                              {memorial.is_published ? "Published" : "Draft"}
                             </Badge>
                           </div>
                           <CardDescription>

@@ -18,12 +18,12 @@ const jsonLd = {
   applicationCategory: "LifestyleApplication",
   operatingSystem: "Web",
   description:
-    "AI-powered platform for creating digital pet memorials. Includes AI-generated tributes, photo galleries, and collaborative memory walls. Currently free while launching.",
+    "AI-powered platform for creating digital pet memorials. Includes AI-generated tributes, photo galleries, and collaborative memory walls. Free to use.",
   offers: {
     "@type": "Offer",
     price: "0",
     priceCurrency: "USD",
-    description: "Free during launch period. Create a full digital memorial with AI tribute, photo gallery, and memory wall.",
+    description: "Free. Create a full digital memorial with AI tribute, photo gallery, and memory wall.",
   },
   featureList: [
     "AI-generated tribute via conversational chat (Claude, Anthropic)",
@@ -70,7 +70,7 @@ export default function AiInfoPage() {
                   ["Product name", "RememberMyPet.ai"],
                   ["Website", "https://remembermypet.ai"],
                   ["Category", "Pet memorial platform / grief technology"],
-                  ["Business model", "Currently free while launching"],
+                  ["Business model", "Free"],
                   ["Primary users", "Pet owners who have lost a companion animal"],
                 ].map(([term, detail]) => (
                   <div key={term} className="flex gap-2">
@@ -95,8 +95,8 @@ export default function AiInfoPage() {
               </p>
               <p className="mt-3">
                 The platform is designed with grief sensitivity at its core — no
-                countdown timers, no pressure tactics, and no subscriptions.
-                Memorials are currently free while launching and stay online permanently.
+                countdown timers, no pressure tactics, and no payments of any
+                kind. Memorials are free and stay online permanently.
               </p>
             </section>
 

@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { LAUNCH_PRICE_DISPLAY } from "@/lib/pricing";
 
 export const metadata: Metadata = {
   title: "Terms of Service — RememberMyPet.ai",
@@ -85,17 +84,13 @@ export default function TermsPage() {
 
           <section>
             <h2 className="text-lg font-semibold text-gray-900 dark:text-amber-50">
-              6. Memorial Hosting & Pricing
+              6. Memorial Hosting
             </h2>
             <p className="mt-3">
-              While we are in our early launch period, creating a memorial is
-              free. Memorials created during this free period will remain free
-              forever — even after we introduce paid pricing for new memorials.
-              When paid pricing is introduced, it will be a one-time payment
-              (currently planned at {LAUNCH_PRICE_DISPLAY}) and never a subscription. Once
-              published, your memorial is hosted indefinitely at no additional
-              cost. You can delete any memorial at any time from your
-              dashboard.
+              Creating a memorial is free. There are no payments, subscriptions,
+              or fees of any kind. Once published, your memorial is hosted
+              indefinitely at no cost, and you can delete any memorial at any
+              time from your dashboard.
             </p>
             <p className="mt-3">
               We will make reasonable efforts to maintain uptime and data
@@ -107,31 +102,7 @@ export default function TermsPage() {
 
           <section>
             <h2 className="text-lg font-semibold text-gray-900 dark:text-amber-50">
-              7. Payments & Refunds
-            </h2>
-            <p className="mt-3">
-              When paid plans are enabled, payments are processed by Stripe.
-              We never see or store your full card details. All purchases are
-              one-time payments — there are no subscriptions or recurring
-              charges.
-            </p>
-            <p className="mt-3">
-              If you are not satisfied with your memorial, you may request a
-              full refund within 30 days of purchase by emailing us at{" "}
-              <a
-                href="mailto:team@remembermypet.ai"
-                className="text-amber-600 hover:underline dark:text-amber-400"
-              >
-                team@remembermypet.ai
-              </a>
-              . Refunds issued after deletion of a memorial cannot restore the
-              deleted content.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-amber-50">
-              8. Memory Wall Contributions
+              7. Memory Wall Contributions
             </h2>
             <p className="mt-3">
               Third-party contributions to a memorial&apos;s memory wall are
@@ -143,20 +114,18 @@ export default function TermsPage() {
 
           <section>
             <h2 className="text-lg font-semibold text-gray-900 dark:text-amber-50">
-              9. Limitation of Liability
+              8. Limitation of Liability
             </h2>
             <p className="mt-3">
               The Service is provided &quot;as is&quot; without warranties of
               any kind. We are not liable for any indirect, incidental, or
-              consequential damages arising from your use of the Service. Our
-              total liability is limited to the amount you paid for the
-              Service.
+              consequential damages arising from your use of the Service.
             </p>
           </section>
 
           <section>
             <h2 className="text-lg font-semibold text-gray-900 dark:text-amber-50">
-              10. Changes to Terms
+              9. Changes to Terms
             </h2>
             <p className="mt-3">
               We may update these terms from time to time. Continued use of the
@@ -167,7 +136,7 @@ export default function TermsPage() {
 
           <section>
             <h2 className="text-lg font-semibold text-gray-900 dark:text-amber-50">
-              11. Contact
+              10. Contact
             </h2>
             <p className="mt-3">
               Questions about these terms? Email us at{" "}

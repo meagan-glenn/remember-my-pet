@@ -31,9 +31,7 @@ export default function PrivacyPage() {
               and pages visited. We use FullStory to record session replays
               (clicks, scrolls, and page navigation) to understand how people
               use the site and improve the experience. FullStory automatically
-              masks sensitive input fields. When you make a purchase, payment
-              information is collected and processed directly by Stripe — we
-              never see or store your full card details.
+              masks sensitive input fields.
             </p>
           </section>
 
@@ -86,8 +84,7 @@ export default function PrivacyPage() {
               service providers necessary to operate the platform: Supabase
               (database and file storage), Vercel (hosting), Anthropic (AI for
               tributes, captions, and decision support), Resend (transactional
-              email), Stripe (payment processing, when paid plans are enabled),
-              and FullStory (session replay analytics). Published memorials are
+              email), and FullStory (session replay analytics). Published memorials are
               publicly accessible via their unique URL — you control when and
               if a memorial is published.
             </p>
