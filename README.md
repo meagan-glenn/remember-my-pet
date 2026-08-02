@@ -46,6 +46,24 @@ I wrote the full story here:
 Everything is free. There are no payments, subscriptions, or upsells anywhere
 in the product.
 
+## Where it could go
+
+RememberMyPet is complete and live. Memorials stay up, the site does its job,
+and it doesn't need more features to keep its promise. But if it ever gets a
+second season, these are the ideas that made the shortlist:
+
+- **Grief journaling** — a private, pet-aware journal that knows who Skylar
+  was, not a generic prompts app
+- **A mobile companion app** — daily check-ins and voice-to-text journaling,
+  with entries you can choose to add to the memorial
+- **Anniversary milestones** — a gentle note on the hard days (30 days, six
+  months, their birthday), never a notification streak
+- **Community stories** — a moderated space for people to share longer
+  pet-loss stories beyond their own memorial
+
+If one of these resonates — or the site helped you — I'd love to hear about
+it: [team@remembermypet.ai](mailto:team@remembermypet.ai).
+
 ## Design principles
 
 The product is built for people who are grieving, which drives some hard
