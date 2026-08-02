@@ -6,6 +6,22 @@ where friends and family can add their own stories.
 
 **Live site: [remembermypet.ai](https://remembermypet.ai)**
 
+## Why this exists
+
+Skylar was my dog for 13 years — through cross-country moves, hard seasons,
+and everything in between. When bone cancer took her, I went looking for a
+place to put the grief and found that nothing out there was built for this:
+journaling apps couldn't acknowledge the loss, and pet grief rarely gets the
+permission other grief does, even though it's proportional to the love.
+
+So I did what product people do — I interviewed people about pet loss,
+starting with myself, and built the thing I needed. The north star is
+"move on, but not forget": a place that holds the good memories without
+rushing anyone through the sad ones.
+
+I wrote the full story here:
+[her name was skylar](https://meaganglenn.beehiiv.com/p/her-name-was-skylar).
+
 ## What it does
 
 - **Memorial pages** — each pet gets a permanent page at
