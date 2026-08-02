@@ -65,7 +65,10 @@ export async function POST(request: Request) {
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
   const message = await anthropic.messages.create({
-    model: "claude-haiku-4-5-20251001",
+    model: "claude-sonnet-5",
+    // Sonnet 5 thinks by default and max_tokens caps thinking + text together;
+    // keep thinking off so short replies come back fast and untruncated.
+    thinking: { type: "disabled" },
     max_tokens: 300,
     system: `You are a friend sitting with someone who lost their ${safeSpecies}, ${safePetName}. They're not ready to celebrate yet — they need to get something off their chest first.
 
