@@ -62,10 +62,85 @@ models.
 | Framework | Next.js (App Router) + TypeScript |
 | UI | Tailwind CSS, shadcn/ui, Framer Motion |
 | Database, storage, auth | Supabase (PostgreSQL + RLS, Storage, Google OAuth + magic links) |
-| AI | Claude (Anthropic) for tributes, chat, photo captions, and vision tags |
+| AI | Claude (Anthropic): Sonnet 5 and Haiku 4.5, split by job (see below) |
 | Video | FFmpeg (server-side compilation) |
 | Email | Resend |
 | Hosting | Vercel |
+
+## How the AI works
+
+There are five places the product calls a model, and they don't all use the
+same one. The split is deliberate: the two calls where the *writing* is the
+product get the stronger model, and the three high-frequency, short-reply
+calls get the fast one.
+
+| Where | Model | Why this one |
+|-------|-------|--------------|
+| Tribute generation (`/api/tribute`) | Claude Sonnet 5 | One call per memorial, 250 to 400 words, and it's the thing people read on the page for years. Emotional register matters more than latency here. |
+| Decision support (`/api/tribute/support`) | Claude Sonnet 5 | Low volume, capped at 3 requests a minute, and the person on the other end is often at their lowest. Worth the better model. |
+| Tribute chat (`/api/tribute/chat`) | Claude Haiku 4.5 | The back-and-forth interview. Replies are 1 to 2 sentences plus one question, up to 20 turns, and it has to feel like a conversation, so speed wins. |
+| Homepage chat (`/api/homepage/chat`) | Claude Haiku 4.5 | A 2 to 3 exchange teaser on the landing page, 150 tokens max. Cheap and fast on purpose. |
+| Photo captions + tags (`/api/caption`) | Claude Haiku 4.5 (vision) | Runs on every upload, returns a short caption plus structured tags as JSON. Haiku handles images and this volume without making the upload step feel slow. |
+
+**How it got here.** The first tribute prompt ran on GPT-4o for about a day in
+January 2026 before moving to Claude Haiku. Photo captions launched on Gemini
+2.5 Flash Lite and moved to Haiku in February so everything sat behind one
+API key and one prompt style. Everything stayed on Haiku until August 2026,
+when I moved the tribute and decision support calls up to Sonnet 5, because
+those are the two places where a slightly better sentence is worth a slightly
+slower response. Chat, homepage, and captions stayed on Haiku.
+
+**Two small Sonnet 5 details.** Sonnet 5 uses extended thinking by default,
+and `max_tokens` covers thinking and text together, so both Sonnet routes set
+`thinking: { type: "disabled" }`. That keeps the whole budget on the words the
+person actually sees and keeps replies from coming back truncated. The tribute
+cap also went from 600 to 1024 tokens for the newer tokenizer.
+
+**The prompts do most of the work.** The model choice matters less than what
+it's told. A few rules show up in every prompt:
+
+- *Friend at the kitchen table, not a form.* React to the specific thing the
+  person just said, match their emotional register (light if they're light,
+  gentle if they're tender), then ask one question. Never two.
+- *A banned-phrase list.* No "thank you for sharing," "what a special bond,"
+  "crossed the rainbow bridge," "forever in our hearts," "healing journey,"
+  "processing," "holding space." If a grief counselor or a sympathy card would
+  say it, the model can't.
+- *Never invent details.* No eye color, coat color, which door, which room,
+  or names of people unless the owner said them. Getting a detail wrong on a
+  memorial breaks trust in a way that's hard to get back.
+- *Quote the owner.* The tribute is built from their words and phrases where
+  possible. "She'd stare at me until I caved" beats "she was persistent."
+- *Pronoun-aware.* Every prompt gets he/she/they from the pet's gender field,
+  so a memorial never misgenders someone's dog.
+- *Guilt gets leaned into, not redirected.* If someone brings up a what-if
+  about timing or treatment mid-chat, the model names it, asks one follow-up,
+  offers a short reframing, and then guides back to a happy memory. That
+  exchange is summarized in a hidden `[SUPPORT_CONTEXT]` marker that flows
+  into tribute generation, so the final tribute can quietly honor the hard
+  part without dwelling on it.
+- *The standalone support page is different on purpose.* That prompt is told
+  *not* to reframe, find silver linings, or name emotions. Just reflect back
+  what happened in plain language, one or two sentences. Some people need to
+  say the thing out loud before anyone responds to it.
+- *The chat knows when to stop.* It emits `[READY_FOR_TRIBUTE]` only after it
+  has 4 or so substantive stories across *different* topics, and it's told to
+  move on after one follow-up so it doesn't ask three questions about walks.
+
+**Guardrails.** Crisis language is detected client-side with a small regex
+list, and it shows a non-blocking 988 Lifeline banner. Nothing is logged or
+sent anywhere. Every user string that lands in a prompt goes through a
+sanitizer that strips control characters, code fences, and HTML-ish tags, and
+every prompt ends with an instruction to ignore embedded overrides. Each AI
+route is rate-limited per user or IP (tribute 5/min, chat 10/min, support
+3/min, homepage 6/min, captions 20/min). Nothing anyone writes is used to
+train models.
+
+**What it deliberately isn't.** No fine-tuning, no retrieval, no agent loops,
+and no memory beyond the conversation in front of it (the homepage chat is
+handed to the tribute chat so nobody has to repeat themselves, but that's the
+extent of it). Five call sites and two models is the whole AI layer, and
+that's about right for a product that mostly needs to listen well.
 
 ## Where it could go
 
